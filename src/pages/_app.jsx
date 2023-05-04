@@ -1,47 +1,44 @@
 import '@/styles/tailwind.css';
-import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth';
-
-import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+} from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
-import { SessionProvider } from 'next-auth/react';
-import { WagmiConfig, configureChains, createClient } from 'wagmi';
-import { mainnet, optimism, polygon, polygonMumbai } from 'wagmi/chains';
-import { publicProvider } from "wagmi/providers/public";
+import { configureChains, createClient, WagmiConfig } from 'wagmi';
+import { mainnet, polygon, polygonMumbai, polygonZkEvm } from 'wagmi/chains';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { publicProvider } from 'wagmi/providers/public';
 
-
-
-export default function App({ Component, pageProps }) {
   const { chains, provider } = configureChains(
-    [mainnet, polygon, optimism, polygonMumbai],
-
-      [publicProvider()]
-    
+    [mainnet, polygon, polygonMumbai, polygonZkEvm],
+    [
+      alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
+      publicProvider()
+    ]
   );
+  
   const { connectors } = getDefaultWallets({
-    appName: 'DataHack',
+    appName: 'My RainbowKit App',
     projectId: 'YOUR_PROJECT_ID',
     chains
   });
   
-  
-  const client = createClient({
+  const wagmiClient = createClient({
     autoConnect: true,
     connectors,
-    provider,
+    provider
   })
-  
-  
+
+export default function App({ Component, pageProps }) {
 
   
+
+
   return (
-  <WagmiConfig client={client}>
-      <SessionProvider refetchInterval={0} session={pageProps.session}>
-        <RainbowKitSiweNextAuthProvider>
-          <RainbowKitProvider chains={chains} >
-            <Component {...pageProps} />
-          </RainbowKitProvider>
-        </RainbowKitSiweNextAuthProvider>
-      </SessionProvider>
-    </WagmiConfig>
+    <WagmiConfig client={wagmiClient}>
+    <RainbowKitProvider chains={chains}>
+      <Component {...pageProps} />
+    </RainbowKitProvider>
+  </WagmiConfig>
    )
 }

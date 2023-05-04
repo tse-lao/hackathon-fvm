@@ -8,6 +8,9 @@ function classNames(...classes) {
 }
 
 export default function Navigation() {
+
+  
+
   return (
     <Disclosure as="nav" className="bg-white shadow">
       {({ open }) => (
@@ -76,7 +79,12 @@ export default function Navigation() {
                 </button>
 
                 {/* Profile dropdown */}
-                <ConnectButton />
+                
+                <ConnectButton 
+                    accountStatus={"full"}
+                    chainStatus={"none"}
+                    showBalance={false}
+                />
               </div>
             </div>
           </div>
