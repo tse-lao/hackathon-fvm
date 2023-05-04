@@ -7,6 +7,9 @@ export default function CardTable({ address }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [files, setFiles] = useState([])
     const [totalFiles, setTotalFiles] = useState(0)
+    
+    const [openDetail, setOpenDetail]   = useState(false)
+    const [detail, setDetail]           = useState({})
 
 
     useEffect(() => {
@@ -42,7 +45,6 @@ export default function CardTable({ address }) {
     const openModal = () => {
         setIsModalOpen(!isModalOpen)
     }
-
     const closeModal = () => {
         setIsModalOpen(false)
     }

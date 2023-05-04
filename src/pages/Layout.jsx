@@ -37,7 +37,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Layout({children}) {
+export default function Layout({children, active}) {
   return (
     <>
       {/*
@@ -49,7 +49,7 @@ export default function Layout({children}) {
         ```
       */}
       <div className="min-h-full">
-      <Navigation />
+      <Navigation active={active}/>
         <main className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8 p-12 rounded-md">
           <div >{children}</div>
         </main>

@@ -3,10 +3,12 @@ import lighthouse from '@lighthouse-web3/sdk';
 import { ethers } from 'ethers';
 import { useState } from 'react';
 import ModalLayout from "./ModalLayout";
+import Toggle from './application/Toggle';
 
 
 export default function UploadModal({ onClose }) {
     const [files, setFiles] = useState([])
+    const [encryption, setEncryption] = useState(false)
 
     const encryptionSignature = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -27,6 +29,22 @@ export default function UploadModal({ onClose }) {
     };
 
     /* Deploy file along with encryption */
+    
+    const upload = async (e) => {
+        
+        if(encryption){
+            uploadFileEncrypted(e)
+        }
+        
+        uploadFile(e)
+    
+    }
+    
+    const uploadFile = async (e) => {
+        const output = await lighthouse.upload(files, "b9b0a58c.978d9c2b57f143c196ccb8aa762cd1a1", progressCallback);
+        console.log('File Status:', output);
+        setFiles(e.target.files)
+    }
     const uploadFileEncrypted = async (e) => {
         /*
            uploadEncrypted(e, accessToken, publicKey, signedMessage, uploadProgressCallback)
@@ -38,7 +56,7 @@ export default function UploadModal({ onClose }) {
         */
         const sig = await encryptionSignature();
         const response = await lighthouse.uploadEncrypted(
-            e,
+            files,
             "b9b0a58c.978d9c2b57f143c196ccb8aa762cd1a1",
             sig.publicKey,
             sig.signedMessage,
@@ -49,10 +67,15 @@ export default function UploadModal({ onClose }) {
         setFiles(e.target.files)
 
     }
+    
+    const changeStatus = (status) => {
+        setEncryption(status)
+    }
 
 
     return (
         <ModalLayout onClose={onClose}>
+            <Toggle  text="Encrypt file" status={encryption} changeStatus={changeStatus} />
             <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
                 <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                     <ul role="list" className="divide-y divide-gray-200 rounded-md border border-gray-200">
@@ -66,7 +89,7 @@ export default function UploadModal({ onClose }) {
                                         name="image"
                                         multiple
                                         accept="image/*"
-                                        onChange={e => uploadFileEncrypted(e)}
+                                        onChange={e => upload(e)}
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </span>

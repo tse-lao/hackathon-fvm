@@ -7,7 +7,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Navigation() {
+export default function Navigation({active}) {
 
   
 
@@ -44,16 +44,24 @@ export default function Navigation() {
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                   <a
-                    href="#"
-                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900"
+                    href="/"
+                    className={classNames(
+                        "Dashboard" == active
+                          ? 'inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                          : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                      )}
                   >
                     Dashboard
                   </a>
                   <a
-                    href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    href="/files"
+                    className={classNames(
+                        "Files" == active
+                          ? 'inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                          : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                      )}
                   >
-                    Access Control
+                    Files
                   </a>
                   <a
                     href="#"
@@ -62,8 +70,12 @@ export default function Navigation() {
                     API Connections
                   </a>
                   <a
-                    href="#"
-                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    href="/settings"
+                    className={classNames(
+                        "Settings" == active
+                          ? 'inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                          : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                      )}
                   >
                     Settings
                   </a>
@@ -84,6 +96,7 @@ export default function Navigation() {
                     accountStatus={"full"}
                     chainStatus={"none"}
                     showBalance={false}
+                    border="none"
                 />
               </div>
             </div>
