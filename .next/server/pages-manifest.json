@@ -2,6 +2,12 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/Layout": "pages/Layout.html",
+  "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
+  "/login": "pages/login.html",
+  "/register": "pages/register.html",
+  "/protected": "pages/protected.html",
+  "/siwe": "pages/siwe.js",
   "/": "pages/index.js",
-  "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js"
+  "/404": "pages/404.html"
 }
