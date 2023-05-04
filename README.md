@@ -1,35 +1,25 @@
-# Pocket
 
-Pocket is a [Tailwind UI](https://tailwindui.com) site template built using [Tailwind CSS](https://tailwindcss.com) and [Next.js](https://nextjs.org).
+4. Open your browser and visit `http://localhost:3000` to view the app.
 
-## Getting started
+## 🛠️ Built With
 
-To get started with this template, first install the npm dependencies:
+- [Next.js](https://nextjs.org/)
+- [React](https://reactjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Web3.js](https://web3js.readthedocs.io/en/v1.3.4/)
 
-```bash
-npm install
-```
+## 🙋‍♂️ Contributing
 
-Next, run the development server:
+We built this for the FVM Hackathon 2023 . 
 
-```bash
-npm run dev
-```
+WELCOME TO THE DATAVERSE
 
-Finally, open [http://localhost:3000](http://localhost:3000) in your browser to view the website.
+## 📄 License
 
-## Customizing
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-You can start editing this template by modifying the files in the `/src` folder. The site will auto-update as you edit these files.
+## 🤝 Acknowledgements
 
-## License
-
-This site template is a commercial product and is licensed under the [Tailwind UI license](https://tailwindui.com/license).
-
-## Learn more
-
-To learn more about the technologies used in this site template, see the following resources:
-
-- [Tailwind CSS](https://tailwindcss.com/docs) - the official Tailwind CSS documentation
-- [Next.js](https://nextjs.org/docs) - the official Next.js documentation
-- [Headless UI](https://headlessui.dev) - the official Headless UI documentation
+- [OpenZeppelin](https://openzeppelin.com/)
+- [IPFS](https://ipfs.io/)
+- All contributors and supporters
