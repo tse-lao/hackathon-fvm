@@ -1,11 +1,46 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { HeartIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Fragment, useState } from 'react'
+import lighthouse from '@lighthouse-web3/sdk'
+import { Fragment, useEffect, useState } from 'react'
+import FileDealStatus from './FileDealStatus'
 import FileDetailInformation from './FileDetailInformation'
 import FileSharedWith from './FileSharedWith'
 
 export default function FileDetail({file}) {
   const [open, setOpen] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [dealStatus, setDealStatus] = useState(null)
+  
+  
+  useEffect(() => {
+    setLoading(true);
+    
+    const getDealStatus = async () => {
+      if(file.status != "queued"){
+      const status = await lighthouse.dealStatus(file.cid)
+      console.log(status)
+      
+      setDealStatus(status.data)
+    }
+    
+    setDealStatus({status: "queued"})
+  }
+    
+    getDealStatus()
+  }, [file])
+  
+  const getCar = async () => {
+    
+    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_API_KEY;
+    const authToken = await lighthouse.dataDepotAuth(apiKey)
+    
+    console.log(authToken)
+  // Create CAR
+    const response = await lighthouse.createCar("https://gateway.lighthouse.storage/ipfs/"+file.cid, authToken.data.access_token)
+    
+    console.log(response)
+    
+  }
 
 
   return (
@@ -79,6 +114,7 @@ export default function FileDetail({file}) {
                         <h3 className="font-medium text-gray-900">Information</h3>
                           <FileDetailInformation detail={file} />
                       </div>
+                      <FileDealStatus dealStatus={dealStatus} />
                       <FileSharedWith cid={file.cid}/>
                       <div className="flex">
                         <button
@@ -88,10 +124,11 @@ export default function FileDetail({file}) {
                           Download
                         </button>
                         <button
+                        onClick={() => getCar()}
                           type="button"
                           className="ml-3 flex-1 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                         >
-                          Delete
+                          Get CAR
                         </button>
                       </div>
                     </div>

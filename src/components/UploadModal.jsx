@@ -41,7 +41,7 @@ export default function UploadModal({ onClose }) {
     }
     
     const uploadFile = async (e) => {
-        const output = await lighthouse.upload(files, "b9b0a58c.978d9c2b57f143c196ccb8aa762cd1a1", progressCallback);
+        const output = await lighthouse.upload(e, "b9b0a58c.978d9c2b57f143c196ccb8aa762cd1a1", progressCallback);
         console.log('File Status:', output);
         setFiles(e.target.files)
     }
@@ -56,7 +56,7 @@ export default function UploadModal({ onClose }) {
         */
         const sig = await encryptionSignature();
         const response = await lighthouse.uploadEncrypted(
-            files,
+            e,
             "b9b0a58c.978d9c2b57f143c196ccb8aa762cd1a1",
             sig.publicKey,
             sig.signedMessage,
@@ -88,7 +88,7 @@ export default function UploadModal({ onClose }) {
                                         id="image"
                                         name="image"
                                         multiple
-                                        accept="image/*"
+                                        accept="*"
                                         onChange={e => upload(e)}
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
