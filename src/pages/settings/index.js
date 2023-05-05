@@ -31,7 +31,7 @@ export default function Example() {
 
   return (
    
-    <SettingsLayout active="Profile">
+    <SettingsLayout active="Profile" title="Profile">
     <div className="divide-y divide-gray-200 lg:col-span-9" >
                 {/* Profile section */}
                 <div className="px-4 py-6 sm:p-6 lg:pb-8">

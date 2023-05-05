@@ -1,6 +1,5 @@
 import CreateOverlay from "@/components/application/overlay/CreateOverlay";
-import RequestElement from "@/components/application/request/RequestElement";
-import Head from "next/head";
+import ListRequest from "@/components/application/request/ListRequest";
 import { useState } from "react";
 import Layout from "../Layout";
 
@@ -44,14 +43,12 @@ export default function Request() {
     setOpenModal(e)
   }
   
+  //fetch the data. 
+  
   return (
-    <Layout>
+    <Layout active="Request">
       <div>
         <h1>Request</h1>
-        <Head>
-          <title>CF | Data Request</title>
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
 
           <main className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
             <div className="relative py-3 sm:max-w-xl sm:mx-auto">
@@ -74,9 +71,7 @@ export default function Request() {
                     </svg>
                   </button>
                   <div className="mt-12">
-                    {requests.map((request, index) => (
-                      <RequestElement index={index} request={request} />
-                    ))}
+                    <ListRequest />
                   </div>
                 </div>
               </div>

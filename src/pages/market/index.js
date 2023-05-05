@@ -4,7 +4,7 @@ import Layout from "../Layout";
 export default function Market() {
     return (
 
-        <Layout >
+        <Layout title="Market" active="Marketplace">
             <div className="container mx-auto px-4 py-8">
                 <Marketplace />
             </div>
