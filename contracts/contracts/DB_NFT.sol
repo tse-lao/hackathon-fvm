@@ -11,42 +11,27 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@tableland/evm/contracts/utils/SQLHelpers.sol";
 
 
-/*
-CryptoStudio is builded to provide a completly dynamic NFT experience
-Digital Artists can create their NFTs and think of unlimited ways to create
-dynamic NFT experiences by leveraging tableland SQL utilities inside SmartContracts
-*/
-
-/** @title CryptoStudio a dynamic NFT Collection. */
+/** @title DB_NFT a dynamic NFT Collection. */
 /// @author Nick Lionis (github handle : nijoe1 )
-/// @notice Use this contract for minting your NFTs inside the Crypto Studio application
-/// @dev A new Dynamic NFTContract that takes The benefits of pure SQL dynamic features
-/// Tableland offers mutable Data with immutable access control only by the SmartContract
-/// All the data inside the tables are pointing to an IPFS CID.
+/// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
+/// All the data inside the tables are pointing to an Tableland and IPFS CID.
 
 // contract FVM_Files is ERC1155, Ownable , ERC2981, AxelarExecutable 
 // contract FilesV2 is ERC1155, Ownable , AxelarExecutable 
-contract FilesV2 is ERC1155 , AxelarExecutable 
+contract DB_NFT is ERC1155 , AxelarExecutable {
 
 // contract FilesV2 is ERC1155 
-{
-    string private constant SUBNFT_TABLE_PREFIX = "sub_NFTs";
-    string private constant SUBNFT_SCHEMA = "rootID text, subNFTID text";
-    string private constant SUBMISSION_TABLE_PREFIX = "data_contribution";
-    string private constant SUBMISSION_SCHEMA = "tokenID text, metadataCID text, rows text, creator text";
-    string private constant ATTRIBUTE_TABLE_PREFIX = "file_attribute";
-    string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
-    string private constant MAIN_TABLE_PREFIX = "file_main";
-    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, DBname text, desc text, metadataCID text";
+    ITablelandTables private tablelandContract;
+    IAxelarGasService public immutable gasService;
+
     using EnumerableSet for EnumerableSet.UintSet;
     using EnumerableSet for EnumerableSet.AddressSet;
-    ITablelandTables private tablelandContract;
-
     using Counters for Counters.Counter;
+
     string private value;
     string private sourceChain;
     string private sourceAddress;
-    IAxelarGasService public immutable gasService;
+    string  private _baseURIString;
 
     struct tokenInfo{
         address creator;
@@ -57,31 +42,35 @@ contract FilesV2 is ERC1155 , AxelarExecutable
         string category;
         bool mintable;
     }
-    
 
     Counters.Counter private tokenID;
     mapping(uint256 => tokenInfo) public tokenInfoMap;
     mapping(uint256 => mapping (address => uint256))  private submissionsNumberByID;
     mapping(uint256=> EnumerableSet.AddressSet) private allowedAddresses;
-  
-    string  private _baseURIString;
 
     string  private mainTable;
     uint256 private mainTableID;
+    string private constant MAIN_TABLE_PREFIX = "file_main";
+    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, DBname text, description text, metadataCID text";
 
     string  private attributeTable;
     uint256 private attributeTableID;
+    string private constant ATTRIBUTE_TABLE_PREFIX = "file_attribute";
+    string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
 
     string  private submission_table;
     uint256 private submission_tableID;
+    string private constant SUBMISSION_TABLE_PREFIX = "data_contribution";
+    string private constant SUBMISSION_SCHEMA = "tokenID text, metadataCID text, rows text, creator text";
 
     string  private subNFT_table;
     uint256 private subNFT_tableID;
+    string private constant SUBNFT_TABLE_PREFIX = "sub_NFTs";
+    string private constant SUBNFT_SCHEMA = "rootID text, subNFTID text";
 
-    string[] public createStatements;
     uint256[] public tokenIDs;
     address public owner;
-
+    string[] public createStatements;
     constructor(address gateway_, address gasReceiver_) ERC1155("") AxelarExecutable(gateway_) {
     // constructor() ERC1155("") {     
         owner = msg.sender;
@@ -90,7 +79,7 @@ contract FilesV2 is ERC1155 , AxelarExecutable
 
         tablelandContract = TablelandDeployments.get();
 
-        createStatements.push(SQLHelpers.toNameFromId(SUBMISSION_TABLE_PREFIX, submission_tableID));
+        createStatements.push(SQLHelpers.toCreateFromSchema(SUBMISSION_SCHEMA, SUBMISSION_TABLE_PREFIX));
         createStatements.push(SQLHelpers.toCreateFromSchema(MAIN_SCHEMA, MAIN_TABLE_PREFIX));
         createStatements.push(SQLHelpers.toCreateFromSchema(ATTRIBUTE_SCHEMA, ATTRIBUTE_TABLE_PREFIX));
         createStatements.push(SQLHelpers.toCreateFromSchema(SUBNFT_SCHEMA, SUBNFT_TABLE_PREFIX));
@@ -109,10 +98,6 @@ contract FilesV2 is ERC1155 , AxelarExecutable
     /// @notice Minting function 
     /// @dev retrieves the values for the NFT that is going to be Minted.
     /// the caller must mint an NFT on top of his pre taken category otherwise he cannot mint
-    // string private constant MAIN_SCHEMA = "tokenID text, description text, image text, name text, files text, maxSupply text, currentSupply text, mintPrice text";
-// tokenID text, dataFormatCID text, DBname text, desc text, metadataCID
-
-// , uint256 mintPrice, uint256 maxSupply add them later
     function RequestDB(string memory dataFormatCID , string memory DBname , string memory description , string memory category, address[] memory allowed, uint256 requiredRows, string memory metadataCID) public {
         tokenID.increment();
         uint256 ID = tokenID.current();
@@ -126,15 +111,12 @@ contract FilesV2 is ERC1155 , AxelarExecutable
         insertMain(ID,dataFormatCID,DBname,description,category,msg.sender,metadataCID);
     }
 
-
-    function insertMain(uint256 ID, string memory dataFormatCID, string memory DBname, string memory description, string memory category, address sender, string memory metadataCID) internal{
-        string memory insert_statement =  insertMainStatement(ID,dataFormatCID,DBname,description,metadataCID);
-        string memory insert_statement2 = insertAttributeStatement(ID ,"category", category);
-        string memory insert_statement3 = insertAttributeStatement(ID ,"creator", Strings.toHexString(sender));   
-        mutate(tokenIDs[1],insert_statement);
-        mutate(tokenIDs[2],insert_statement2);
-        mutate(tokenIDs[2],insert_statement3);
+    function insertMain(uint256 ID, string memory dataFormatCID, string memory DBname, string memory description, string memory category, address sender, string memory metadataCID) private{ 
+        mutate(tokenIDs[1],insertMainStatement(ID,dataFormatCID,DBname,description,metadataCID));
+        mutate(tokenIDs[2],insertAttributeStatement(ID ,"category", category));
+        mutate(tokenIDs[2],insertAttributeStatement(ID ,"creator", Strings.toHexString(sender)));
     }
+
     function mutate(
         uint256 tableId,
         string memory statement
@@ -156,8 +138,7 @@ contract FilesV2 is ERC1155 , AxelarExecutable
         else{
             tokenInfoMap[tokenId].remainingRows = 0;
         }
-        string memory insert_statement =  insertSubmissionStatement(tokenId ,metadataCID,rows,msg.sender);
-        mutate(tokenIDs[1],insert_statement);
+        mutate(tokenIDs[1],insertSubmissionStatement(tokenId ,metadataCID,rows,msg.sender));
     }
 
     function createDB_NFT(uint256 tokenId, string memory metadataCID , uint256 mintPrice, address royaltiesAddress) public {
@@ -166,8 +147,7 @@ contract FilesV2 is ERC1155 , AxelarExecutable
         tokenInfoMap[tokenId].splitterContract = royaltiesAddress;
         string memory set = string.concat("metadataCID='",metadataCID,"'");
         string memory filter = string.concat("tokenID=",Strings.toString(tokenId));
-        string memory Update_statement = SQLHelpers.toUpdate(MAIN_TABLE_PREFIX,tokenIDs[1], set, filter);
-        mutate(tokenIDs[1],Update_statement);
+        mutate(tokenIDs[1],SQLHelpers.toUpdate(MAIN_TABLE_PREFIX,tokenIDs[1], set, filter));
     }
 
     // Handles calls created by setAndSend. Updates this contract's value
@@ -184,8 +164,7 @@ contract FilesV2 is ERC1155 , AxelarExecutable
             uint256 tokenId = tokenID.current();
             tokenInfoMap[tokenId].price = mintPrice;
             insertMain(tokenId,dataFormatCID,DBname,description,category,sender,metadataCID);
-            string memory insert_statement4 = subNFTInsertion(Strings.toString(subNFTOF), Strings.toString(ID));
-            mutate(tokenIDs[3],insert_statement4);
+            mutate(tokenIDs[3],subNFTInsertion(Strings.toString(subNFTOF), Strings.toString(ID)));
     }
 
     // Call this function to update the value of this contract along with all its siblings'.
@@ -281,7 +260,7 @@ contract FilesV2 is ERC1155 , AxelarExecutable
     SQLHelpers.toInsert(
             MAIN_TABLE_PREFIX,
             mainTableID,
-            "tokenID, dataFormatCID, DBname, desc, metadataCID",
+            "tokenID, dataFormatCID, DBname, description, metadataCID",
             string.concat(
                 SQLHelpers.quote(Strings.toString(tokenid)),
                 ",",
@@ -301,7 +280,7 @@ contract FilesV2 is ERC1155 , AxelarExecutable
     SQLHelpers.toInsert(
             SUBMISSION_TABLE_PREFIX,
             submission_tableID,
-            "tokenID, metadataCID , rows, creator",
+            "tokenID, metadataCID, rows, creator",
             string.concat(
                 SQLHelpers.quote(Strings.toString(tokenid)),
                 ",",
