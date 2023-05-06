@@ -21,12 +21,16 @@
         "@nomiclabs/hardhat-ethers": "^2.0.3",
         "@nomiclabs/hardhat-etherscan": "^3.1.0",
         "@openzeppelin/hardhat-upgrades": "^1.12.0",
+        "@tableland/hardhat": "^0.0.4",
+        "@tableland/local": "^1.2.2",
         "ethers": "^5.5.2",
-        "hardhat": "^2.12.3"
+        "hardhat": "^2.14.0"
     },
     "dependencies": {
         "@openzeppelin/contracts": "^4.8.0",
         "@openzeppelin/contracts-upgradeable": "^4.4.1",
-        "@tableland/evm": "^2.0.2"
+        "@tableland/evm": "^2.0.4",
+        "chai": "^4.3.7",
+        "node": "^20.1.0"
     }
 }

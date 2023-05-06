@@ -1,18 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
-// import { AxelarExecutable } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
-// import { IAxelarGateway } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol";
-// import { IAxelarGasService } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
-// import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "@tableland/evm/contracts/ITablelandTables.sol";
-// import "@tableland/evm/contracts/ITablelandController.sol";
+import { AxelarExecutable } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
+import { IAxelarGateway } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol";
+import { IAxelarGasService } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
+import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-// import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-// import "@openzeppelin/contracts/access/Ownable.sol";
-import "./utils/SQLHelpers.sol";
+import "@tableland/evm/contracts/utils/SQLHelpers.sol";
 
 
 /*
@@ -30,10 +26,9 @@ dynamic NFT experiences by leveraging tableland SQL utilities inside SmartContra
 
 // contract FVM_Files is ERC1155, Ownable , ERC2981, AxelarExecutable 
 // contract FilesV2 is ERC1155, Ownable , AxelarExecutable 
-// contract FilesV2 is ERC1155 , AxelarExecutable 
+contract FilesV2 is ERC1155 , AxelarExecutable 
 
-contract FVM_Files is ERC1155 
-
+// contract FilesV2 is ERC1155 
 {
     string private constant SUBNFT_TABLE_PREFIX = "sub_NFTs";
     string private constant SUBNFT_SCHEMA = "rootID text, subNFTID text";
@@ -45,11 +40,13 @@ contract FVM_Files is ERC1155
     string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, DBname text, desc text, metadataCID text";
     using EnumerableSet for EnumerableSet.UintSet;
     using EnumerableSet for EnumerableSet.AddressSet;
+    ITablelandTables private tablelandContract;
+
     using Counters for Counters.Counter;
     string private value;
     string private sourceChain;
     string private sourceAddress;
-    // IAxelarGasService public immutable gasService;
+    IAxelarGasService public immutable gasService;
 
     struct tokenInfo{
         address creator;
@@ -67,8 +64,6 @@ contract FVM_Files is ERC1155
     mapping(uint256 => mapping (address => uint256))  private submissionsNumberByID;
     mapping(uint256=> EnumerableSet.AddressSet) private allowedAddresses;
   
-    ITablelandTables private tablelandContract;
-
     string  private _baseURIString;
 
     string  private mainTable;
@@ -83,49 +78,32 @@ contract FVM_Files is ERC1155
     string  private subNFT_table;
     uint256 private subNFT_tableID;
 
+    string[] public createStatements;
+    uint256[] public tokenIDs;
     address public owner;
 
-    // constructor(address gateway_, address gasReceiver_) ERC1155("") AxelarExecutable(gateway_) {
-    constructor() ERC1155("") {     
+    constructor(address gateway_, address gasReceiver_) ERC1155("") AxelarExecutable(gateway_) {
+    // constructor() ERC1155("") {     
         owner = msg.sender;
-        // gasService = IAxelarGasService(gasReceiver_);
+        gasService = IAxelarGasService(gasReceiver_);
         _baseURIString = "https://testnets.tableland.network/api/v1/query?statement=";
-        // MUMBAI
-        // tablelandContract = ITablelandTables(0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68);
-        // HYPERSPACE
-        tablelandContract = ITablelandTables(0x0B9737ab4B3e5303CB67dB031b509697e31c02d3);
 
-        // Create  tables.
+        tablelandContract = TablelandDeployments.get();
 
-        submission_tableID = tablelandContract.createTable(
+        createStatements.push(SQLHelpers.toNameFromId(SUBMISSION_TABLE_PREFIX, submission_tableID));
+        createStatements.push(SQLHelpers.toCreateFromSchema(MAIN_SCHEMA, MAIN_TABLE_PREFIX));
+        createStatements.push(SQLHelpers.toCreateFromSchema(ATTRIBUTE_SCHEMA, ATTRIBUTE_TABLE_PREFIX));
+        createStatements.push(SQLHelpers.toCreateFromSchema(SUBNFT_SCHEMA, SUBNFT_TABLE_PREFIX));
+
+        tokenIDs = tablelandContract.create(
             address(this),
-            SQLHelpers.toCreateFromSchema(SUBMISSION_SCHEMA, SUBMISSION_TABLE_PREFIX)
+            createStatements
         );
 
-        submission_table = SQLHelpers.toNameFromId(SUBMISSION_TABLE_PREFIX, submission_tableID);
-
-                // Create crypto Studio main nft table.
-        mainTableID = tablelandContract.createTable(
-            address(this),
-            SQLHelpers.toCreateFromSchema(MAIN_SCHEMA, MAIN_TABLE_PREFIX)
-        );
-
-        mainTable = SQLHelpers.toNameFromId(MAIN_TABLE_PREFIX, mainTableID);
-        // Create crypto Studio attribute nft table.
-        attributeTableID = tablelandContract.createTable(
-            address(this),
-            SQLHelpers.toCreateFromSchema(ATTRIBUTE_SCHEMA, ATTRIBUTE_TABLE_PREFIX)
-        );
-
-        attributeTable = SQLHelpers.toNameFromId(ATTRIBUTE_TABLE_PREFIX, attributeTableID);
-
-        // Create crypto Studio social space table.
-        subNFT_tableID = tablelandContract.createTable(
-            address(this),
-            SQLHelpers.toCreateFromSchema(SUBNFT_SCHEMA, SUBNFT_TABLE_PREFIX)
-        );
-
-        subNFT_table = SQLHelpers.toNameFromId(SUBNFT_TABLE_PREFIX, subNFT_tableID);
+        submission_table = SQLHelpers.toNameFromId(SUBMISSION_TABLE_PREFIX, tokenIDs[0]);
+        mainTable = SQLHelpers.toNameFromId(MAIN_TABLE_PREFIX, tokenIDs[1]);
+        attributeTable = SQLHelpers.toNameFromId(ATTRIBUTE_TABLE_PREFIX, tokenIDs[2]);
+        subNFT_table = SQLHelpers.toNameFromId(SUBNFT_TABLE_PREFIX, tokenIDs[3]);
     }
 
     /// @notice Minting function 
@@ -150,12 +128,23 @@ contract FVM_Files is ERC1155
 
 
     function insertMain(uint256 ID, string memory dataFormatCID, string memory DBname, string memory description, string memory category, address sender, string memory metadataCID) internal{
-        string memory insert_statement =  SQLHelpers.insertMainStatement(MAIN_TABLE_PREFIX,mainTableID,ID,dataFormatCID,DBname,description,metadataCID);
-        string memory insert_statement2 = SQLHelpers.insertAttributeStatement(ATTRIBUTE_TABLE_PREFIX,attributeTableID,ID ,"category", category);
-        string memory insert_statement3 = SQLHelpers.insertAttributeStatement(ATTRIBUTE_TABLE_PREFIX,attributeTableID,ID ,"creator", Strings.toHexString(sender));   
-        runSQL(mainTableID,insert_statement);
-        runSQL(attributeTableID,insert_statement2);
-        runSQL(attributeTableID,insert_statement3);
+        string memory insert_statement =  insertMainStatement(ID,dataFormatCID,DBname,description,metadataCID);
+        string memory insert_statement2 = insertAttributeStatement(ID ,"category", category);
+        string memory insert_statement3 = insertAttributeStatement(ID ,"creator", Strings.toHexString(sender));   
+        mutate(tokenIDs[1],insert_statement);
+        mutate(tokenIDs[2],insert_statement2);
+        mutate(tokenIDs[2],insert_statement3);
+    }
+    function mutate(
+        uint256 tableId,
+        string memory statement
+    ) internal {
+        tablelandContract.mutate(
+            address(this),
+            tableId,
+            statement
+        );
+        
     }
 
     function submitData(uint256 tokenId, string memory metadataCID, uint256 rows) public{
@@ -167,8 +156,8 @@ contract FVM_Files is ERC1155
         else{
             tokenInfoMap[tokenId].remainingRows = 0;
         }
-        string memory insert_statement =  SQLHelpers.insertSubmissionStatement(SUBMISSION_TABLE_PREFIX,submission_tableID,tokenId ,metadataCID,rows,msg.sender);
-        runSQL(mainTableID,insert_statement);
+        string memory insert_statement =  insertSubmissionStatement(tokenId ,metadataCID,rows,msg.sender);
+        mutate(tokenIDs[1],insert_statement);
     }
 
     function createDB_NFT(uint256 tokenId, string memory metadataCID , uint256 mintPrice, address royaltiesAddress) public {
@@ -177,50 +166,49 @@ contract FVM_Files is ERC1155
         tokenInfoMap[tokenId].splitterContract = royaltiesAddress;
         string memory set = string.concat("metadataCID='",metadataCID,"'");
         string memory filter = string.concat("tokenID=",Strings.toString(tokenId));
-        string memory Update_statement = SQLHelpers.toUpdate(MAIN_TABLE_PREFIX,mainTableID, set, filter);
-        runSQL(mainTableID,Update_statement);
+        string memory Update_statement = SQLHelpers.toUpdate(MAIN_TABLE_PREFIX,tokenIDs[1], set, filter);
+        mutate(tokenIDs[1],Update_statement);
     }
 
-    // // Handles calls created by setAndSend. Updates this contract's value
-    // function _execute(
-    //     // string calldata sourceChain_,
-    //     // string calldata sourceAddress_,
-    //     bytes calldata payload_
-    // ) internal {
-    // // ) internal override {
+    // Handles calls created by setAndSend. Updates this contract's value
+    function _execute(
+        // string calldata sourceChain_,
+        // string calldata sourceAddress_,
+        bytes calldata payload_
+    ) internal {
+    // ) internal override {
 
-    //     (uint256 ID,string memory DBname, string memory dataFormatCID , string memory metadataCID , string memory description ,string memory category, uint256 mintPrice, uint256 subNFTOF, address sender) = abi.decode(payload_, (uint256,string,string,string ,string,string,uint256,uint256, address));
-    //     // CreateFileNFT(name, imageCID, fileCID, description, category, mintPrice, maxSupply, subNFTOF);
-    //     require(balanceOf(sender, subNFTOF) > 0 || tokenInfoMap[subNFTOF].creator == sender || sender == address(this));
-    //         tokenID.increment();
-    //         uint256 tokenId = tokenID.current();
-    //         tokenInfoMap[tokenId].price = mintPrice;
-    //         insertMain(tokenId,dataFormatCID,DBname,description,category,sender,metadataCID);
-    //         string memory insert_statement4 = SQLHelpers.subNFTInsertion(SUBNFT_TABLE_PREFIX,subNFT_tableID, Strings.toString(subNFTOF), Strings.toString(ID));
-    //         runSQL(subNFT_tableID,insert_statement4);
-    // }
+        (uint256 ID,string memory DBname, string memory dataFormatCID , string memory metadataCID , string memory description ,string memory category, uint256 mintPrice, uint256 subNFTOF, address sender) = abi.decode(payload_, (uint256,string,string,string ,string,string,uint256,uint256, address));
+        require(balanceOf(sender, subNFTOF) > 0 || tokenInfoMap[subNFTOF].creator == sender || sender == address(this));
+            tokenID.increment();
+            uint256 tokenId = tokenID.current();
+            tokenInfoMap[tokenId].price = mintPrice;
+            insertMain(tokenId,dataFormatCID,DBname,description,category,sender,metadataCID);
+            string memory insert_statement4 = subNFTInsertion(Strings.toString(subNFTOF), Strings.toString(ID));
+            mutate(tokenIDs[3],insert_statement4);
+    }
 
-    //     // Call this function to update the value of this contract along with all its siblings'.
-    // function setRemoteValue(
-    //     string calldata destinationChain,
-    //     string calldata destinationAddress,
-    //     uint256 tokenId
-    // ) external payable {
-    //     bytes memory payload = abi.encode(tokenId, msg.sender);
-    //     if (msg.value > 0) {
-    //         gasService.payNativeGasForContractCall{ value: msg.value }(
-    //             address(this),
-    //             destinationChain,
-    //             destinationAddress,
-    //             payload,
-    //             msg.sender
-    //         );
-    //     }
-    //     gateway.callContract(destinationChain, destinationAddress, payload);
-    // }
+    // Call this function to update the value of this contract along with all its siblings'.
+    function setRemoteValue(
+        string calldata destinationChain,
+        string calldata destinationAddress,
+        uint256 tokenId
+    ) external payable {
+        bytes memory payload = abi.encode(tokenId, msg.sender);
+        if (msg.value > 0) {
+            gasService.payNativeGasForContractCall{ value: msg.value }(
+                address(this),
+                destinationChain,
+                destinationAddress,
+                payload,
+                msg.sender
+            );
+        }
+        gateway.callContract(destinationChain, destinationAddress, payload);
+    }
 
 
-    function Mint(uint256 tokenid) public payable {
+    function mint(uint256 tokenid) public payable {
         require(_exists(tokenid) && tokenInfoMap[tokenid].price <= msg.value);
         require(tokenInfoMap[tokenid].mintable);
         require(balanceOf(msg.sender,tokenid) < 1);
@@ -231,17 +219,6 @@ contract FVM_Files is ERC1155
 
     function _exists(uint256 tokenId) internal view returns(bool){
         return tokenId <= tokenID.current();
-    }
-
-    // Function to make Insertions , Updates and Deletions to our Tableland Tables 
-    /// @notice Function to make Insertions , Updates and Deletions to our Tableland Tables 
-    /// @dev retrieves the value of the tableID and the statement to execute on the table 
-    function runSQL(uint256 tableID, string memory statement) private{
-         tablelandContract.runSQL(
-            address(this),
-            tableID,
-            statement        
-        );
     }
 
     /// @notice Setting the tableland gateway prefix 
@@ -298,5 +275,70 @@ contract FVM_Files is ERC1155
         onlyOwner(msg.sender);
         address payable to = payable(msg.sender);
         to.transfer(address(this).balance);
+    }
+    function insertMainStatement(uint256 tokenid ,string memory dataFormatCID, string memory DBname,string memory description,string memory metadataCID) internal view returns(string memory){
+    return
+    SQLHelpers.toInsert(
+            MAIN_TABLE_PREFIX,
+            mainTableID,
+            "tokenID, dataFormatCID, DBname, desc, metadataCID",
+            string.concat(
+                SQLHelpers.quote(Strings.toString(tokenid)),
+                ",",
+                SQLHelpers.quote(dataFormatCID),
+                ",",
+                SQLHelpers.quote(DBname),
+                ",",
+                SQLHelpers.quote(description),
+                ",",
+                SQLHelpers.quote(metadataCID)
+            )
+    );
+    }
+
+    function insertSubmissionStatement(uint256 tokenid ,string memory metadataCID, uint256 rows,address creator) internal view returns(string memory){
+    return
+    SQLHelpers.toInsert(
+            SUBMISSION_TABLE_PREFIX,
+            submission_tableID,
+            "tokenID, metadataCID , rows, creator",
+            string.concat(
+                SQLHelpers.quote(Strings.toString(tokenid)),
+                ",",
+                SQLHelpers.quote(metadataCID),
+                ",",
+                SQLHelpers.quote(Strings.toString(rows)),
+                ",",
+                SQLHelpers.quote(Strings.toHexString(creator))
+            )
+    );
+    }
+
+    function insertAttributeStatement(uint256 tokenid ,string memory trait_type, string memory value1) internal view returns(string memory){
+        return  SQLHelpers.toInsert(
+                ATTRIBUTE_TABLE_PREFIX,
+                attributeTableID,
+                "tokenID, trait_type, value",
+                string.concat(
+                    SQLHelpers.quote((Strings.toString(tokenid))),
+                    ",",
+                    SQLHelpers.quote(trait_type),
+                    ",",
+                    SQLHelpers.quote(value1)
+                )
+            );
+    }
+
+    function subNFTInsertion(string memory rootID, string memory subNFTID) internal view returns(string memory){
+        return SQLHelpers.toInsert(
+            SUBNFT_TABLE_PREFIX,
+            subNFT_tableID,
+            "rootID, subNFTID",
+            string.concat(
+                SQLHelpers.quote(rootID),
+                ",",
+                SQLHelpers.quote(subNFTID)
+            )
+        );
     }
 }
