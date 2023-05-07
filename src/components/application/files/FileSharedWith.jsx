@@ -1,11 +1,36 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
 import lighthouse from "@lighthouse-web3/sdk";
+import { useDocument } from "@polybase/react";
 import { ethers } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 
 export default function FileSharedWith({ cid }) {
 
     const [publicShareKey, setPublicShareKey] = useState("")
+    const [errorMessage, setSetErrorMessages] = useState("")
+    const {address} = useAccount();
+
+
+    const [accessControl, setAccessControl] = useState({
+        conditions: [],
+        conditionsSolana: [],
+        sharedTo: [],
+        owner: '0xae0c1e25dc9dbb782f67757a236e5335d7670407',
+        cid: 'QmQ4RtiVh43E1QUKq2aNcSAzLv5WELxwdnncj3Mjp4PCUk'
+    })
+
+    const { data, loading, error } = useDocument()
+
+    useEffect(() => {
+
+        const getAccessConditions = async () => {
+            const response = await lighthouse.getAccessConditions(cid);
+            setAccessControl(response.data);
+        };
+
+        getAccessConditions();
+    }, [cid])
 
     const signAuthMessage = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -20,7 +45,6 @@ export default function FileSharedWith({ cid }) {
 
 
     const sharePrivateFile = async () => {
-
         // Then get auth message and sign
         // Note: the owner of the file should sign the message.
         const { publicKey, signedMessage } = await signAuthMessage();
@@ -28,51 +52,126 @@ export default function FileSharedWith({ cid }) {
         //neeed to collect public key o a user. 
         const publicKeyUserB = [publicShareKey];
 
-        const res = await lighthouse.shareFile(
+        try {
+            await lighthouse.shareFile(
+                publicKey,
+                publicKeyUserB,
+                cid,
+                signedMessage
+            );
+        } catch (e) {
+            setErrorMessage(e)
+        }
+
+
+        /*  const newId = uuidv4();
+         const createSharing = await polybase
+         .collection("FileShare")
+         .create([
+             newId, publicShareKey, 
+         ]); */
+
+        //console.log(createSharing);
+
+    }
+
+
+    const applyAccessConditions = async (e) => {
+
+        const contractAddress = "0x019e5A2Eb07C677E0173CA789d1b8ed4384e59A5"
+        const minCount = 5;
+
+        // Conditions to add
+        const conditions = [
+            {
+                id: 1,
+                chain: "Mumbai",
+                method: "getOwner",
+                standardContractType: "Custom",
+                contractAddress: contractAddress,
+                returnValueTest: {
+                    comparator: "==",
+                    value: address
+                },
+                parameters: [],
+                inputArrayType: [],
+                outputType: "address"
+            },
+            {
+                id: 2,
+                chain: "Mumbai",
+                method: "totalCount",
+                standardContractType: "Custom",
+                contractAddress: contractAddress,
+                returnValueTest: {
+                comparator: ">=",
+                value: minCount
+                },
+                parameters: [],
+                inputArrayType: [],
+                outputType: "uint256"
+            }
+        ];
+        
+
+
+        // Aggregator is what kind of operation to apply to access conditions
+        // Suppose there are two conditions then you can apply ([1] and [2]), ([1] or [2]), !([1] and [2]).
+        const aggregator = "([2] and [3])";
+        const { publicKey, signedMessage } = await signAuthMessage();
+
+        /*
+          accessCondition(publicKey, cid, signedMessage, conditions, aggregator)
+            Parameters:
+              publicKey: owners public key
+              CID: CID of the file to decrypt
+              signedMessage: message signed by the owner of publicKey
+              conditions: should be in a format like above
+              aggregator: aggregator to apply conditions
+        */
+        const response = await lighthouse.applyAccessCondition(
             publicKey,
-            publicKeyUserB,
             cid,
-            signedMessage
+            signedMessage,
+            conditions,
+            aggregator
         );
 
-        console.log(res)
+        console.log(response);
+        /*
+          {
+            data: {
+              cid: "QmZkEMF5y5Pq3n291fG45oyrmX8bwRh319MYvj7V4W4tNh",
+              status: "Success"
+            }
+          }
+        */
     }
+
+
     return (
         <div>
             <h3 className="font-medium text-gray-900">Shared with</h3>
             <ul role="list" className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                <li className="flex items-center justify-between py-3">
-                    <div className="flex items-center">
-                        <img
-                            src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=1024&h=1024&q=80"
-                            alt=""
-                            className="h-8 w-8 rounded-full"
-                        />
-                        <p className="ml-4 text-sm font-medium text-gray-900">0xdb1B6961d1F9d1A17C02f23BD186b3bC4f3e7E2A</p>
-                    </div>
-                    <button
-                        type="button"
-                        className="ml-6 rounded-md bg-white text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Remove <span className="sr-only">0xdb1B6961d1F9d1A17C02f23BD186b3bC4f3e7E2A</span>
-                    </button>
-                </li>
-                <li className="flex items-center justify-between py-3">
-                    <div className="flex items-center">
-                        <img
-                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixqx=oilqXxSqey&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                            alt=""
-                            className="h-8 w-8 rounded-full"
-                        />
-                        <p className="ml-4 text-sm font-medium text-gray-900">0xdb1B6961d1F9d1A17C02f23BD186b3bC4f3e7E2A</p>
-                    </div>
-                    <button
-                        type="button"
-                        className="ml-6 rounded-md bg-white text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Remove <span className="sr-only"> 0xdb1B6961d1F9d1A17C02f23BD186b3bC4f3e7E2A</span>
-                    </button>
-                </li>
+                {accessControl.sharedTo.map((person) => (
+                    <li className="flex items-center justify-between py-3" key={person}>
+                        <div className="flex items-center">
+                            <img
+                                src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=1024&h=1024&q=80"
+                                alt=""
+                                className="h-8 w-8 rounded-full"
+                            />
+                            <p className="ml-4 text-sm font-medium text-gray-900 truncate">{person} </p>
+                        </div>
+                        <button
+                            type="button"
+                            className="ml-6 rounded-md bg-white text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            Remove <span className="sr-only truncate">{person}</span>
+                        </button>
+                    </li>
+                ))}
+
                 <li className="flex items-center justify-between py-2">
                     <input type="text"
                         onChange={e => setPublicShareKey(e.target.value)}
@@ -92,6 +191,18 @@ export default function FileSharedWith({ cid }) {
                         </span>
                     </button>
                 </li>
+            </ul>
+
+            <ul role="list" className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                {accessControl.conditions.map((condition) => (
+                    <li className="flex items-center justify-between py-3" key={condition.id}>
+                        <div className="flex items-center">
+                            {condition.chain} {condition.method} {condition.value}
+                        </div>
+                    </li>
+                ))}
+                
+                <button name="Apply Conditions" onClick={applyAccessConditions}>Apply Conditions</button>
             </ul>
         </div>
     )

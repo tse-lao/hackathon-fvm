@@ -12,7 +12,7 @@ const subNavigation = [
   { name: 'Profile', href: '/settings', icon: UserCircleIcon, current: true },
   { name: 'Files', href: '/settings/files', icon: CogIcon, current: false },
   { name: 'Notifications', href: 'notications', icon: BellIcon, current: false },
-  { name: 'Integrations', href: '#', icon: SquaresPlusIcon, current: false },
+  { name: 'Integrations', href: '/settings/integrations', icon: SquaresPlusIcon, current: false },
 ]
 
 
@@ -58,8 +58,11 @@ export default function SettingsLayout({children, active}) {
                   ))}
                 </nav>
               </aside>
+                          
 
-             {children}
+                {children}
+
+
             </div>
           </div>
         </div>

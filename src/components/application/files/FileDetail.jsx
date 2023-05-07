@@ -117,12 +117,13 @@ export default function FileDetail({file}) {
                       <FileDealStatus dealStatus={dealStatus} />
                       <FileSharedWith cid={file.cid}/>
                       <div className="flex">
-                        <button
+                        <a
+                          href={`files/${file.cid}`}
                           type="button"
                           className="flex-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >
                           Download
-                        </button>
+                        </a>
                         <button
                         onClick={() => getCar()}
                           type="button"

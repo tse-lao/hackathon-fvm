@@ -1,7 +1,9 @@
+import { getLighthouse } from '@/lib/createLighthouseApi';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
 import lighthouse from '@lighthouse-web3/sdk';
 import { ethers } from 'ethers';
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
 import ModalLayout from "./ModalLayout";
 import Toggle from './application/Toggle';
 
@@ -9,11 +11,14 @@ import Toggle from './application/Toggle';
 export default function UploadModal({ onClose }) {
     const [files, setFiles] = useState([])
     const [encryption, setEncryption] = useState(false)
+    const { address } = useAccount();
+
 
     const encryptionSignature = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const address = await signer.getAddress();
+        console.log(address);
         const messageRequested = (await lighthouse.getAuthMessage(address)).data.message;
         const signedMessage = await signer.signMessage(messageRequested);
         return ({
@@ -29,19 +34,22 @@ export default function UploadModal({ onClose }) {
     };
 
     /* Deploy file along with encryption */
-    
+
     const upload = async (e) => {
-        
-        if(encryption){
+
+        if (encryption) {
             uploadFileEncrypted(e)
+        }else{
+            uploadFile(e)
         }
-        
-        uploadFile(e)
-    
+
+
     }
-    
+
     const uploadFile = async (e) => {
-        const output = await lighthouse.upload(e, "b9b0a58c.978d9c2b57f143c196ccb8aa762cd1a1", progressCallback);
+
+        let api = await getLighthouse(address);
+        const output = await lighthouse.upload(e, api, progressCallback);
         console.log('File Status:', output);
         setFiles(e.target.files)
     }
@@ -53,21 +61,25 @@ export default function UploadModal({ onClose }) {
            - publicKey: wallets public key
            - signedMessage: message signed by the owner of publicKey
            - uploadProgressCallback: function to get progress (optional)
+                
+
         */
-        const sig = await encryptionSignature();
-        const response = await lighthouse.uploadEncrypted(
+           let api = await getLighthouse(address);
+           console.log(api);
+            const sig = await encryptionSignature();
+            const response = await lighthouse.uploadEncrypted(
             e,
-            "b9b0a58c.978d9c2b57f143c196ccb8aa762cd1a1",
+            api,
             sig.publicKey,
             sig.signedMessage,
             progressCallback
         );
         console.log(response);
-        
+
         setFiles(e.target.files)
 
     }
-    
+
     const changeStatus = (status) => {
         setEncryption(status)
     }
@@ -75,7 +87,7 @@ export default function UploadModal({ onClose }) {
 
     return (
         <ModalLayout onClose={onClose}>
-            <Toggle  text="Encrypt file" status={encryption} changeStatus={changeStatus} />
+            <Toggle text="Encrypt file" status={encryption} changeStatus={changeStatus} />
             <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5">
                 <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                     <ul role="list" className="divide-y divide-gray-200 rounded-md border border-gray-200">
@@ -88,7 +100,7 @@ export default function UploadModal({ onClose }) {
                                         id="image"
                                         name="image"
                                         multiple
-                                        accept="*"
+                                        accept="application/json, application/csv"
                                         onChange={e => upload(e)}
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
@@ -117,17 +129,17 @@ export default function UploadModal({ onClose }) {
                     </ul>
                 </dd>
             </div>
-            
+
             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
 
-            <button
-              type="button"
-              className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-          </div>
+                <button
+                    type="button"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    onClick={onClose}
+                >
+                    Cancel
+                </button>
+            </div>
         </ModalLayout>
     )
 }
