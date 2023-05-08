@@ -12,7 +12,7 @@ export default function FileItem  ({ file }) {
   };
 
   const handleCloseModal = () => {
-    setShowModal(false);
+    setShowModal(!showModal);
   };
 
   return (
@@ -46,7 +46,7 @@ export default function FileItem  ({ file }) {
           <span className="text-sm text-gray-600">{file.fileSizeInBytes} Bytes</span>
         </div>
       </div>
-      {showModal && <FileDetail file={file} onClose={handleCloseModal} />}
+      {showModal && <FileDetail file={file} changeModalState={handleCloseModal} />}
     </>
   );
 };

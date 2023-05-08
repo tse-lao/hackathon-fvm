@@ -6,7 +6,7 @@ import FileDealStatus from './FileDealStatus'
 import FileDetailInformation from './FileDetailInformation'
 import FileSharedWith from './FileSharedWith'
 
-export default function FileDetail({file}) {
+export default function FileDetail({file, changeModalState}) {
   const [open, setOpen] = useState(true)
   const [loading, setLoading] = useState(true)
   const [dealStatus, setDealStatus] = useState(null)
@@ -41,11 +41,16 @@ export default function FileDetail({file}) {
     console.log(response)
     
   }
+  
+  const handleOpenState = () => {
+    setOpen(false)
+    changeModalState(false)
+  }
 
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={setOpen}>
+      <Dialog as="div" className="relative z-10" onClose={handleOpenState}>
         <Transition.Child
           as={Fragment}
           enter="ease-in-out duration-500"
@@ -122,7 +127,7 @@ export default function FileDetail({file}) {
                           type="button"
                           className="flex-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >
-                          Download
+                          View File
                         </a>
                         <button
                         onClick={() => getCar()}

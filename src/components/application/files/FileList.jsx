@@ -8,12 +8,12 @@ export default function FileList({ address }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [files, setFiles] = useState([])
     const [totalFiles, setTotalFiles] = useState(0)
-    
+
 
 
     useEffect(() => {
         const getFiles = async () => {
-            
+
             console.log(address)
             const uploads = await lighthouse.getUploads(address);
             setFiles(uploads.data.fileList)
@@ -74,18 +74,16 @@ export default function FileList({ address }) {
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
                             <div className="min-w-full divide-y divide-gray-300">
-                             
+                                {totalFiles > 0 ?
+                                    files.map((item) =>
+                                        <FileItem file={item} key={item.id} />
+                                    ) : (
 
-                                    {totalFiles > 0 ?
-                                        files.map((item) => 
-                                            <FileItem file={item} key={item.id}/>
-                                        ): (
-
-                                                <div className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                    No files found
-                                                </div>
-                                        )}
+                                        <div className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            No files found
                                         </div>
+                                    )}
+                            </div>
                         </div>
                     </div>
                 </div>

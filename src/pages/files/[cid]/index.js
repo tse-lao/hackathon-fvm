@@ -1,3 +1,4 @@
+import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
 import { signAuthMessage } from '@/lib/createLighthouseApi';
 import readBlobAsJson, { analyzeJSONStructure, readBlobAsCsvToJson } from '@/lib/dataManipulation';
@@ -33,17 +34,9 @@ export default function ViewFile() {
         const getFile = async () => {
             const status = await lighthouse.getFileInfo(cid)
             setFileInfo(status.data);
-
-            if (status.data.encryption) {
-               await decrypt();
-               setLoading(false)
-            }else{
-                setLoading(false)
-            }
-           
         }
 
-        if (cid) { getFile(); setLoading(false)}
+        if (cid) { getFile(); setLoading(false) }
 
     }, [cid])
 
@@ -59,18 +52,13 @@ export default function ViewFile() {
         );
 
         const fileType = fileInfo.mimeType;
-        
-        console.log(keyObject.data.key)
         const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
-
         setFileData(decrypted);
-        
-        console.log(decrypted)
 
         if (fileType == "image/png" || fileType == "image/jpeg") {
             const url = URL.createObjectURL(decrypted);
             setFileURL(url);
-        } 
+        }
         if (fileType == "application/json") {
             await readBlobAsJson(decrypted, (error, json) => {
                 if (error) {
@@ -81,17 +69,17 @@ export default function ViewFile() {
                 }
             });
         }
-        
-        if(fileType == "application/csv"){
-                
-                await readBlobAsCsvToJson(decrypted, (error, json) => {
-                    if (error) {
-                        console.error('Failed to read the Blob as JSON:', error);
-                    } else {
-                        console.log('Parsed JSON:', json);
-                        setFileURL(json)
-                    }
-                });
+
+        if (fileType == "application/csv") {
+
+            await readBlobAsCsvToJson(decrypted, (error, json) => {
+                if (error) {
+                    console.error('Failed to read the Blob as JSON:', error);
+                } else {
+                    console.log('Parsed JSON:', json);
+                    setFileURL(json)
+                }
+            });
         }
 
 
@@ -101,12 +89,12 @@ export default function ViewFile() {
         try {
             await polybase.collection("File").record("cid").get(cid);
             setInPolybase(true);
-        }catch(e){
+        } catch (e) {
             console.log(e);
             setInPolybase(false);
-            
+
         }
-        
+
 
     }
     function download() {
@@ -126,96 +114,107 @@ export default function ViewFile() {
         }, 0);
     }
 
-    async function analyze(){
-        const structure  = analyzeJSONStructure(fileURL);
-        
+    async function analyze() {
+        const structure = analyzeJSONStructure(fileURL);
+
 
         console.log(structure)
-        
+
         try {
             const response = await fetch("/api/generate", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ json: fileURL }),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ json: fileURL }),
             });
-      
+
             const data = await response.json();
             if (response.status !== 200) {
-              throw data.error || new Error(`Request failed with status ${response.status}`);
+                throw data.error || new Error(`Request failed with status ${response.status}`);
             }
-      
+
             setResult(data.result);
             setAnimalInput("");
-          } catch(error) {
+        } catch (error) {
             // Consider implementing your own error handling logic here
             console.error(error);
             alert(error.message);
-          }
+        }
     }
-    
-    
+
+
 
 
     return (
         <Layout>
-        
-        {loading ? <div>Loading...</div> : (
-            
-            <div>
-                <div className="sm:flex sm:items-center">
-                    <div className="sm:flex-auto">
-                        <h1 className="text-base font-semibold leading-6 text-gray-900">Your file</h1>
-                        <p className="mt-2 text-sm text-gray-700">
-                            Please find the file below. If its encrypted you need to sign it.
-                        </p>
-                    </div>
-                    <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                    <button onClick={decrypt}
-                    className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >Decrypt</button>
 
-                <button onClick={download}
-                    className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >Download</button>
+            {loading ? <div>Loading...</div> : (
 
-                    
-                    <button onClick={analyze}
-                    className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >Get Metadata</button>
-                    </div>
-                </div>
-                <div className="flex">
-                    {/* File content */}
-                    <div className="flex-1 p-4 bg-white border-r border-gray-200">
-                        <div className="prose prose-sm max-w-none">
+                <div>
+                    <div className="sm:flex sm:items-center">
+                        <div className="sm:flex-auto">
+                            <h1 className="text-base font-semibold leading-6 text-gray-900">Your file</h1>
+                            <p className="mt-2 text-sm text-gray-700">
+                                Please find the file below. If its encrypted you need to sign it.
+                            </p>
+                        </div>
+                        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                            <button onClick={decrypt}
+                                className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            >Decrypt</button>
 
-                            {fileInfo.mimeType == "image/jpeg" && fileURL && <img src={fileURL} />}
-                            {fileInfo.mimeType == "image/png" && <img src={fileURL} />}
-                            {fileInfo.mimeType == "application/json" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
+                            <button onClick={download}
+                                className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            >Download</button>
+
+
+                            <button onClick={analyze}
+                                className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            >Get Metadata</button>
                         </div>
                     </div>
+                    <div className="flex">
+                        {/* File content */}
 
-                    {/* Sidebar */}
-                    <div className="w-120 p-4 bg-gray-100">
-                        <h2 className="text-xl font-semibold mb-4">File Information</h2>
-                        <ul className="mb-12">
-                            {Object.entries(fileInfo).map((info, index) => (
-                                <li key={index} className="mb-2">
-                                    <span className="font-semibold">{info[0]}:</span>
-                                    <span className="truncate m-w-full">{info[1]}</span>
-                                </li>
-                            ))}
-                        </ul>
+                        {fileInfo.encryption && !fileData ? (
+                            <div className="flex-1 p-4 bg-white border-r border-gray-200">
+                            <div className="prose prose-sm max-w-none">
+                                <SimpleDecrypted startDecrypt={decrypt} />
+                            </div>
+                        </div>
+                        ) : (
+                            <div className="flex-1 p-4 bg-white border-r border-gray-200">
+                            <div className="prose prose-sm max-w-none">
 
-                        <FileSharedWith cid={cid}/>
-                        
-                        
+                                {fileInfo.mimeType == "image/jpeg" && fileURL && <img src={fileURL} />}
+                                {fileInfo.mimeType == "image/png" && <img src={fileURL} />}
+                                {fileInfo.mimeType == "application/json" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
+                            </div>
+                        </div>
+                            
+                        )}
+
+
+                        {/* Sidebar */}
+                        <div className="w-120 p-4 bg-gray-100">
+                            <h2 className="text-xl font-semibold mb-4">File Information</h2>
+                            <ul className="mb-12">
+                                {Object.entries(fileInfo).map((info, index) => (
+                                    <li key={index} className="mb-2">
+                                        <span className="font-semibold">{info[0]}:</span>
+                                        <span className="truncate m-w-full">{info[1]}</span>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <FileSharedWith cid={cid} />
+
+
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
         </Layout>
 
     )

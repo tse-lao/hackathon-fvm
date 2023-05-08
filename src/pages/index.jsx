@@ -1,5 +1,5 @@
-import CardTable from '@/components/application/CardTable';
 import Stats from '@/components/application/Stats';
+import FileList from '@/components/application/files/FileList';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { useAccount } from 'wagmi';
 import Layout from './Layout';
@@ -17,7 +17,7 @@ export default function Home() {
         <main className='flex flex-col gap-12'>
           <Stats address={address} />
 
-          <CardTable address={address} />
+          <FileList address={address} />
         </main>
 
       ) :
