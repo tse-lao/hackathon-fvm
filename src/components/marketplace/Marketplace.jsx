@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import DatasetItem from './DatasetItem';
+import SignMetadata from './SignMetadata';
 
 const categories = ['All', 'Health', 'Finance', 'Technology', 'Environment'];
 
@@ -98,6 +99,10 @@ const Marketplace = () => {
 
   return (
     <div className="flex">
+    
+      <div>
+          <SignMetadata />
+      </div>
       <aside className="bg-white shadow-md rounded-lg p-6 mr-6 w-1/4">
         <h2 className="text-2xl font-semibold mb-4">Categories</h2>
         <ul>

@@ -25,28 +25,32 @@ export default function ViewFile() {
     const [fileURL, setFileURL] = useState(null);
     const [fileData, setFileData] = useState(null);
     const [inPolybase, setInPolybase] = useState(true);
+    const [loading, setLoading] = useState(true);
     const polybase = usePolybase();
 
     //get the file info.
     useEffect(() => {
         const getFile = async () => {
             const status = await lighthouse.getFileInfo(cid)
-            console.log(status)
             setFileInfo(status.data);
 
             if (status.data.encryption) {
-                decrypt();
+               await decrypt();
+               setLoading(false)
+            }else{
+                setLoading(false)
             }
-            
+           
         }
 
-        if (cid) { getFile(); }
+        if (cid) { getFile(); setLoading(false)}
 
     }, [cid])
 
     /* Decrypt file */
     const decrypt = async () => {
         const { signedMessage, publicKey } = await signAuthMessage(address);
+
 
         const keyObject = await lighthouse.fetchEncryptionKey(
             cid,
@@ -55,9 +59,13 @@ export default function ViewFile() {
         );
 
         const fileType = fileInfo.mimeType;
+        
+        console.log(keyObject.data.key)
         const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
 
         setFileData(decrypted);
+        
+        console.log(decrypted)
 
         if (fileType == "image/png" || fileType == "image/jpeg") {
             const url = URL.createObjectURL(decrypted);
@@ -152,6 +160,9 @@ export default function ViewFile() {
 
     return (
         <Layout>
+        
+        {loading ? <div>Loading...</div> : (
+            
             <div>
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
@@ -180,9 +191,8 @@ export default function ViewFile() {
                     <div className="flex-1 p-4 bg-white border-r border-gray-200">
                         <div className="prose prose-sm max-w-none">
 
-                            {fileInfo.mimeType == "image/jpeg" && <img src={fileURL} />}
+                            {fileInfo.mimeType == "image/jpeg" && fileURL && <img src={fileURL} />}
                             {fileInfo.mimeType == "image/png" && <img src={fileURL} />}
-
                             {fileInfo.mimeType == "application/json" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
                         </div>
                     </div>
@@ -204,10 +214,8 @@ export default function ViewFile() {
                         
                     </div>
                 </div>
-
-                
-
             </div>
+        )}
         </Layout>
 
     )

@@ -4,11 +4,15 @@ import { ethers } from "ethers";
 export async function signAuthMessage  (
     
 ){
+  
+  
+    
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const address = await signer.getAddress();
     const messageRequested = (await lighthouse.getAuthMessage(address)).data.message;
     const signedMessage = await signer.signMessage(messageRequested);
+    
     return({
       signedMessage: signedMessage,
       publicKey: address

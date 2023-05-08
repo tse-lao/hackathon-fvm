@@ -8,7 +8,7 @@ import { useAccount } from "wagmi";
 export default function FileSharedWith({ cid }) {
 
     const [publicShareKey, setPublicShareKey] = useState("")
-    const [errorMessage, setSetErrorMessages] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
     const {address} = useAccount();
 
 
@@ -24,13 +24,14 @@ export default function FileSharedWith({ cid }) {
 
     useEffect(() => {
 
+        
         const getAccessConditions = async () => {
             const response = await lighthouse.getAccessConditions(cid);
             setAccessControl(response.data);
         };
 
         getAccessConditions();
-    }, [cid])
+    }, [])
 
     const signAuthMessage = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -117,7 +118,7 @@ export default function FileSharedWith({ cid }) {
 
         // Aggregator is what kind of operation to apply to access conditions
         // Suppose there are two conditions then you can apply ([1] and [2]), ([1] or [2]), !([1] and [2]).
-        const aggregator = "([2] and [3])";
+        const aggregator = "([1] and [2])";
         const { publicKey, signedMessage } = await signAuthMessage();
 
         /*
