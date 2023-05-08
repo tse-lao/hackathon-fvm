@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "fvm-dataverse",
   "version": "0.1.0",
   "private": true,
@@ -44,3 +45,48 @@
     "prettier-plugin-tailwindcss": "^0.1.13"
   }
 }
+=======
+    "name": "fvm-dataverse",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    },
+    "browserslist": "defaults, not ie <= 11",
+    "dependencies": {
+        "@headlessui/react": "^1.7.0",
+        "@heroicons/react": "^2.0.17",
+        "@lighthouse-web3/sdk": "^0.2.3",
+        "@polybase/auth": "^0.5.0",
+        "@polybase/client": "^0.5.0",
+        "@polybase/react": "^0.5.0",
+        "@rainbow-me/rainbowkit": "^0.12.12",
+        "@tailwindcss/forms": "^0.5.3",
+        "@walletconnect/web3wallet": "^1.7.0",
+        "autoprefixer": "^10.4.8",
+        "clsx": "^1.2.1",
+        "ethers": "^5.7.2",
+        "focus-visible": "^5.2.0",
+        "framer-motion": "^6.5.1",
+        "next": "^12.3.0",
+        "openai": "^3.2.1",
+        "papaparse": "^5.4.1",
+        "postcss-focus-visible": "^6.0.4",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "tailwindcss": "^3.1.8",
+        "use-debounce": "^8.0.4",
+        "uuid": "^9.0.0",
+        "wagmi": "^0.12.12"
+    },
+    "devDependencies": {
+        "eslint": "8.15.0",
+        "eslint-config-next": "12.2.5",
+        "prettier": "^2.7.1",
+        "prettier-plugin-tailwindcss": "^0.1.13"
+    }
+}
+>>>>>>> a68b2492a831f52b0a8ff83dea0aa02cab6f4a28

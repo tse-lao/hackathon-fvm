@@ -15,6 +15,10 @@ module.exports = {
             url: `https://polygon-mumbai.g.alchemy.com/v2/ZiPX0JtXnVqQ56RGdvdy8mvCOs4ZDchO`,
             accounts: [""],
         },
+        hyperspace: {
+            url: ``,
+            accounts: [""],
+        },
     },
     etherscan: {
         apiKey: "",
