@@ -1,4 +1,4 @@
-import Stats from '@/components/application/Stats';
+import Stats from '@/components/application/elements/Stats';
 import FileList from '@/components/application/files/FileList';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { useAccount } from 'wagmi';
