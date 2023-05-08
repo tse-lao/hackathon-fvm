@@ -1,0 +1,56 @@
+[
+    {
+      "name": "My Drive",
+      "id": 1,
+      "type": "folder",
+      "subfolders": [
+        {
+          "name": "Documents",
+          "id": 2,
+          "type": "folder",
+          "subfolders": [
+            {
+              "name": "Invoices",
+              "id": 3,
+              "type": "folder",
+              "subfolders": [],
+              "files": [
+                {
+                  "name": "Invoice #001",
+                  "id": 1,
+                  "type": "file"
+                },
+                {
+                  "name": "Invoice #002",
+                  "id": "invoice-002",
+                  "type": "file"
+                }
+              ]
+            }
+          ],
+          "files": [
+            {
+              "name": "Resume",
+              "id": "invoice-002",
+              "type": "file"
+            }
+          ]
+        },
+        {
+          "name": "Photos",
+          "id": 4,
+          "type": "folder",
+          "subfolders": [],
+          "files": [
+            {
+              "name": "Vacation 2022",
+              "id": "vacation-2022",
+              "type": "file"
+            }
+          ]
+        }
+      ],
+      "files": []
+    }
+  ]
+  

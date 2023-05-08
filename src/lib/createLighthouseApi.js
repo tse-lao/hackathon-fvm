@@ -41,3 +41,10 @@ export async function getLighthouse(address) {
     }
     return api;
 }
+
+export async function uploadMetaData(string) {
+    const api = await getLighthouse();
+    const response = await lighthouse.uploadText(string, api);
+    console.log(response)
+    return response;
+}

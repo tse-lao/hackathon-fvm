@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi';
 import Button from '../elements/Button';
 import CheckboxSelect from '../elements/Checkbox';
 
-export default function CreateFileRecord({ file }) {
+export default function CreateFileRecord({ record }) {
     const polybase = usePolybase();
     const { address } = useAccount();
     const [selectedCategories, setSelectedCategories] = useState([]);
@@ -25,9 +25,15 @@ export default function CreateFileRecord({ file }) {
 
     //constructor(id: string, name: string, cid: string, metadata:string, addedAt: string){
     const createRecord = async () => {
+        
+        //check if metadat is not zero
+        if(metadata.length == 0){
+            return;
+            
+        }
         const newId = uuidv4();
         const getCreation = await polybase
-            .collection("FileRecord")
+            .collection("File")
             .create([
                 newId,
                 file.fileName,

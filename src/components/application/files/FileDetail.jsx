@@ -1,3 +1,4 @@
+import { formatBytes } from '@/lib/helpers'
 import { Dialog, Transition } from '@headlessui/react'
 import { HeartIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import lighthouse from '@lighthouse-web3/sdk'
@@ -104,7 +105,7 @@ export default function FileDetail({file, changeModalState}) {
                             <h2 className="text-base font-semibold leading-6 text-gray-900">
                               <span className="sr-only">Details for </span>{file.fileName}
                             </h2>
-                            <p className="text-sm font-medium text-gray-500">{file.fileSizeInBytes} Bytes</p>
+                            <p className="text-sm font-medium text-gray-500">{formatBytes(file.fileSizeInBytes)}</p>
                           </div>
                           <button
                             type="button"

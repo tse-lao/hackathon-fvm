@@ -1,5 +1,6 @@
 // components/FileItem.js
 
+import { formatBytes } from '@/lib/helpers';
 import { FolderIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import FileDetail from './FileDetail';
@@ -43,7 +44,7 @@ export default function FileItem  ({ file }) {
           <span className="text-gray-700">{file.fileName}</span>
         </div>
         <div className="flex items-center">
-          <span className="text-sm text-gray-600">{file.fileSizeInBytes} Bytes</span>
+          <span className="text-sm text-gray-600">{formatBytes(file.fileSizeInBytes)}</span>
         </div>
       </div>
       {showModal && <FileDetail file={file} changeModalState={handleCloseModal} />}

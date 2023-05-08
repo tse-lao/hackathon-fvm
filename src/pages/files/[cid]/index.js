@@ -1,10 +1,11 @@
 import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
+import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
-import { signAuthMessage } from '@/lib/createLighthouseApi';
+import FileStatus from '@/components/application/files/FileStatus';
+import { signAuthMessage, uploadMetaData } from '@/lib/createLighthouseApi';
 import readBlobAsJson, { analyzeJSONStructure, readBlobAsCsvToJson } from '@/lib/dataManipulation';
 import Layout from '@/pages/Layout';
 import lighthouse from '@lighthouse-web3/sdk';
-import { usePolybase } from '@polybase/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -21,13 +22,18 @@ const fileDefault = {
 export default function ViewFile() {
     const { cid } = useRouter().query;
     const { address } = useAccount();
+    
+    const [record, setRecord] = useState(
+        {
+            cid: "",
+            metadata: "", 
+        }
+    );
 
     const [fileInfo, setFileInfo] = useState(fileDefault);
     const [fileURL, setFileURL] = useState(null);
     const [fileData, setFileData] = useState(null);
-    const [inPolybase, setInPolybase] = useState(true);
     const [loading, setLoading] = useState(true);
-    const polybase = usePolybase();
 
     //get the file info.
     useEffect(() => {
@@ -85,18 +91,6 @@ export default function ViewFile() {
 
     }
 
-    const dataRecord = async () => {
-        try {
-            await polybase.collection("File").record("cid").get(cid);
-            setInPolybase(true);
-        } catch (e) {
-            console.log(e);
-            setInPolybase(false);
-
-        }
-
-
-    }
     function download() {
         // Create an anchor element with the download attribute
         const link = document.createElement('a');
@@ -116,31 +110,18 @@ export default function ViewFile() {
 
     async function analyze() {
         const structure = analyzeJSONStructure(fileURL);
-
-
         console.log(structure)
+      
 
-        try {
-            const response = await fetch("/api/generate", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ json: fileURL }),
-            });
-
-            const data = await response.json();
-            if (response.status !== 200) {
-                throw data.error || new Error(`Request failed with status ${response.status}`);
-            }
-
-            setResult(data.result);
-            setAnimalInput("");
-        } catch (error) {
-            // Consider implementing your own error handling logic here
-            console.error(error);
-            alert(error.message);
-        }
+        //we want to upload this record to polybase but also lighthouse.
+        const metadata = await uploadMetaData(JSON.stringify(structure));
+        console.log("SHOW METADATA:")
+        console.log(metadata);
+        
+       setRecord({
+            cid: cid,
+            metadata: metadata.data.Hash
+        });
     }
 
 
@@ -199,16 +180,12 @@ export default function ViewFile() {
                         {/* Sidebar */}
                         <div className="w-120 p-4 bg-gray-100">
                             <h2 className="text-xl font-semibold mb-4">File Information</h2>
-                            <ul className="mb-12">
-                                {Object.entries(fileInfo).map((info, index) => (
-                                    <li key={index} className="mb-2">
-                                        <span className="font-semibold">{info[0]}:</span>
-                                        <span className="truncate m-w-full">{info[1]}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                            
+                            <FileStatus record={record} />
+                            <FileDetailInformation detail={fileInfo} />
 
                             <FileSharedWith cid={cid} />
+
 
 
                         </div>
