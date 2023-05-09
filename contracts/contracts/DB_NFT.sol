@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.17;
 import { AxelarExecutable } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
 import { IAxelarGateway } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol";
 import { IAxelarGasService } from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
@@ -53,6 +53,7 @@ contract DB_NFT is ERC1155 , AxelarExecutable {
     string[] public tables;
     uint256[] private tableIDs;
     address public owner;
+    address public PKP;
     // Gateway = 0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B & gasReceiver = 0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
     // 0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
     constructor(address gateway_, address gasReceiver_) ERC1155("") AxelarExecutable(gateway_) {
@@ -87,7 +88,7 @@ contract DB_NFT is ERC1155 , AxelarExecutable {
     }
 
     function submitData(uint256 tokenId, string memory metadataCID, uint256 rows) public{
-        // require(ONLUpkpaddress);
+        onlyPKP(msg.sender);        
         submissionsNumberByID[tokenId][msg.sender] = submissionsNumberByID[tokenId][msg.sender] + rows;
         if(tokenInfoMap[tokenId].remainingRows >= rows){
             tokenInfoMap[tokenId].remainingRows = tokenInfoMap[tokenId].remainingRows - rows;
@@ -100,7 +101,8 @@ contract DB_NFT is ERC1155 , AxelarExecutable {
 
     // We also need to call this function from the PKP because we need to set a fair royaltiesAddress splitter contract
     function createDB_NFT(uint256 tokenId, string memory metadataCID , uint256 mintPrice, address royaltiesAddress) public {
-        // require(msg.sender == tokenInfoMap[tokenId].creator && tokenInfoMap[tokenId].remainingRows == 0); ADD EXISTS REQUIRE
+        require(_exists(tokenId));
+        onlyPKP(msg.sender);
         require(!tokenInfoMap[tokenId].mintable && tokenInfoMap[tokenId].remainingRows == 0);
         tokenInfoMap[tokenId].mintable = true;
         tokenInfoMap[tokenId].price = mintPrice;
@@ -108,6 +110,10 @@ contract DB_NFT is ERC1155 , AxelarExecutable {
         string memory set = string.concat("metadataCID='",metadataCID,"'");
         string memory filter = string.concat("tokenID=",Strings.toString(tokenId));
         mutate(tableIDs[1],SQLHelpers.toUpdate(MAIN_TABLE_PREFIX,tableIDs[1], set, filter));
+    }
+
+    function getContribution(address contributor, uint256 tokenId) public view returns(uint256){
+        return submissionsNumberByID[tokenId][contributor];
     }
 
 
@@ -153,6 +159,10 @@ contract DB_NFT is ERC1155 , AxelarExecutable {
 
     function onlyOwner(address sender) internal view{
         require(sender == owner);
+    }
+     
+    function onlyPKP(address sender) internal view{
+        require(sender == PKP);
     }
 
     /// @notice Overriten URI function of the ERC1155 to fit Tableland based NFTs

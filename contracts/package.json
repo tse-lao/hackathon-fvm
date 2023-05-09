@@ -27,9 +27,10 @@
         "hardhat": "^2.14.0"
     },
     "dependencies": {
+        "@axelar-network/axelar-gmp-sdk-solidity": "^3.3.0",
         "@openzeppelin/contracts": "^4.8.0",
         "@openzeppelin/contracts-upgradeable": "^4.4.1",
-        "@tableland/evm": "^2.0.4",
+        "@tableland/evm": "^4.2.2",
         "chai": "^4.3.7",
         "node": "^20.1.0"
     }
