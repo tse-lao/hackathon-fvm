@@ -2,9 +2,9 @@ const go = async () => {
     //public api endpoint.
     const url = "https://apollo-server-gateway.herokuapp.com/";
     const query = `
-    query Query($cid: String) {
-      verifyCID(cid: $cid)
-    }`
+    query Query {
+        unsafeVerify
+      }`
 
 
     const fetchCID = await fetch(url, {
@@ -14,17 +14,12 @@ const go = async () => {
         },
         body: JSON.stringify({
             "query": query,
-            "variables": {
-                "cid": cid, //this we need to provide in params 
-            }
+           
         }
         )
     }).then((response) => response.json());
 
-    console.log(fetchCID)
-    const verifiedCID = fetchCID.data.verifyCID;
-    
-    console.log(verifiedCID)
+    const verifiedCID = fetchCID.data.unsafeVerify;
     const contractFormatCID = "bafkreigpliv6qwuawfwkea45t4rj2fzc6whbapp3awxssjmf3puqd7huve";
    
     if(verifiedCID != contractFormatCID){
