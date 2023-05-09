@@ -1,9 +1,10 @@
-import lighthouse from "@lighthouse-web3/sdk";
+import { getLighthouse } from '@/lib/createLighthouseApi';
+import lighthouse from '@lighthouse-web3/sdk';
 import { ethers } from "ethers";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 export default function CreateSpace({ address }) {
   const [api, setApi] = useState(null)
+
 
   const signAuthMessage = async (messageRequested) => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -11,6 +12,19 @@ export default function CreateSpace({ address }) {
     const signedMessage = await signer.signMessage(messageRequested);
     return (signedMessage)
   }
+  
+  useEffect(() => {
+    const checkAPI = async () => {
+        const response = await getLighthouse()
+        console.log(response)
+        if(!response){
+         return; 
+        }
+        setApi(response)
+    }
+    checkAPI()
+        
+  }, [])
 
   const getApiKey = async () => {
 
@@ -27,7 +41,7 @@ export default function CreateSpace({ address }) {
 
     setApi(response.data.apiKey)
     
-    localStorage.setItem("lighthouse", response.data.apiKey)
+    localStorage.setItem(`lighthouse-${address}`, response.data.apiKey)
 
     /* { data: { apiKey: '7d8f3d18.eda91521aa294773a8201d2a7d241a2c' } } */
   }
@@ -45,8 +59,9 @@ export default function CreateSpace({ address }) {
         value={api}
       />
       <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
         onClick={getApiKey}
+        disabled={api !== null}
       >
         Generate API Key
       </button>

@@ -34,8 +34,8 @@ export default async function getApiKey (){
     /* { data: { apiKey: '7d8f3d18.eda91521aa294773a8201d2a7d241a2c' } } */
 }
   
-export async function getLighthouse() {
-    let api = await localStorage.getItem("lighthouse")
+export async function getLighthouse(address) {
+    let api = await localStorage.getItem(`lighthouse-${address}`)
     console.log(api);
     
     if(!api){
