@@ -1,19 +1,47 @@
+import { DB_main } from "@/constants";
+import { useContract } from "@/hooks/useContract";
+import useNftStorage from "@/hooks/useNftStorage";
+import { analyzeJSONStructure, readJSONFromFileInput } from "@/lib/dataHelper";
 import { useAuth, usePolybase } from "@polybase/react";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-
+import { toast } from "react-toastify";
 
 export default function DataRequestForm  ({onClose}) {
     const [formData, setFormData] = useState({
       name: "",
-      email: "",
-      metadata: ""
+      categories: "",
+      description: "",
+      metadata: "",
+      minRows: "",
     });
+    
+    const [metadata, setMetadata] = useState(null);
     const {auth, state, loading} = useAuth();
 
     const polybase = usePolybase();
+    const {RequestDB} = useContract();
+    const {uploadMetadata}= useNftStorage();
 
-  
+
+    const uploadMeta = async(e) => {
+      const file = e.target.files[0];
+
+      readJSONFromFileInput(e.target, async(error, jsonData) => {
+        if (error) {
+          console.error(error);
+        } else {
+          console.log(jsonData);
+          const format = analyzeJSONStructure(jsonData);
+          console.log(format);
+          const cid = await uploadMetadata(JSON.stringify(format));
+          setMetadata(cid);
+          
+          console.log(cid);
+        }
+      });
+      
+
+    }
     const handleChange = (e) => {
       const { name, value } = e.target;
       setFormData({ ...formData, [name]: value });
@@ -24,22 +52,17 @@ export default function DataRequestForm  ({onClose}) {
       // Process the form data and send it to the server or API endpoint.
       console.log(formData);
       
+      if(formData.minRows <= 0){
+        toast.error("Min rows is invalid");
+      }
       
-     console.log(state);
-      const requestId = uuidv4();
-      
-      const requestTime = new Date().toISOString();
-      
-      const collection = await polybase.collection("DataRequest").create([
-        requestId,
-        formData.name,
-        formData.metadata,
-        true, 
-         false, 
-         requestTime
-      ])
-      
-      console.log(collection)
+      try{
+        await RequestDB(metadata, DB_main, formData.description, formData.categories, formData.minRows);
+      }catch(e){
+        console.log(e);
+        toast.error("Error creating request");
+      }
+
     };
 
     return (
@@ -65,26 +88,49 @@ export default function DataRequestForm  ({onClose}) {
           </label>
           <input
             type="text"
-            name="category"
-            id="category"
-            value={formData.email}
+            name="categories"
+            id="categories"
+            value={formData.categories}
             onChange={handleChange}
             className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
         <div>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Required rows
+        </label>
+        <input
+          type="number"
+          name="minRows"
+          id="minRows"
+          value={formData.numRows}
+          onChange={handleChange}
+          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+      <div>
+      <label htmlFor="requestData" className="block text-sm font-medium text-gray-700">
+        Description
+      </label>
+      <textarea
+        name="description"
+        id="description"
+        rows="3"
+        value={formData.description}
+        onChange={handleChange}
+        required
+        className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      ></textarea>
+    </div>
+        <div>
           <label htmlFor="requestData" className="block text-sm font-medium text-gray-700">
             Metadata Request
           </label>
-          <textarea
-            name="metadata"
-            id="metadata"
-            rows="3"
-            value={formData.requestData}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          ></textarea>
+          <input 
+            type="file" 
+            name="metadata" id="metadata" onChange={uploadMeta} required
+            accept="application/json, application/csv"
+            />
         </div>
         <button
           type="submit"

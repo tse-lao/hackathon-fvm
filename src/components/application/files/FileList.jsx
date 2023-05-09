@@ -12,6 +12,8 @@ export default function FileList({ address }) {
 
 
     useEffect(() => {
+        
+        
         const getFiles = async () => {
 
             console.log(address)

@@ -70,10 +70,12 @@ export function readBlobAsCsvToJson(blob, callback) {
 export function analyzeJSONStructure(json) {
   function analyzeNode(node, path = []) {
     let structure = {};
+    
+    let count = 0;
 
     if (Array.isArray(node)) {
       structure.type = 'array';
-      structure.count = node.length;
+      count = node.length;
 
       if (node.length > 0) {
         structure.children = analyzeNode(node[0], [...path, '[0]']);
@@ -140,5 +142,27 @@ export async function categorizeData(json){
 
 
   return 'Unable to analyze and categorize the JSON data.';
+}
+
+export function readJSONFromFileInput(fileInput, callback) {
+  // Get the first file object from the file input
+  const file = fileInput.files[0];
+
+  // Create a new FileReader object
+  const reader = new FileReader();
+
+  // Set up the 'load' event listener on the reader
+  reader.addEventListener('load', () => {
+    try {
+      // Parse the JSON data from the reader's result
+      const jsonData = JSON.parse(reader.result);
+      callback(null, jsonData);
+    } catch (error) {
+      callback(error);
+    }
+  });
+
+  // Read the file as text using the reader
+  reader.readAsText(file);
 }
 

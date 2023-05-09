@@ -9,7 +9,7 @@ export default function Files() {
     const mounted = useIsMounted();
     const { address } = useAccount();
     const [loading, setLoading] = useState(true);
-    const [organised, setOrganised] = useState(false);
+    const [organised, setOrganised] = useState(true);
 
 
     return (

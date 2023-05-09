@@ -1,140 +1,135 @@
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 
-
+const PUBLIC_KEY ="0x04808e24bb109fac42882de0203d77f2ad60ffdbf7ff339d77036f71b35095198aa8cb2705030b4b1a206b066cb0bebd18b45353a79f150eebd6b1e986e97f5d32"
 
 export default function SignMetadata() {
-    
-    const runLitActions = async (e) => {
-        e.preventDefault();
-        const litActionCode = `
-          const checkAndSignResponse = async () => {
-            const satisfyConditions = await LitActions.checkConditions({ conditions, authSig, chain });
-            const currentTimestamp = (new Date()).getTime();
-            const afterOneMinute = Math.abs(currentTimestamp - timestamp) >= 2 * 60 * 1000;
-            if (!satisfyConditions || afterOneMinute) {
-              return;
-            }
-    
-            toSign = { minBalance, fullName, timestamp, currentTimestamp };
-            const sigShare = await LitActions.signEcdsa({ toSign, publicKey, sigName });
-            LitActions.setResponse({ response: JSON.stringify(toSign) });
-          };
-    
-          checkAndSignResponse();
-        `;
-    
-        const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "ethereum" });
-        const litNodeClient = new LitJsSdk.LitNodeClient({ litNetwork: "serrano" });
-        await litNodeClient.connect();
-    
-        const date = new Date();
-        const dateInString = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-        const timestamp = new Date(dateInString + " " + 100);
-    
-        const { signatures, response, logs } = await litNodeClient.executeJs({
-          code: litActionCode,
-          authSig,
-          jsParams: {
-            conditions: [
-              {
-                conditionType: "evmBasic",
-                contractAddress: "",
-                standardContractType: "",
-                chain: "ethereum",
-                method: "eth_getBalance",
-                parameters: [":userAddress", "latest"],
-                returnValueTest: {
-                  comparator: ">=",
-                  value: `${minBalanceRef.current.value}`,
-                },
-              },
-            ],
-            minBalance: minBalanceRef.current.value,
-            fullName: nameRef.current.value,
-            timestamp: timestamp.getTime(),
-            authSig,
-            chain: "ethereum",
-            publicKey: "0498e4db753aa871f70fa8c29429a4ece3f8f48c3df320bf26bfa3fa135c7f13ecb9036ad1bb873cea0d0cdd082935feb1e547f46323debb1371833bf270f33f28",
-            sigName: "sig1",
-          },
-        });
-    
-        setReturnedJson(response !== "" ? JSON.stringify(response, null, 4) : "Doesn't satisfy Access Conditions");
-        setSignature(response !== "" ? signatures?.sig1?.signature : "Doesn't satisfy Access Conditions");
-      };
+
       
-      const code = `
-      const go = async () => {
-      
-        /* wat representation:
-        (module 
-          (type $0 (func (param i32 i32) (result i32)))
-          (memory $0 0)
-          (export "add" (func $0))
-          (func $0 (type $0) (param $var$0 i32) (param $var$1 i32) (result i32) 
-            (i32.add
-            (get_local $var$0)
-            (get_local $var$1)
-            )
-          )
-        )
-        */
-        var source = new Uint8Array([
-            0, 97, 115, 109, 1,   0, 0,  0,  1,   7,   1,
-           96,  2, 127, 127, 1, 127, 3,  2,  1,   0,   5,
-            3,  1,   0,   0, 7,   7, 1,  3, 97, 100, 100,
-            0,  0,  10,   9, 1,   7, 0, 32,  0,  32,   1,
-          106, 11
-        ]);
-      
-        var instance = (await WebAssembly.instantiate(source)).instance;
-        var val = instance.exports.add(2, 2);
-      
-        LitActions.setResponse({response: JSON.stringify(val)})
-      };
-      
-      go();
-      `
-      function litJsSdkLoaded() {
-        var litNodeClient = new LitJsSdk_litNodeClient();
-        litNodeClient.connect();
-        window.litNodeClient = litNodeClient;
+    
+      async function litJsSdkLoaded() {
+        const client = new LitJsSdk.LitNodeClient({ litNetwork: "serrano" });
+
+        await client.connect();
+        window.litNodeClient = client;
       }
+      
+      //QmfYdvmY4cifjzis7zWq4UmhVYKJq5J3AiyEVBFRCwx1TB => validate
+      //cid => accept
+      //rows => accept
+      //pkp singing  => valide
+      
       
       const runLitCode = async () => {
         // you need an AuthSig to auth with the nodes
         // this will get it from metamask or any browser wallet
         const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "ethereum" });
         
-        litJsSdkLoaded();
+        await litJsSdkLoaded();
+
+        const litActionCode = `
+          const go = async () => {
+            // test an access control condition
+
+            // only sign if the access condition is true
+            
+            if (cid != "QmdwVoFEcTSZY9W3h91ExJAZmnzmjBaTETv9fHSRixXRom"){
+              return;
+            }
+            
+            https://hackathon.fvm.com/checkMeta/${cid}
+            cid => checkMeta => true/false
+                        
+            // turn CID => into JSON
+            // JSON => function
+            // function => METADATA CID
+            
+            
+            
+            
+            
+
+            // this is the string "Hello World" for testing
+            const toSign = cid;
+            // this requests a signature share from the Lit Node
+            // the signature share will be automatically returned in the HTTP response from the node
+            const sigShare = await LitActions.signEcdsa({ toSign, publicKey: publicKey, sigName: "sig1" });
+          };
+
+
+
+          go();
+          `;
         
-        const signatures = await litNodeClient.executeJs({
-            ipfsId: "QmRwN9GKHvCn4Vk7biqtr6adjXMs7PzzYPCzNCRjPFiDjm",
-            authSig,
-            // all jsParams can be used anywhere in your Lit Action Code
-            jsParams: {
-              // this is the string "Hello World" for testing
-              toSign: [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100],
-              publicKey:
-                "0x0404e12210c57f81617918a5b783e51b6133790eb28a79f141df22519fb97977d2a681cc047f9f1a9b533df480eb2d816fb36606bd7c716e71a179efd53d2a55d1",
-              sigName: "sig1",
-            },
-          });
-          
-          console.log(signatures);
-      };
+        const PERS = "sdfsdf"
+        const CID = "QmdwVoFEcTSZY9W3h91ExJAZmnzmjBaTETv9fHSRixXRom";
+        console.log(CID);
+
+        const results = await litNodeClient.executeJs({
+          code: litActionCode,
+          authSig,
+          jsParams: {
+            cid: PERS, 
+            publicKey: PUBLIC_KEY,
+          },
+        });
+        console.log("results", results);
+        const { signatures, response } = results;
+        console.log("response", response);
+        console.log(signatures);
+      /*   const sig = signatures.sig1;
+        const { dataSigned } = sig;
+        const encodedSig = joinSignature({
+          r: "0x" + sig.r,
+          s: "0x" + sig.s,
+          v: sig.recid,
+        });
+        
+        console.log("ENCODED SIG")
+        console.log(encodedSig)
+      
+        const { txParams } = response;
+      
+        console.log("encodedSig", encodedSig);
+        console.log("sig length in bytes: ", encodedSig.substring(2).length / 2);
+        console.log("dataSigned", dataSigned);
+        const splitSig = splitSignature(encodedSig);
+        console.log("splitSig", splitSig);
+      
+        const recoveredPubkey = recoverPublicKey(dataSigned, encodedSig);
+        console.log("uncompressed recoveredPubkey", recoveredPubkey);
+        const compressedRecoveredPubkey = computePublicKey(recoveredPubkey, true);
+        console.log("compressed recoveredPubkey", compressedRecoveredPubkey);
+        const recoveredAddress = recoverAddress(dataSigned, encodedSig);
+        console.log("recoveredAddress", recoveredAddress);
+      
+        const txn = serialize(txParams, encodedSig);
+      
+        console.log("txn", txn);
+      
+        // broadcast txn
+        const provider = new ethers.providers.JsonRpcProvider(
+          // process.env.LIT_MUMBAI_RPC_URL
+          "https://rpc.ankr.com/polygon_mumbai"
+        );
+        const result = await provider.sendTransaction(txn);
+        console.log("broadcast txn result:", JSON.stringify(result, null, 4));  */
+        
+      }
+      
+      
+      
+      
       
   return (
     <div>
     
         <h1>Run lit actions</h1>
         
-        <div>
-                <button  
-                className="btn btn-primary"
-                onClick={runLitActions}>Run Lit Actions</button>
+        <div className="flex">
+            
                 <button  onClick={e => {runLitCode()}}
-                className="btn btn-primary"
+                className="btn btn-primary bg-cf-500 p-5 m-5"
+
                 >Run Signatures</button>
                     
         </div>

@@ -83,6 +83,11 @@ export default function FileSharedWith({ cid }) {
         const minCount = 5;
 
         // Conditions to add
+        
+        // owner or contributor to the dataPool / RequestDB
+        // minAmount of contributors. = data anonimity
+        // minRequired = 100 before data is released.
+        
         const conditions = [
             {
                 id: 1,
@@ -111,7 +116,7 @@ export default function FileSharedWith({ cid }) {
                 parameters: [],
                 inputArrayType: [],
                 outputType: "uint256"
-            }
+            }, 
         ];
         
 

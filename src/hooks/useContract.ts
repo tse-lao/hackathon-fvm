@@ -1,6 +1,6 @@
-import { BigNumber, ethers } from "ethers";
-import { DBAbi, DB_NFT_address,crossChainBacalhauJobsAbi,crossChainBacalhauJobs_address } from "../constants"
+import { ethers } from "ethers";
 import { useSigner } from "wagmi";
+import { DBAbi, DB_NFT_address, crossChainBacalhauJobsAbi, crossChainBacalhauJobs_address } from "../constants";
 
 
 export const useContract = () => {
@@ -14,12 +14,13 @@ export const useContract = () => {
     }
 
     const RequestDB = async( dataFormatCID: string, DBname: string, description: string, category: string, requiredRows: number) => {
+        //read dataFormatCID from the contract.
         const tx = await contract.RequestDB(dataFormatCID, DBname, description, category, requiredRows, { gasLimit: 1000000 })
         return await tx.wait()
     }
 
-    const submitData = async(tokenId: number, metadataCID: String, rows: number) => {
-        const tx = await contract.submitData(tokenId, metadataCID, rows, { gasLimit: 1000000 })
+    const submitData = async(tokenId: number, dataCID: String, rows: number) => {
+        const tx = await contract.submitData(tokenId, dataCID, rows, { gasLimit: 1000000 })
         return await tx.wait()
     }
     const createDB_NFT = async(tokenId: String, metadataCID: String, mintPrice: number, royaltiesAddress: String) => {

@@ -5,7 +5,7 @@ import CheckboxSelect from "../elements/Checkbox";
 
 export default function FileStatus({ record }) {
     const polybase = usePolybase();
-    const { data, error, loading } = useDocument(polybase.collection("File").where("cid", "==", record.cid));
+    const { data, error, loading } = useDocument(polybase.collection("File").where("cid", "==", record.cid) );
     
     const [selectedCategories, setSelectedCategories] = useState([]);
 
@@ -86,8 +86,19 @@ export default function FileStatus({ record }) {
     }
 
     return (
-        <div>
-            {JSON.stringify(data)}
+        console.log(data), 
+        <div>            
+            <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+            <div className="flex justify-between py-3 text-sm font-medium">
+              <dt className="text-gray-500">Added At</dt>
+              <dd className="text-gray-900">{data.data[0].data.addedAt}</dd>
+            </div>
+            <div className="flex justify-between py-3 text-sm font-medium">
+            <dt className="text-gray-500">MetaData cid</dt>
+            <dd className="text-gray-900">{data.data[0].data.metadata}</dd>
+            </div>
+         
+          </dl>
         </div>
     )
 }

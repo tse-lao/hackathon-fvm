@@ -2,8 +2,9 @@ import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
 import FileStatus from '@/components/application/files/FileStatus';
-import { signAuthMessage, uploadMetaData } from '@/lib/createLighthouseApi';
-import readBlobAsJson, { analyzeJSONStructure, readBlobAsCsvToJson } from '@/lib/dataManipulation';
+import useNftStorage from '@/hooks/useNftStorage';
+import { signAuthMessage } from '@/lib/createLighthouseApi';
+import readBlobAsJson, { analyzeJSONStructure, readBlobAsCsvToJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
 import lighthouse from '@lighthouse-web3/sdk';
 import { useRouter } from 'next/router';
@@ -22,7 +23,8 @@ const fileDefault = {
 export default function ViewFile() {
     const { cid } = useRouter().query;
     const { address } = useAccount();
-    
+    const {uploadMetadata} = useNftStorage();
+
     const [record, setRecord] = useState(
         {
             cid: "",
@@ -38,6 +40,7 @@ export default function ViewFile() {
     //get the file info.
     useEffect(() => {
         const getFile = async () => {
+            setRecord({cid: cid, metadata: ""})
             const status = await lighthouse.getFileInfo(cid)
             setFileInfo(status.data);
         }
@@ -112,15 +115,14 @@ export default function ViewFile() {
         const structure = analyzeJSONStructure(fileURL);
         console.log(structure)
       
-
+        const metadata = await uploadMetadata(JSON.stringify(structure));
         //we want to upload this record to polybase but also lighthouse.
-        const metadata = await uploadMetaData(JSON.stringify(structure));
         console.log("SHOW METADATA:")
         console.log(metadata);
         
        setRecord({
             cid: cid,
-            metadata: metadata.data.Hash
+            metadata: metadata
         });
     }
 
