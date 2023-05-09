@@ -5,7 +5,7 @@ import {
 } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
-import { mainnet, polygon } from 'wagmi/chains';
+import { mainnet, polygon, polygonMumbai } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
 import { Auth } from '@polybase/auth';
@@ -22,7 +22,7 @@ const auth = typeof window !== 'undefined' ? new Auth() : null;
 
 
 const { chains, provider } = configureChains(
-  [mainnet, polygon],
+  [mainnet, polygon, polygonMumbai],
   [
     publicProvider()
   ]

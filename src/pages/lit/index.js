@@ -10,7 +10,8 @@ export default function Lit() {
   
   
 const [verified, setVerified] = useState("")
-const cid = "QmceLYg2qo9KbUqTA1fzontG9i49TCHZZgau2Vrca5j38b"
+const cid = "QmX6iWJ52kKzzkzMgvriwJb5KV1PtpuQ4CQpjM8DE66pGM"
+const cid2 = "QmREAx7KiUPNfGGH9myXcMc8dpREX2ym2rKdus4tceMPrt"
 const publicVerifier = "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"
 
 const shareFile = async() =>{
@@ -96,6 +97,8 @@ const revokeAccess = async() =>{
 const verifyData = async () => {
     const url = "http://localhost:4000"
     
+    const pUrl = "https://apollo-server-gateway.herokuapp.com/"
+    
     //share cid with verifier. 
     await shareFile();
       
@@ -105,7 +108,7 @@ const verifyData = async () => {
       }`
 
         try {    
-          const fetchCID = await fetch(url, {
+          const fetchCID = await fetch(pUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -123,19 +126,51 @@ const verifyData = async () => {
             setVerified(result.data.verifyCID)
 
             if(result.errors){
-                toast.error("Error: " + result.errors[0].message)
+                toast.error("Error 1: " + result.errors[0].message)
             }
             toast.success("succesfully fetched..")
 
             
         }catch(e){
             console.log(e)
-            toast.error("Error: " + e)
+            toast.error("Error 2: " + e)
         }
         
         //revoke acess
-        revokeAccess();
+        //revokeAccess();
 
+}
+
+const verifyLit = async () => {
+  const query = `
+  query Query($cid: String) {
+    verifyCID(cid: $cid)
+  }`
+
+  const url = "https://apollo-server-gateway.herokuapp.com/";
+  const fetchCID = await fetch(url, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+        "query": query,
+        "variables": {
+            "cid": cid, //this we need to provide in params 
+        }
+    }
+    )
+}).then((response) => response.json());
+
+console.log(fetchCID.data.verifyCID)
+
+const verifiedCID = fetchCID.data.verifyCID;
+    const contractFormatCID = "bafkreigpliv6qwuawfwkea45t4rj2fzc6whbapp3awxssjmf3puqd7huve";
+    if (verifiedCID != contractFormatCID) {
+        return;
+    }
+    
+    return verifiedCID;
 }
   return (
     <Layout>
@@ -157,7 +192,7 @@ const verifyData = async () => {
         <span>{verified}</span>
           <button
           className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-          onClick={verifyData}
+          onClick={verifyLit}
           >Verify data over http request</button>
       </div>
     </Layout>

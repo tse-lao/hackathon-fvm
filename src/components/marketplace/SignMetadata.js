@@ -26,50 +26,21 @@ export default function SignMetadata() {
         
         await litJsSdkLoaded();
 
-        const litActionCode = `
-          const go = async () => {
-            // test an access control condition
-
-            // only sign if the access condition is true
-            
-            if (cid != "QmdwVoFEcTSZY9W3h91ExJAZmnzmjBaTETv9fHSRixXRom"){
-              return;
-            }
-            
-            https://hackathon.fvm.com/checkMeta/${cid}
-            cid => checkMeta => true/false
-                        
-            // turn CID => into JSON
-            // JSON => function
-            // function => METADATA CID
-            
-            
-            
-            
-            
-
-            // this is the string "Hello World" for testing
-            const toSign = cid;
-            // this requests a signature share from the Lit Node
-            // the signature share will be automatically returned in the HTTP response from the node
-            const sigShare = await LitActions.signEcdsa({ toSign, publicKey: publicKey, sigName: "sig1" });
-          };
-
-
-
-          go();
-          `;
         
-        const PERS = "sdfsdf"
-        const CID = "QmdwVoFEcTSZY9W3h91ExJAZmnzmjBaTETv9fHSRixXRom";
-        console.log(CID);
+        const submitCID = "QmX6iWJ52kKzzkzMgvriwJb5KV1PtpuQ4CQpjM8DE66pGM";
+        const metadata= "";
+        const validateCID = "QmWQkXH28ePG6bvoUtAkfb1dogpcQ6ThLeWfXqypetjVtQ";
+
 
         const results = await litNodeClient.executeJs({
-          code: litActionCode,
+          targetNodeRange: 1, 
+          ipfsId: validateCID,
           authSig,
           jsParams: {
-            cid: PERS, 
+            cid: submitCID, 
             publicKey: PUBLIC_KEY,
+            sigName: "sig1",
+            toSign: [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100],
           },
         });
         console.log("results", results);
