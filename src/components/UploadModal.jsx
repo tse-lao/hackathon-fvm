@@ -16,8 +16,7 @@ export default function UploadModal({ onClose }) {
     const uploadedFiles = [];
 
     useEffect(() => {
-        console.log(files)
-    }, [files])
+    }, [])
 
     const progressCallback = (progressData) => {
         let percentageDone =
@@ -33,12 +32,18 @@ export default function UploadModal({ onClose }) {
             tempFiles.push(e.target.files[i])
         }
 
-        setFiles(tempFiles)
-
-        console.log(files)
-
+        setFiles(tempFiles);
+        toast.success("File added");
     }
 
+    
+    const startUpload = async () => {
+        if (encryption) {
+            uploadFileEncrypted()
+        } else {
+            uploadFile()
+        }
+    }
     const uploadFile = async (e) => {
 
         let api = await getLighthouse(address);
@@ -66,6 +71,8 @@ export default function UploadModal({ onClose }) {
 
             progressCallback
         );
+        
+        console.log(response);
 
     }
 
@@ -137,7 +144,7 @@ export default function UploadModal({ onClose }) {
                 <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-cf-500 text-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-cf-600 hover:bg-cf-300 sm:mt-0 sm:w-auto"
-                    onClick={onClose}
+                    onClick={startUpload}
                 >
                     Upload
                 </button>

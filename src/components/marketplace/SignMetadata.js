@@ -1,12 +1,15 @@
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 
-const PUBLIC_KEY ="0x04808e24bb109fac42882de0203d77f2ad60ffdbf7ff339d77036f71b35095198aa8cb2705030b4b1a206b066cb0bebd18b45353a79f150eebd6b1e986e97f5d32"
 
 export default function SignMetadata() {
-
-  const dataCID = "QmX6iWJ52kKzzkzMgvriwJb5KV1PtpuQ4CQpjM8DE66pGM";
+  
+  //if want to use your own: change PUBLIC KEY 
+  const PUBLIC_KEY ="0x04808e24bb109fac42882de0203d77f2ad60ffdbf7ff339d77036f71b35095198aa8cb2705030b4b1a206b066cb0bebd18b45353a79f150eebd6b1e986e97f5d32"
   const litCID = "QmanxAzq5LrkJdGWR1V8SWN8kpGVJawqnV9YoyMnMg9R9w";
+  const dataCID = "QmX6iWJ52kKzzkzMgvriwJb5KV1PtpuQ4CQpjM8DE66pGM";
   const metaCID = "bafkreigpliv6qwuawfwkea45t4rj2fzc6whbapp3awxssjmf3puqd7huve";
+  
+  
       async function litJsSdkLoaded() {
         const client = new LitJsSdk.LitNodeClient({ litNetwork: "serrano" });
 

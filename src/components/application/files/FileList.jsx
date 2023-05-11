@@ -47,7 +47,7 @@ export default function FileList({ address }) {
         setIsModalOpen(!isModalOpen)
     }
     const closeModal = () => {
-        setIsModalOpen(false)
+        setIsModalOpen(!isModalOpen)
     }
     return (
         <div className="px-4 sm:px-6 lg:px-8">
