@@ -15,8 +15,6 @@ export default function FileList({ address }) {
         
         
         const getFiles = async () => {
-
-            console.log(address)
             const uploads = await lighthouse.getUploads(address);
             setFiles(uploads.data.fileList)
             setTotalFiles(uploads.data.totalFiles)

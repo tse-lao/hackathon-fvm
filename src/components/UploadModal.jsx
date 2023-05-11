@@ -27,13 +27,13 @@ export default function UploadModal({ onClose }) {
 
 
     const upload = async (e) => {
-        const tempFiles = files
+        const tempFiles = [...files]
         for (let i = 0; i < e.target.files.length; i++) {
             tempFiles.push(e.target.files[i])
         }
 
         setFiles(tempFiles);
-        toast.success("File added");
+    
     }
 
     
@@ -44,15 +44,35 @@ export default function UploadModal({ onClose }) {
             uploadFile()
         }
     }
-    const uploadFile = async (e) => {
+    const uploadFile = async () => {
 
         let api = await getLighthouse(address);
-        const output = await lighthouse.upload(e, api, progressCallback);
+        
+        for(let i = 0; i < files.length; i++) {
+            const mockEvent = {
+                target: {
+                    files: [files[i]],
+                },
+                persist: () => {},
+            };
 
-        console.log(output)
+            try{
+                
+                const output = await lighthouse.upload(mockEvent, api, progressCallback);
+                
+                toast.success("Succesfully uploaded the files");
+                window.location.reload();
+            }catch(e){
+                toast.error(e.message)
+            }
+     
+        }
+        
+        toast.success("Succesfully uploaded the files");
+
     }
 
-    const uploadFileEncrypted = async (e) => {
+    const uploadFileEncrypted = async () => {
         /*
            uploadEncrypted(e, accessToken, publicKey, signedMessage, uploadProgressCallback)
            - e: js event
@@ -63,16 +83,32 @@ export default function UploadModal({ onClose }) {
         */
         let api = await getLighthouse(address);
         const sig = await signAuthMessage();
-        const response = await lighthouse.uploadEncrypted(
-            e,
-            api,
-            sig.publicKey,
-            sig.signedMessage,
-
-            progressCallback
-        );
         
-        console.log(response);
+        for(let i = 0; i < files.length; i++) {
+            
+            const mockEvent = {
+                target: {
+                    files: [files[i]],
+                },
+                persist: () => {},
+            };
+                
+            try {
+                const response = await lighthouse.uploadEncrypted(
+                    mockEvent,
+                    api,
+                    sig.publicKey,
+                    sig.signedMessage,
+                    progressCallback
+                );
+                
+                
+                window.location.reload();
+    
+        }catch(e){
+            toast.error(e.message)
+        }
+    }
 
     }
 
@@ -81,10 +117,9 @@ export default function UploadModal({ onClose }) {
     }
 
     const removeSelect = (index) => {
+        const newFiles = files.filter((_, i) => i !== index);
+        setFiles(newFiles);
         toast.success("File removed" + index);
-        const tempFiles = files
-        tempFiles.splice(index, 1)
-        setFiles(tempFiles)
 
     }
 
