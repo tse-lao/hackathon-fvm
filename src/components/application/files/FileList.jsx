@@ -15,8 +15,6 @@ export default function FileList({ address }) {
         
         
         const getFiles = async () => {
-
-            console.log(address)
             const uploads = await lighthouse.getUploads(address);
             setFiles(uploads.data.fileList)
             setTotalFiles(uploads.data.totalFiles)
@@ -47,7 +45,7 @@ export default function FileList({ address }) {
         setIsModalOpen(!isModalOpen)
     }
     const closeModal = () => {
-        setIsModalOpen(false)
+        setIsModalOpen(!isModalOpen)
     }
     return (
         <div className="px-4 sm:px-6 lg:px-8">

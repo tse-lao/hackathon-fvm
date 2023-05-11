@@ -34,7 +34,7 @@ export default function Toggle({text, status, changeStatus}) {
       </Switch>
       <Switch.Label as="span" className="ml-3 text-sm">
         <span className="font-medium text-gray-900">{text}</span>{' '}
-        <span className="text-gray-500">(Save 10%)</span>
+        <span className="text-gray-500">(Select is on)</span>
       </Switch.Label>
     </Switch.Group>
   )
