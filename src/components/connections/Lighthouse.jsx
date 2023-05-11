@@ -1,46 +1,31 @@
-import { getLighthouse, lighthouseSetup } from "@/lib/createLighthouseApi";
-import { usePolybase } from "@polybase/react";
+import { createApiKey, getLighthouse } from "@/lib/createLighthouseApi";
 import { useEffect, useState } from "react";
+import Connected from "../application/elements/Connected";
 
 export default function Lighthouse({address}) {
-    const polybase = usePolybase();
+  
     
     const [apiExist, setApiExist] = useState(false);
     
     
     useEffect(() => {
         const getApi = async () => {
-            const lighthouse = await lighthouseSetup();
-          setApiExist(lighthouse);    
+            const lighthouse = await getLighthouse(address);
+            console.log(lighthouse)
+            if (!lighthouse) {
+                setApiExist(false);
+            }else{
+                setApiExist(true);
+            }
         }
         getApi();
     }, [])
     
-    
-
-    
-    
-    
     const createApi = async () => {
-      
-        const apiKey = await getLighthouse(address);
-        console.log(apiKey);
+      const create = await createApiKey(address);
+      console.log(create);
     }
     
-  return (
-    <div>
-        <h2>Lighthouse</h2>
-        {apiExist ? <p>API exists</p> : (
-          <div>
-          <button onClick={createApi}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-          Create API access
-          </button>
-          
-          </div>
-          
-          )}
-    </div>
-  )
+    
+  return <Connected connected={apiExist} msg="Lighthouse API" handleConnect={createApi}/>
 }

@@ -15,20 +15,20 @@ export default function Home() {
 
 
 
-  useEffect(() => {    
-   const setup = async () => {
+  useEffect(() => {
+    const setup = async () => {
       const result = await getLighthouse(address);
-      
-      if(!result){
+
+      if (!result) {
         router.push('/settings/files');
       }
 
-   }
-   
-   setup();
-   
+    }
+
+    setup();
+
   }, [])
-  
+
 
   return (
     <Layout active="Dashboard">
@@ -36,9 +36,7 @@ export default function Home() {
       {mounted ? address && (
         <main className='flex flex-col gap-12'>
           <Stats address={address} />
-          
-     <FileList address={address} />
-        
+          <FileList address={address} />
         </main>
 
       ) :
