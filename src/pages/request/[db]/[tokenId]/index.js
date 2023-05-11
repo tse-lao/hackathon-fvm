@@ -7,10 +7,11 @@ import { useEffect, useState } from "react";
 import Contributions from "@/components/application/data/Contributions";
 import GrantAccess from "@/components/application/request/GrantAccess";
 import {
-    CheckIcon,
-    HandThumbUpIcon,
-    UserIcon
+  CheckIcon,
+  HandThumbUpIcon,
+  UserIcon
 } from '@heroicons/react/20/solid';
+import { useAccount } from "wagmi";
 
 
 const eventTypes = {
@@ -72,6 +73,7 @@ export default function GetRequestDetails() {
     const { db, tokenId } = router.query;
     const [loading, setLoading] = useState(true);
     const [metadata, setMetadata] = useState(null);
+    const {address} = useAccount();
     const [data, setData] = useState(null);
     const [showGrant, setShowGrant] = useState(false);
 
@@ -197,7 +199,7 @@ export default function GetRequestDetails() {
             <section aria-labelledby="timeline-title" className="lg:col-span-1 lg:col-start-3">
             <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             {showGrant ? (
-                <GrantAccess tokenID={data.tokenID} setShowGrant={setShowGrant}/>
+                <GrantAccess tokenID={data.tokenID} setShowGrant={setShowGrant} address={address}/>
             ): (
                 <div>
                 <h2 id="timeline-title" className="text-lg font-medium text-gray-900">

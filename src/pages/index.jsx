@@ -38,7 +38,7 @@ export default function Home() {
           <Stats address={address} />
           <FileList address={address} />
         </main>
-
+ 
       ) :
         (
           <main className='flex flex-col gap-12'>

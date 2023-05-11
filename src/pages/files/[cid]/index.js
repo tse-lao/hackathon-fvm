@@ -182,8 +182,8 @@ export default function ViewFile() {
                         {/* Sidebar */}
                         <div className="w-120 p-4 bg-gray-100">
                             <h2 className="text-xl font-semibold mb-4">File Information</h2>
-                            
-                            <FileStatus record={record} />
+                            {address &&   <FileStatus cid={cid} address={address}/> }
+                          
                             <FileDetailInformation detail={fileInfo} />
 
                             <FileSharedWith cid={cid} />

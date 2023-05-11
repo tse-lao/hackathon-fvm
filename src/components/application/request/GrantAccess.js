@@ -1,18 +1,22 @@
 import { useContract } from "@/hooks/useContract";
+import { grantSmartAccess } from "@/hooks/useLighthouse";
+import { recoverAddress, runLitProtocol } from "@/hooks/useLitProtocol";
 import { useDocument, usePolybase } from "@polybase/react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export default function GrantAccess({tokenID, metadataCID}) {
+export default function GrantAccess({tokenID, metadataCID, address}) {
     const polybase = usePolybase();
-    const { data, error, loading } = useDocument(polybase.collection("File").where("metadata", "==", metadataCID) );
+    
+    const { data, error, loading } = useDocument(polybase.collection("File").where("metadata", "==", metadataCID).where("owner", "==", address) );
+    
     const [selectedOptions, setSelectedOptions] = useState([]);
     const {submitData} = useContract();
 
     if(loading) return <div>Loading...</div>
     if(error) return <div>Error: {error.message}</div>
 
-    
+
   
     const handleCheckboxChange = (e) => {
       const checkedValue = e.target.value;
@@ -28,7 +32,20 @@ export default function GrantAccess({tokenID, metadataCID}) {
     };
 
     const provideAcces = async () => {
+        //call lighthouse function to provide access based on the porject statistics. 
+        const cid = selectedOptions[0];
         
+        
+      await recoverAddress(cid);
+      return
+        const result = await grantSmartAccess(cid, tokenID, "5");
+        console.log(result)
+        
+        const litProtocol = await runLitProtocol(cid);
+        console.log(litProtocol)
+      
+        return;
+      
         if(tokenID < 1 && selectedOptions.length == 1){
             toast.error("Error: By not providing the rights inputs")
         }

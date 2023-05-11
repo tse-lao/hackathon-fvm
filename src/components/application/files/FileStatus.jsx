@@ -1,12 +1,11 @@
 import { useDocument, usePolybase } from "@polybase/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import CheckboxSelect from "../elements/Checkbox";
 
-export default function FileStatus({ record }) {
+export default function FileStatus({ metadata,cid, address }) {
     const polybase = usePolybase();
-    const { data, error, loading } = useDocument(polybase.collection("File").where("cid", "==", record.cid) );
-    
+    const { data, loading } = useDocument(polybase.collection("File").where("cid", "==", cid).where("owner", "==", address));
+
     const [selectedCategories, setSelectedCategories] = useState([]);
 
     const categories = [
@@ -16,6 +15,9 @@ export default function FileStatus({ record }) {
         'Interactions',
         'Interests',
     ];
+    
+    useEffect(() => {
+    }, [address])
 
     const handleCategoryChange = (newSelectedCategories) => {
         setSelectedCategories(newSelectedCategories);
@@ -44,10 +46,11 @@ export default function FileStatus({ record }) {
 
         const collection = await polybase.collection("File").create([
             requestId,
-            record.cid,
-            record.metadata,
+            cid,
+            metadata,
             selectedCategories,
-            requestTime
+            requestTime, 
+            address
         ])
 
         console.log(collection)
@@ -58,47 +61,42 @@ export default function FileStatus({ record }) {
     }
 
     // if it does, we want to check if the file is uploaded to polybase
-    if (error) { return (<div>Error: {error.message}</div>) }
     if (loading) { return (<div>Loading...</div>) }
-    if (data.data.length == 0) {
+    if (data == null || data.data.length == 0) {
         return (
             <div>
-            
                 <div>
-                    <span>CID</span>
-                    <span>{record.cid}</span>
+                    <span>metadata</span>
+                    <span>{metadata}</span>
                 </div>
-                <div>
-                <span>metadata</span>
-                <span>{record.metadata}</span>
-            </div>
-                <CheckboxSelect
-                    options={categories}
-                    selectedValues={selectedCategories}
-                    onChange={handleCategoryChange}
-                />
-                <button onClick={createRecord}>
+                {metadata == "" ? <button onClick={createRecord}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-500 hover:bg-cf-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cf-indigo-500"
+                >
+                    Create Metadata CID
+                </button> : <button onClick={createRecord}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-cf-500 hover:bg-cf-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cf-indigo-500"
+                >
                     Create Record
                 </button>
-
+                }
             </div>
         )
     }
 
     return (
-        console.log(data), 
-        <div>            
+        console.log(data),
+        <div>
             <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-            <div className="flex justify-between py-3 text-sm font-medium">
-              <dt className="text-gray-500">Added At</dt>
-              <dd className="text-gray-900">{data.data[0].data.addedAt}</dd>
-            </div>
-            <div className="flex justify-between py-3 text-sm font-medium">
-            <dt className="text-gray-500">MetaData cid</dt>
-            <dd className="text-gray-900">{data.data[0].data.metadata}</dd>
-            </div>
-         
-          </dl>
+                <div className="flex justify-between py-3 text-sm font-medium">
+                    <dt className="text-gray-500">Added At</dt>
+                    <dd className="text-gray-900">{data.data[0].data.addedAt}</dd>
+                </div>
+                <div className="flex justify-between py-3 text-sm font-medium">
+                    <dt className="text-gray-500">MetaData cid</dt>
+                    <dd className="text-gray-900">{data.data[0].data.metadata}</dd>
+                </div>
+
+            </dl>
         </div>
     )
 }
