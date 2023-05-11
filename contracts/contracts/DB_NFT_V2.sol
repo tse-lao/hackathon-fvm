@@ -20,6 +20,7 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
     ITablelandView private tablelandView;
     using Counters for Counters.Counter;
     using EnumerableSet for EnumerableSet.UintSet;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     string private value;
     string private sourceChain;
@@ -34,6 +35,7 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
         uint256 remainingRows;
         uint256 minimumRowsOnSubmission;
         bool mintable;
+        EnumerableSet.AddressSet allowedAddresses;
     }
     
     Counters.Counter private tokenID;
@@ -78,8 +80,9 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
         tables.push(SQLHelpers.toNameFromId(MAIN_TABLE_PREFIX, tableIDs[1]));
         tables.push(SQLHelpers.toNameFromId(ATTRIBUTE_TABLE_PREFIX, tableIDs[2]));
     }
-
     function RequestDB(string memory dataFormatCID , string memory dbName , string memory description , string[] memory categories, uint256 requiredRows, uint256 minimumRowsOnSubmission) public {
+
+    // function RequestDB(string memory dataFormatCID , string memory dbName , string memory description , string[] memory categories, uint256 requiredRows, uint256 minimumRowsOnSubmission, address[] allowed) public {
         // REQUIRE MORE THAN 1 ROWS
         tokenID.increment();
         uint256 ID = tokenID.current();
@@ -87,7 +90,9 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
         tokenInfoMap[ID].remainingRows = requiredRows;
         tokenInfoMap[ID].minimumRowsOnSubmission = minimumRowsOnSubmission;
         tokenInfoMap[ID].creator = msg.sender;
-
+        // for(uint256 i = 0; i < allowed.length; i++){
+        //     tokenInfoMap[ID].allowedAddresses.add(allowed[i]);
+        // }
         mutate(tableIDs[1],tablelandView.insertMainStatement(ID,dataFormatCID,dbName,description,"CID will get added after the DB is fullfilled and the DB NFT creation",minimumRowsOnSubmission));
         mutate(tableIDs[2],tablelandView.insertAttributeStatement(ID ,"creator", Strings.toHexString(msg.sender)));
         
@@ -101,10 +106,14 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
     }
 
     function submitData(uint256 tokenId, string memory dataCID, uint256 rows) public{
-        // onlyPKP(msg.sender);       
+        // onlyPKP(msg.sender);  
+        // if(tokenInfoMap[tokenId].allowedAddresses.length > 0){
+        //     require(tokenInfoMap[tokenId].allowedAddresses.contains(msg.sender));     
+        // }
         require(tokenInfoMap[tokenId].minimumRowsOnSubmission <= rows, "sumbit more data");
         require(!submittedCIDtoTokens[dataCID].contains(tokenId), "DB already has that CID");
         submissionsNumberByID[tokenId][msg.sender] = submissionsNumberByID[tokenId][msg.sender] + rows;
+        submittedCIDtoTokens[dataCID].add(tokenId);
         if(tokenInfoMap[tokenId].remainingRows >= rows){
             tokenInfoMap[tokenId].remainingRows = tokenInfoMap[tokenId].remainingRows - rows;
         }

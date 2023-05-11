@@ -65,6 +65,7 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
             )
         );
     }
+
     function bountyInsertion(bytes memory piece_cid, address creator, string memory key, string memory piece_cidIPFS_URL, uint256 bountyreward, uint256 size) internal view returns(string memory){
         return SQLHelpers.toInsert(
             BOUNTY_TABLE_PREFIX,
@@ -95,7 +96,6 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
             tableId,
             statement
         );
-        
     }
 
     constructor(address gateway_, address gasReceiver_) AxelarExecutable(gateway_) {
@@ -142,18 +142,24 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
         mutate(bounty_tableID, bountyInsertion( piece_cid, creator , key, piece_cidIPFS_URL, bountyReward, size )); 
 
     }
-    // https://ethereum.stackexchange.com/questions/2519/how-to-convert-a-bytes32-to-string
-    function bytes32ToString(bytes32 _bytes32) public pure returns (string memory) {
-        uint8 i = 0;
-        while(i < 32 && _bytes32[i] != 0) {
-            i++;
-        }
-        bytes memory bytesArray = new bytes(i);
-        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
-            bytesArray[i] = _bytes32[i];
-        }
-        return string(bytesArray);
+
+    // First string to bytes and then bytes to string to make the pieceCID 
+    // look similar but now us a real string 
+    // string => bytes
+    // pieceCID STRING  0x00000181E2039220206B86B273FF34FCE19D6B804EFF5A3F5747ADA4EAA22F1D49C01E52DDB7875B4B
+    // Bytes of pieceCID 0x307830303030303138314532303339323230323036423836423237334646333446434531394436423830344546463541334635373437414441344541413232463144343943303145353244444237383735423442
+    
+    // bytes of pieceCID to String and we take a string representation
+    // 
+    function stringToBytes(string memory input)public pure returns(bytes memory) {
+        bytes memory output = bytes(input);
+    return output;
     }
+
+    function bytesToString(bytes memory output)public pure returns(string memory){
+            return string(output);
+    }
+
 
     /// @dev Funding a Bounty
     /// @param piece_cid: cid of the bounty to get funded
@@ -161,10 +167,6 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
         require(pieceToBounty[piece_cid].created, "bounty does not exists");
         pieceToBounty[piece_cid].donatedTokens = pieceToBounty[piece_cid].donatedTokens + msg.value;
     }
-
-
-
-
 
     /// @dev Claiming a bounty: Client or SP that made a deal for a piece_cid can claim it and 
     /// @dev get rewarded  
@@ -244,5 +246,4 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
         (int256 exit, uint64 return_codec, bytes memory return_value) = abi.decode(data, (int256, uint64, bytes));
         return (success, exit, return_codec, return_value);
     }
-
 }
