@@ -13,9 +13,14 @@ export const useContract = () => {
         return await contract.totalSupply()
     }
 
-    const RequestDB = async( dataFormatCID: string, DBname: string, description: string, category: string, requiredRows: number) => {
+    // Now only contributors that at least one time submitted || only  the owner || NFT holder
+    const hasAccess = async(address: string, tokenId: number) => {
+        return await contract.hasAccess(address, tokenId)
+    }
+
+    const RequestDB = async( dataFormatCID: string, DBname: string, description: string, categories: string[], requiredRows: number, minimumRowsOnSubmission:number) => {
         //read dataFormatCID from the contract.
-        const tx = await contract.RequestDB(dataFormatCID, DBname, description, category, requiredRows, { gasLimit: 1000000 })
+        const tx = await contract.RequestDB(dataFormatCID, DBname, description, categories, requiredRows,minimumRowsOnSubmission, { gasLimit: 1000000 })
         return await tx.wait()
     }
 
@@ -23,9 +28,11 @@ export const useContract = () => {
         const tx = await contract.submitData(tokenId, dataCID, rows, { gasLimit: 1000000 })
         return await tx.wait()
     }
-    const createDB_NFT = async(tokenId: String, metadataCID: String, mintPrice: number, royaltiesAddress: String) => {
+
+
+    const createDB_NFT = async(tokenId: String, dbCID: String, mintPrice: number, royaltiesAddress: String) => {
         const price = ethers.utils.parseEther(mintPrice.toString())
-        const tx = await contract.createDB_NFT(tokenId, metadataCID,price,royaltiesAddress, { gasLimit: 1000000 })
+        const tx = await contract.createDB_NFT(tokenId, dbCID, price, royaltiesAddress, "0x00", { gasLimit: 1000000 })
         return await tx.wait()
     }
 
@@ -58,5 +65,6 @@ export const useContract = () => {
         executeCrossChainBacalhauJob,
         submitFunds,
         balanceOf,
+        hasAccess
     }
 }
