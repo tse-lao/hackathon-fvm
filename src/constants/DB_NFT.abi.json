@@ -1,15 +1,9 @@
 [{
         "inputs": [{
-                "internalType": "address",
-                "name": "gateway_",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "gasReceiver_",
-                "type": "address"
-            }
-        ],
+            "internalType": "contract ITablelandView",
+            "name": "tablelandview",
+            "type": "address"
+        }],
         "stateMutability": "nonpayable",
         "type": "constructor"
     },
@@ -20,16 +14,6 @@
             "type": "uint256"
         }],
         "name": "ChainNotSupported",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "InvalidAddress",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "NotApprovedByGateway",
         "type": "error"
     },
     {
@@ -54,6 +38,24 @@
             }
         ],
         "name": "ApprovalForAll",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
         "type": "event"
     },
     {
@@ -147,6 +149,17 @@
         "type": "event"
     },
     {
+        "inputs": [],
+        "name": "PKP",
+        "outputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [{
                 "internalType": "string",
                 "name": "dataFormatCID",
@@ -154,7 +167,7 @@
             },
             {
                 "internalType": "string",
-                "name": "DBname",
+                "name": "dbName",
                 "type": "string"
             },
             {
@@ -163,17 +176,33 @@
                 "type": "string"
             },
             {
-                "internalType": "string",
-                "name": "category",
-                "type": "string"
+                "internalType": "string[]",
+                "name": "categories",
+                "type": "string[]"
             },
             {
                 "internalType": "uint256",
                 "name": "requiredRows",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "minimumRowsOnSubmission",
+                "type": "uint256"
             }
         ],
         "name": "RequestDB",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "newPKP",
+            "type": "address"
+        }],
+        "name": "assignNewPKP",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -228,7 +257,7 @@
             },
             {
                 "internalType": "string",
-                "name": "metadataCID",
+                "name": "dbCID",
                 "type": "string"
             },
             {
@@ -240,6 +269,11 @@
                 "internalType": "address",
                 "name": "royaltiesAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "bytes",
+                "name": "commP",
+                "type": "bytes"
             }
         ],
         "name": "createDB_NFT",
@@ -249,113 +283,21 @@
     },
     {
         "inputs": [{
-                "internalType": "bytes32",
-                "name": "commandId",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "string",
-                "name": "sourceChain",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "sourceAddress",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes",
-                "name": "payload",
-                "type": "bytes"
-            }
-        ],
-        "name": "execute",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "string",
-                "name": "destinationChain",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "destinationAddress",
-                "type": "string"
+                "internalType": "address",
+                "name": "contributor",
+                "type": "address"
             },
             {
                 "internalType": "uint256",
                 "name": "tokenId",
                 "type": "uint256"
-            },
-            {
-                "internalType": "string",
-                "name": "_spec",
-                "type": "string"
             }
         ],
-        "name": "executeCrossChainBacalhauJob",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "bytes32",
-                "name": "commandId",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "string",
-                "name": "sourceChain",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "sourceAddress",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes",
-                "name": "payload",
-                "type": "bytes"
-            },
-            {
-                "internalType": "string",
-                "name": "tokenSymbol",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "executeWithToken",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "gasService",
+        "name": "hasAccess",
         "outputs": [{
-            "internalType": "contract IAxelarGasService",
+            "internalType": "bool",
             "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "gateway",
-        "outputs": [{
-            "internalType": "contract IAxelarGateway",
-            "name": "",
-            "type": "address"
+            "type": "bool"
         }],
         "stateMutability": "view",
         "type": "function"
@@ -401,6 +343,13 @@
             "type": "address"
         }],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -486,24 +435,13 @@
     },
     {
         "inputs": [{
-            "internalType": "string",
-            "name": "baseURI",
-            "type": "string"
-        }],
-        "name": "setTableURI",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
                 "internalType": "uint256",
                 "name": "tokenId",
                 "type": "uint256"
             },
             {
                 "internalType": "string",
-                "name": "metadataCID",
+                "name": "dataCID",
                 "type": "string"
             },
             {
@@ -538,6 +476,21 @@
             "name": "",
             "type": "uint256"
         }],
+        "name": "tableIDs",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
         "name": "tables",
         "outputs": [{
             "internalType": "string",
@@ -555,6 +508,16 @@
         }],
         "name": "tokenInfoMap",
         "outputs": [{
+                "internalType": "bytes",
+                "name": "commP",
+                "type": "bytes"
+            },
+            {
+                "internalType": "address",
+                "name": "creator",
+                "type": "address"
+            },
+            {
                 "internalType": "address",
                 "name": "splitterContract",
                 "type": "address"
@@ -575,9 +538,9 @@
                 "type": "uint256"
             },
             {
-                "internalType": "string",
-                "name": "category",
-                "type": "string"
+                "internalType": "uint256",
+                "name": "minimumRowsOnSubmission",
+                "type": "uint256"
             },
             {
                 "internalType": "bool",
@@ -597,6 +560,17 @@
             "type": "uint256"
         }],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+        }],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {

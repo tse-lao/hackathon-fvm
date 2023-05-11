@@ -26,7 +26,7 @@ contract crossChainBacalhauJobs is AxelarExecutable , LilypadCallerInterface, Ow
     uint256 tableID;
     string public tableName;
     string private constant COMPUTATION_TABLE_PREFIX = "computation";
-    string private constant COMPUTATION_SCHEMA = "tokenID text, spec text, jobId text, resultCID text, creator text";
+    string private constant COMPUTATION_SCHEMA = "tokenID text, spec text, bridgeJobId text, jobId text, resultCID text, creator text";
 
     // Gateway = 0xe432150cce91c13a887f7D836923d5597adD8E31 & gasReceiver = 0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
     // lillypad bridge = 0x489656E4eDDD9c88F5Fe863bDEd9Ed0Dc29B224c,0xe432150cce91c13a887f7D836923d5597adD8E31,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
@@ -69,13 +69,12 @@ contract crossChainBacalhauJobs is AxelarExecutable , LilypadCallerInterface, Ow
         to.transfer(userFunds[msg.sender]);
     }
 
-    function executeJOB(uint256 tokenID, string memory _spec, address sender) internal {
+    function executeJOB(uint256 tokenID, string memory _spec, string memory jobId, address sender) internal {
         require(userFunds[sender] >= lilypadFee, "Not enough to run Lilypad job");
         // TODO: spec -> do proper json encoding, look out for quotes in _prompt
-        uint id = bridge.runLilypadJob{value: lilypadFee}(address(this), _spec, uint8(LilypadResultType.CID));
-        require(id > 0, "job didn't return a value");
-        computationInsertion(tokenID, _spec, id, sender);
-        mutate(tableID,computationInsertion(tokenID, _spec, id, sender));
+        uint bridgeJobId = bridge.runLilypadJob{value: lilypadFee}(address(this), _spec, uint8(LilypadResultType.CID));
+        require(bridgeJobId > 0, "job didn't return a value");
+        mutate(tableID,computationInsertion(tokenID, _spec, bridgeJobId, jobId,  sender));
     }
 
 
@@ -103,10 +102,11 @@ contract crossChainBacalhauJobs is AxelarExecutable , LilypadCallerInterface, Ow
     ) internal override {
         require(allowedSourceAddresses[sourceAddress_] && allowedSourceChains[sourceChain_]);
         string memory _spec;
+        string memory jobId;
         uint256 tokenId;
         address sender;
-        (tokenId, _spec, sender) = abi.decode(payload_, (uint256, string, address));
-        executeJOB(tokenId, _spec, sender);
+        (tokenId, _spec, jobId, sender) = abi.decode(payload_, (uint256, string, string, address));
+        executeJOB(tokenId, _spec, jobId ,sender);
     }
 
     function addSourceChains(string memory new_sourceChain, string memory new_sourceAddress) public onlyOwner{
@@ -115,17 +115,19 @@ contract crossChainBacalhauJobs is AxelarExecutable , LilypadCallerInterface, Ow
         allowedSourceChains[new_sourceChain] = true;
     }
 
-    function computationInsertion(uint256 tokenId, string memory _spec, uint256 jobId, address creator) internal view returns(string memory){
+    function computationInsertion(uint256 tokenId, string memory _spec, uint256 bridgeJobId, string memory jobId, address creator) internal view returns(string memory){
         return SQLHelpers.toInsert(
             COMPUTATION_TABLE_PREFIX,
             tableID,
-            "tokenID, spec, jobId, resultCID, creator",
+            "tokenID, spec, bridgeJobId, jobId, resultCID, creator",
             string.concat(
                 SQLHelpers.quote(Strings.toString(tokenId)),
                 ",",
                 SQLHelpers.quote(_spec),
                 ",",
-                SQLHelpers.quote(Strings.toString(jobId)),
+                SQLHelpers.quote(Strings.toString(bridgeJobId)),
+                ",",
+                SQLHelpers.quote(jobId),
                 ",",
                 SQLHelpers.quote("pending"),
                 ",",

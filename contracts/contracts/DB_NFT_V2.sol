@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@tableland/evm/contracts/utils/SQLHelpers.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -18,15 +19,20 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
     ITablelandTables private tablelandContract;
     ITablelandView private tablelandView;
     using Counters for Counters.Counter;
+    using EnumerableSet for EnumerableSet.UintSet;
+
     string private value;
     string private sourceChain;
     string private sourceAddress;
 
     struct tokenInfo{
+        bytes commP;
+        address creator;
         address splitterContract;
         uint256 price;
         uint256 requiredRows;
         uint256 remainingRows;
+        uint256 minimumRowsOnSubmission;
         bool mintable;
     }
     
@@ -35,17 +41,19 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
     mapping(uint256 => tokenInfo) public tokenInfoMap;
 
     mapping(uint256 => mapping (address => uint256))  private submissionsNumberByID;
+
+    mapping(string => EnumerableSet.UintSet) private submittedCIDtoTokens;
   
     string  private _baseURIString;
 
     string private constant MAIN_TABLE_PREFIX = "file_main";
-    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, DBname text, description text, metadataCID text";
+    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text";
 
     string private constant ATTRIBUTE_TABLE_PREFIX = "file_attribute";
     string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
 
     string private constant SUBMISSION_TABLE_PREFIX = "data_contribution";
-    string private constant SUBMISSION_SCHEMA = "tokenID text, metadataCID text, rows text, creator text"; 
+    string private constant SUBMISSION_SCHEMA = "tokenID text, dataCID text, rows text, creator text"; 
 
     string[] private createStatements;
     string[] public tables;
@@ -71,22 +79,31 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
         tables.push(SQLHelpers.toNameFromId(ATTRIBUTE_TABLE_PREFIX, tableIDs[2]));
     }
 
-    function RequestDB(string memory dataFormatCID , string memory DBname , string memory description , string memory category, uint256 requiredRows) public {
+    function RequestDB(string memory dataFormatCID , string memory dbName , string memory description , string[] memory categories, uint256 requiredRows, uint256 minimumRowsOnSubmission) public {
         // REQUIRE MORE THAN 1 ROWS
         tokenID.increment();
         uint256 ID = tokenID.current();
         tokenInfoMap[ID].requiredRows = requiredRows;
         tokenInfoMap[ID].remainingRows = requiredRows;
-        string memory temp = tablelandView.insertMainStatement(ID,dataFormatCID,DBname,description,"CID will get added after the DB is fullfilled and the DB NFT creation");
-        mutate(tableIDs[1],temp);
-        temp = tablelandView.insertAttributeStatement(ID ,"category", category);
-        mutate(tableIDs[2],temp);
-        temp = tablelandView.insertAttributeStatement(ID ,"creator", Strings.toHexString(msg.sender));
-        mutate(tableIDs[2],temp);
+        tokenInfoMap[ID].minimumRowsOnSubmission = minimumRowsOnSubmission;
+        tokenInfoMap[ID].creator = msg.sender;
+
+        mutate(tableIDs[1],tablelandView.insertMainStatement(ID,dataFormatCID,dbName,description,"CID will get added after the DB is fullfilled and the DB NFT creation",minimumRowsOnSubmission));
+        mutate(tableIDs[2],tablelandView.insertAttributeStatement(ID ,"creator", Strings.toHexString(msg.sender)));
+        
+        ITablelandTables.Statement[] memory statements;
+
+        for(uint256 i = 0; i < categories.length; i++){
+            statements[i].statement = (tablelandView.insertAttributeStatement(ID ,"category", categories[i]));
+            statements[i].tableId = tableIDs[2];
+        }
+        mutate(statements);
     }
 
-    function submitData(uint256 tokenId, string memory metadataCID, uint256 rows) public{
-        // onlyPKP(msg.sender);        
+    function submitData(uint256 tokenId, string memory dataCID, uint256 rows) public{
+        // onlyPKP(msg.sender);       
+        require(tokenInfoMap[tokenId].minimumRowsOnSubmission <= rows, "sumbit more data");
+        require(!submittedCIDtoTokens[dataCID].contains(tokenId), "DB already has that CID");
         submissionsNumberByID[tokenId][msg.sender] = submissionsNumberByID[tokenId][msg.sender] + rows;
         if(tokenInfoMap[tokenId].remainingRows >= rows){
             tokenInfoMap[tokenId].remainingRows = tokenInfoMap[tokenId].remainingRows - rows;
@@ -94,25 +111,26 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
         else{
             tokenInfoMap[tokenId].remainingRows = 0;
         }
-        mutate(tableIDs[0],tablelandView.insertSubmissionStatement(tokenId ,metadataCID,rows,msg.sender));
+        mutate(tableIDs[0],tablelandView.insertSubmissionStatement(tokenId ,dataCID,rows,msg.sender));
     }
 
     // We also need to call this function from the PKP because we need to set a fair royaltiesAddress splitter contract
-    function createDB_NFT(uint256 tokenId, string memory metadataCID , uint256 mintPrice, address royaltiesAddress) public {
+    function createDB_NFT(uint256 tokenId, string memory dbCID , uint256 mintPrice, address royaltiesAddress, bytes memory commP) public {
         require(_exists(tokenId));
         // onlyPKP(msg.sender);
-        require(!tokenInfoMap[tokenId].mintable && tokenInfoMap[tokenId].remainingRows == 0);
+        require(!tokenInfoMap[tokenId].mintable && tokenInfoMap[tokenId].remainingRows <= 0 && tokenInfoMap[tokenId].creator == msg.sender);
         tokenInfoMap[tokenId].mintable = true;
         tokenInfoMap[tokenId].price = mintPrice;
         tokenInfoMap[tokenId].splitterContract = royaltiesAddress;
-        string memory set = string.concat("metadataCID='",metadataCID,"'");
+        tokenInfoMap[tokenId].commP = commP;
+        string memory set = string.concat("dbCID='",dbCID,"'");
         string memory filter = string.concat("tokenID=",Strings.toString(tokenId));
         mutate(tableIDs[1],tablelandView.toUpdate(MAIN_TABLE_PREFIX,tableIDs[1], set, filter));
     }
 
-
-    function getContribution(address contributor, uint256 tokenId) public view returns(uint256){
-        return submissionsNumberByID[tokenId][contributor];
+    // Give access to the submissions of an NFT and the NFT final DB to the contributors and to the Owner
+    function hasAccess(address contributor, uint256 tokenId) public view returns(bool){
+        return submissionsNumberByID[tokenId][contributor] > 0 || tokenInfoMap[tokenId].creator == contributor  || balanceOf(contributor,tokenId) > 0;
     }
 
 
@@ -163,7 +181,14 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
         );
     }
 
- 
+    function mutate(
+        ITablelandTables.Statement[] memory statements 
+    ) internal {
+        tablelandContract.mutate(
+            address(this),
+            statements
+        );
+    }
 
     function assignNewPKP(address newPKP) public onlyOwner {
         PKP = newPKP;

@@ -28,20 +28,19 @@ contract tablelandView is  AxelarExecutable ,Ownable{
     string  private _baseURIString;
 
     string private constant MAIN_TABLE_PREFIX = "file_main";
-    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, DBname text, description text, metadataCID text";
+    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text";
 
     string private constant ATTRIBUTE_TABLE_PREFIX = "file_attribute";
     string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
 
     string private constant SUBMISSION_TABLE_PREFIX = "data_contribution";
-    string private constant SUBMISSION_SCHEMA = "tokenID text, metadataCID text, rows text, creator text"; 
+    string private constant SUBMISSION_SCHEMA = "tokenID text, dataCID text, rows text, creator text"; 
 // ["data_contribution_80001_6068","file_main_80001_6069","file_attribute_80001_6070"]
 
 // 0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
      constructor(address gateway_, address gasReceiver_) AxelarExecutable(gateway_) {
         
         gasService = IAxelarGasService(gasReceiver_);
-        // Creating the crypto Studio Tableland Tables on the constructor
         _baseURIString = "https://testnets.tableland.network/api/v1/query?statement=";
      }
 
@@ -49,61 +48,60 @@ contract tablelandView is  AxelarExecutable ,Ownable{
         DB_NFT = IERC1155(nft);
     }
 
-    function setTableInfo(string memory tableName1,string memory tableName2,string memory tableName3) public onlyOwner{ 
-        contribution = tableName1;
-        main = tableName2;
-        attribute = tableName3;
+    function setTableInfo(string memory contributionName,uint256 contributionId,string memory mainName,uint256 mainId,string memory attributeName, uint256 attributeId) public onlyOwner{ 
+        contribution = contributionName;
+        main = mainName;
+        attribute = attributeName;
+        contributionID = contributionId;
+        mainID = mainId;
+        attributeID = attributeId;
     }
 
-     function setTableIDInfo(uint256 tableId1,uint256 tableId2, uint256 tableId3) public onlyOwner{
-        contributionID = tableId1;
-        mainID = tableId2;
-        attributeID = tableId3;
-    }
 
     function toUpdate(string memory prefix, uint256 tableID,string memory set, string memory filter)public view returns(string memory){
         return SQLHelpers.toUpdate(prefix,tableID, set, filter);
     }
     
-    function insertMainStatement(uint256 tokenid ,string memory dataFormatCID, string memory DBname,string memory description,string memory metadataCID) public view returns(string memory){
+    function insertMainStatement(uint256 tokenid ,string memory dataFormatCID, string memory dbName,string memory description,string memory dbCID,uint256 minimumRowsOnSubmission) public view returns(string memory){
     return
     SQLHelpers.toInsert(
             MAIN_TABLE_PREFIX,
             mainID,
-            "tokenID, dataFormatCID, DBname, description, metadataCID",
+            "tokenID, dataFormatCID, dbName, description, dbCID, minimumRowsOnSubmission",
             string.concat(
                 SQLHelpers.quote(Strings.toString(tokenid)),
                 ",",
                 SQLHelpers.quote(dataFormatCID),
                 ",",
-                SQLHelpers.quote(DBname),
+                SQLHelpers.quote(dbName),
                 ",",
                 SQLHelpers.quote(description),
                 ",",
-                SQLHelpers.quote(metadataCID)
+                SQLHelpers.quote(dbCID),
+                ",",
+                SQLHelpers.quote(Strings.toString(minimumRowsOnSubmission))
             )
     );
     }
 
-    function insertSubmissionStatement(uint256 tokenid ,string memory metadataCID, uint256 rows,address creator) public view returns(string memory){
-    return
-    SQLHelpers.toInsert(
-            SUBMISSION_TABLE_PREFIX,
-            contributionID,
-            "tokenID, metadataCID, rows, creator",
-            string.concat(
-                SQLHelpers.quote(Strings.toString(tokenid)),
-                ",",
-                SQLHelpers.quote(metadataCID),
-                ",",
-                SQLHelpers.quote(Strings.toString(rows)),
-                ",",
-                SQLHelpers.quote(Strings.toHexString(creator))
-            )
-    );
+    function insertSubmissionStatement(uint256 tokenid ,string memory dataCID, uint256 rows,address creator) public view returns(string memory){
+        return   SQLHelpers.toInsert(
+                    SUBMISSION_TABLE_PREFIX,
+                    contributionID,
+                    "tokenID, dataCID, rows, creator",
+                    string.concat(
+                        SQLHelpers.quote(Strings.toString(tokenid)),
+                        ",",
+                        SQLHelpers.quote(dataCID),
+                        ",",
+                        SQLHelpers.quote(Strings.toString(rows)),
+                        ",",
+                        SQLHelpers.quote(Strings.toHexString(creator))
+                    )
+                );
     }
 
-    function insertAttributeStatement(uint256 tokenid ,string memory trait_type, string memory value1) public view returns(string memory){
+    function insertAttributeStatement(uint256 tokenid ,string memory trait_type, string memory value) public view returns(string memory){
         return  SQLHelpers.toInsert(
                 ATTRIBUTE_TABLE_PREFIX,
                 attributeID,
@@ -113,7 +111,7 @@ contract tablelandView is  AxelarExecutable ,Ownable{
                     ",",
                     SQLHelpers.quote(trait_type),
                     ",",
-                    SQLHelpers.quote(value1)
+                    SQLHelpers.quote(value)
                 )
             );
     }
@@ -128,7 +126,7 @@ contract tablelandView is  AxelarExecutable ,Ownable{
 				'SELECT%20',
 				'json_object%28%27tokenID%27%2C',
 				main,
-				'%2EtokenID%2C%27DBname%27%2CDBname%2C%27metadataCID%27%2CmetadataCID%2C%27description%27%2Cdescription%2C%27dataFormatCID%27%2CdataFormatCID%2C%27attributes%27%2Cjson_group_array%28json_object%28%27trait_type%27%2Ctrait_type%2C%27value%27%2Cvalue%29%29%29%20',
+				'%2EtokenID%2C%27dbName%27%2CdbName%2C%27dbCID%27%2CdbCID%2C%27description%27%2Cdescription%2C%27dataFormatCID%27%2CdataFormatCID%2C%27attributes%27%2Cjson_group_array%28json_object%28%27trait_type%27%2Ctrait_type%2C%27value%27%2Cvalue%29%29%29%20',
 				'FROM%20',
 				main,
 				'%20JOIN%20',
@@ -156,10 +154,53 @@ contract tablelandView is  AxelarExecutable ,Ownable{
         string calldata destinationChain,
         string calldata destinationAddress,
         uint256 tokenId,
-        string memory _spec
-    ) external payable {
+        string memory _spec,
+        string memory jobId
+    ) public payable {
         require(DB_NFT.balanceOf(msg.sender, tokenId) > 0);
-        bytes memory payload = abi.encode(tokenId, _spec, msg.sender);
+        bytes memory payload = abi.encode(tokenId, _spec, jobId, msg.sender);
+        if (msg.value > 0) {
+            gasService.payNativeGasForContractCall{ value: msg.value }(
+                address(this),
+                destinationChain,
+                destinationAddress,
+                payload,
+                msg.sender
+            );
+        }
+        gateway.callContract(destinationChain, destinationAddress, payload);
+    }
+
+    function createCrossChainBounty(
+        string calldata destinationChain,
+        string calldata destinationAddress,
+        uint256 tokenId,
+        string memory _spec,
+        string memory jobId
+    ) public payable {
+        require(DB_NFT.balanceOf(msg.sender, tokenId) > 0);
+        bytes memory payload = abi.encode(tokenId, _spec, jobId, msg.sender);
+        if (msg.value > 0) {
+            gasService.payNativeGasForContractCall{ value: msg.value }(
+                address(this),
+                destinationChain,
+                destinationAddress,
+                payload,
+                msg.sender
+            );
+        }
+        gateway.callContract(destinationChain, destinationAddress, payload);
+    }
+
+    function createCrossChainDealRequest(
+        string calldata destinationChain,
+        string calldata destinationAddress,
+        uint256 tokenId,
+        string memory _spec,
+        string memory jobId
+    ) public payable {
+        require(DB_NFT.balanceOf(msg.sender, tokenId) > 0);
+        bytes memory payload = abi.encode(tokenId, _spec, jobId, msg.sender);
         if (msg.value > 0) {
             gasService.payNativeGasForContractCall{ value: msg.value }(
                 address(this),
