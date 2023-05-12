@@ -14,7 +14,7 @@ import "./interfaces/ITablelandView.sol";
 /// @author Nick Lionis (github handle : nijoe1 )
 /// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
 /// All the data inside the tables are pointing on an IPFS CID.
-contract DB_NFT_V2 is ERC1155 , Ownable {
+contract DB_NFT_V3 is ERC1155 , Ownable {
 
     ITablelandTables private tablelandContract;
     ITablelandView private tablelandView;
@@ -105,7 +105,9 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
         mutate(statements);
     }
 
-    function submitData(uint256 tokenId, string memory dataCID, uint256 rows) public{
+    function submitData(uint256 tokenId, string memory dataCID, uint256 rows, uint8 v, bytes32 r, bytes32 s) public{
+        string memory signMessage = string.concat(Strings.toString(tokenId),dataCID,Strings.toString(rows));
+        require(tablelandView.verifyString(signMessage, v, r, s, PKP));
         // onlyPKP(msg.sender);  
         // if(tokenInfoMap[tokenId].allowedAddresses.length > 0){
         //     require(tokenInfoMap[tokenId].allowedAddresses.contains(msg.sender));     
@@ -126,6 +128,8 @@ contract DB_NFT_V2 is ERC1155 , Ownable {
     // We also need to call this function from the PKP because we need to set a fair royaltiesAddress splitter contract
     function createDB_NFT(uint256 tokenId, string memory dbCID , uint256 mintPrice, address royaltiesAddress, bytes memory commP) public {
         require(_exists(tokenId));
+        string memory signMessage = string.concat(Strings.toString(tokenId),dbCID,Strings.toString(mintPrice),Strings.toHexString(royaltiesAddress));
+        require(tablelandView.verifyString(signMessage, v, r, s, PKP));
         // onlyPKP(msg.sender);
         require(!tokenInfoMap[tokenId].mintable && tokenInfoMap[tokenId].remainingRows <= 0 && tokenInfoMap[tokenId].creator == msg.sender);
         tokenInfoMap[tokenId].mintable = true;

@@ -24,15 +24,15 @@ export const useContract = () => {
         return await tx.wait()
     }
 
-    const submitData = async(tokenId: number, dataCID: String, rows: number) => {
-        const tx = await contract.submitData(tokenId, dataCID, rows, { gasLimit: 1000000 })
+    const submitData = async(tokenId: number, dataCID: String, rows: number, v: number, r: string,  s: string) => {
+        const tx = await contract.submitData(tokenId, dataCID, rows, v , r , s, { gasLimit: 1000000 })
         return await tx.wait()
     }
 
 
-    const createDB_NFT = async(tokenId: String, dbCID: String, mintPrice: number, royaltiesAddress: String) => {
+    const createDB_NFT = async(tokenId: String, dbCID: String, mintPrice: number, royaltiesAddress: String, v: number, r: string,  s: string) => {
         const price = ethers.utils.parseEther(mintPrice.toString())
-        const tx = await contract.createDB_NFT(tokenId, dbCID, price, royaltiesAddress, "0x00", { gasLimit: 1000000 })
+        const tx = await contract.createDB_NFT(tokenId, dbCID, price, royaltiesAddress, "0x00", v , r , s, { gasLimit: 1000000 })
         return await tx.wait()
     }
 

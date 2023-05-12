@@ -128,7 +128,7 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
     function createBounty(bytes memory piece_cid, address creator, string memory piece_cidIPFS_URL ,uint256 bountyReward,int64 minDealDays,uint256 size) public {
         require(pieceToBounty[piece_cid].created == false, "Bounty exists");
         bytes32 hash = keccak256(abi.encode(piece_cid,msg.sender));
-        string memory key = bytes32ToString(hash);
+        // string memory key = bytes32ToString(hash);
         bounty memory newBounty =       
         bounty({
                 bountyReward: bountyReward, 
@@ -153,7 +153,7 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
     // 
     function stringToBytes(string memory input)public pure returns(bytes memory) {
         bytes memory output = bytes(input);
-    return output;
+        return output;
     }
 
     function bytesToString(bytes memory output)public pure returns(string memory){
