@@ -84,7 +84,8 @@ export default function GetRequestDetails() {
                 setMetadata(metaResponse);
             }
             const getData = async() => {
-                const response = await fetchTokenRequest(db, tokenId);
+                const response = await fetchTokenRequest(tokenId);
+                // /console.log(response[0]);
                 console.log(response[0]);
                 setData(response[0])
                 
@@ -141,19 +142,19 @@ export default function GetRequestDetails() {
                 <div className="bg-white shadow sm:rounded-lg">
                   <div className="px-4 py-5 sm:px-6">
                     <h2 id="applicant-information-title" className="text-lg font-medium leading-6 text-gray-900">
-                        Request Details
+                      {data.dbName} - {data.tokenID}
                     </h2>
                     <p className="mt-1 max-w-2xl text-sm text-gray-500">Find here an overview of all the requested data.</p>
                   </div>
                   <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
                     <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                       <div className="sm:col-span-1">
-                        <dt className="text-sm font-medium text-gray-500">Request creator</dt>
+                        <dt className="text-sm font-medium text-gray-500">Categories</dt>
                         <dd className="mt-1 text-sm text-gray-900"></dd>
                       </div>
                       <div className="sm:col-span-1">
                         <dt className="text-sm font-medium text-gray-500">Min rows required</dt>
-                        <dd className="mt-1 text-sm text-gray-900">10.000</dd>
+                        <dd className="mt-1 text-sm text-gray-900">{data.minimumRowsOnSubmission}</dd>
                       </div>
                       <div className="sm:col-span-1">
                         <dt className="text-sm font-medium text-gray-500">Metadata Format</dt>

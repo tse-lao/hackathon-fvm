@@ -1,6 +1,6 @@
 import { useContract } from "@/hooks/useContract";
 import { grantSmartAccess } from "@/hooks/useLighthouse";
-import { recoverAddress, runLitProtocol } from "@/hooks/useLitProtocol";
+import { runLitProtocol } from "@/hooks/useLitProtocol";
 import { useDocument, usePolybase } from "@polybase/react";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -35,16 +35,15 @@ export default function GrantAccess({tokenID, metadataCID, address}) {
         //call lighthouse function to provide access based on the porject statistics. 
         const cid = selectedOptions[0];
         
-        
-      await recoverAddress(cid);
-      return
-        const result = await grantSmartAccess(cid, tokenID, "5");
+      //for testing recover address only
+      //await recoverAddress(cid);
+      
+        const result = await grantSmartAccess(cid, tokenID, "10001");
         console.log(result)
         
         const litProtocol = await runLitProtocol(cid);
         console.log(litProtocol)
       
-        return;
       
         if(tokenID < 1 && selectedOptions.length == 1){
             toast.error("Error: By not providing the rights inputs")
@@ -52,7 +51,7 @@ export default function GrantAccess({tokenID, metadataCID, address}) {
        
         
         try{
-            await submitData(tokenID, selectedOptions[0], "100");
+            await submitData(tokenID, selectedOptions[0], "10000");
             toast.success("Access granted!")
             //also want toa dd to db            
         }catch(e){

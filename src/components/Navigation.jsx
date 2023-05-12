@@ -105,7 +105,7 @@ export default function Navigation({active}) {
                 <div>
                   <Menu.Button className="flex rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     <span className="sr-only">Open user menu</span>
-                    <img className="h-8 w-8 rounded-full" src="" alt="" />
+                    <img className="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1634896941598-b6b500a502a7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1356&q=80" alt="" />
                   </Menu.Button>
                 </div>
 

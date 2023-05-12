@@ -1,18 +1,21 @@
-import { DB_main } from "@/constants";
 import { useContract } from "@/hooks/useContract";
 import useNftStorage from "@/hooks/useNftStorage";
 import { analyzeJSONStructure, readJSONFromFileInput } from "@/lib/dataHelper";
 import { useAuth, usePolybase } from "@polybase/react";
 import { useState } from "react";
+import TagsInput from "react-tagsinput";
+import 'react-tagsinput/react-tagsinput.css';
 import { toast } from "react-toastify";
+
 
 export default function DataRequestForm  ({onClose}) {
     const [formData, setFormData] = useState({
       name: "",
-      categories: "",
+      categories: [],
       description: "",
       metadata: "",
-      minRows: "",
+      minRows: 0,
+      requiredRows: 0, 
     });
     
     const [metadata, setMetadata] = useState(null);
@@ -22,6 +25,9 @@ export default function DataRequestForm  ({onClose}) {
     const {RequestDB} = useContract();
     const {uploadMetadata}= useNftStorage();
 
+    const handleTagChange = (tags) => {
+      setFormData({ ...formData, categories: tags });
+    };
 
     const uploadMeta = async(e) => {
       const file = e.target.files[0];
@@ -57,13 +63,16 @@ export default function DataRequestForm  ({onClose}) {
       }
       
       try{
-        await RequestDB(metadata, DB_main, formData.description, formData.categories, formData.minRows);
+       //    const RequestDB = async( dataFormatCID: string, DBname: string, description: string, categories: string[], requiredRows: number, minimumRowsOnSubmission:number) => {
+        await RequestDB(metadata, formData.name, formData.description,formData.categories,  formData.requiredRows, formData.minRows);
       }catch(e){
         console.log(e);
         toast.error("Error creating request");
       }
 
     };
+    
+  
 
     return (
 
@@ -86,28 +95,34 @@ export default function DataRequestForm  ({onClose}) {
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Category
           </label>
-          <input
-            type="text"
-            name="categories"
-            id="categories"
-            value={formData.categories}
-            onChange={handleChange}
-            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
+          <TagsInput value={formData.categories} onChange={handleTagChange} />
         </div>
         <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Required rows
+          Min rows
         </label>
         <input
           type="number"
           name="minRows"
           id="minRows"
-          value={formData.numRows}
+          value={formData.minRows}
           onChange={handleChange}
           className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
       </div>
+      <div>
+      <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        Required Rows
+      </label>
+      <input
+        type="number"
+        name="requiredRows"
+        id="requiredRows"
+        value={formData.requiredRows}
+        onChange={handleChange}
+        className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      />
+    </div>
       <div>
       <label htmlFor="requestData" className="block text-sm font-medium text-gray-700">
         Description

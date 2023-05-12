@@ -13,7 +13,7 @@ export const useContract = () => {
         return await contract.totalSupply()
     }
 
-    // Now only contributors that at least one time submitted || only  the owner || NFT holder
+    // Now only contributors that at least one time submitted || only  the owner| NFT holder
     const hasAccess = async(address: string, tokenId: number) => {
         return await contract.hasAccess(address, tokenId)
     }

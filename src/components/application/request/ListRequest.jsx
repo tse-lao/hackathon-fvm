@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import RequestElement from "./RequestElement";
 export default function ListRequest() {
     const [loading, setLoading] = useState(true);
-    const [data, setData] = useState(null);
+    const [data, setData] = useState([]);
     
     useEffect(() => {
 
@@ -20,8 +20,11 @@ export default function ListRequest() {
             })
               .then(response => response.json())
               .then(data => {
-                setData(data)
-                console.log(data);
+                if(data != "Row not found"){
+                  setData(data)
+                  console.log(data);
+                }
+               
                 setLoading(false);
             })
               .catch(error => console.error(error));
@@ -37,9 +40,10 @@ export default function ListRequest() {
     if(loading) return <div>Loading...</div>
     return (
         <div>
-            {data && data.map((request, index) => (
+            {data.length > 0 ? data.map((request, index) => (
                 <RequestElement index={index} request={request} key={index} />
-            )) }
+            )): (<p>No data found!</p>)}
+            
 
         </div>
    

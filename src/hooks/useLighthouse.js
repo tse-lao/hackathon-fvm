@@ -37,7 +37,7 @@ export async function grantSmartAccess(cid, tokenID, minRows) {
     
     ]
 
-    const aggregator = "([1]";
+    const aggregator = "([1])";
     
     const {signedMessage, publicKey} = await signAuthMessage()
     const response = await lighthouse.applyAccessCondition(
