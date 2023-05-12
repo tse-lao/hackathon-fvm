@@ -14,7 +14,7 @@ import "./interfaces/ITablelandView.sol";
 /// @author Nick Lionis (github handle : nijoe1 )
 /// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
 /// All the data inside the tables are pointing on an IPFS CID.
-contract DB_NFT_V3 is ERC1155 , Ownable {
+contract DB_NFT_V2 is ERC1155 , Ownable {
 
     ITablelandTables private tablelandContract;
     ITablelandView private tablelandView;
@@ -27,7 +27,6 @@ contract DB_NFT_V3 is ERC1155 , Ownable {
     string private sourceAddress;
 
     struct tokenInfo{
-        bytes commP;
         address creator;
         address splitterContract;
         uint256 price;
@@ -40,7 +39,7 @@ contract DB_NFT_V3 is ERC1155 , Ownable {
     
     Counters.Counter private tokenID;
 
-    mapping(uint256 => tokenInfo) public tokenInfoMap;
+    mapping(uint256 => tokenInfo) private  tokenInfoMap;
 
     mapping(uint256 => mapping (address => uint256))  private submissionsNumberByID;
 
@@ -49,7 +48,7 @@ contract DB_NFT_V3 is ERC1155 , Ownable {
     string  private _baseURIString;
 
     string private constant MAIN_TABLE_PREFIX = "file_main";
-    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text";
+    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text, piece_cid text";
 
     string private constant ATTRIBUTE_TABLE_PREFIX = "file_attribute";
     string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
@@ -93,10 +92,10 @@ contract DB_NFT_V3 is ERC1155 , Ownable {
         // for(uint256 i = 0; i < allowed.length; i++){
         //     tokenInfoMap[ID].allowedAddresses.add(allowed[i]);
         // }
-        mutate(tableIDs[1],tablelandView.insertMainStatement(ID,dataFormatCID,dbName,description,"CID will get added after the DB is fullfilled and the DB NFT creation",minimumRowsOnSubmission));
+        mutate(tableIDs[1],tablelandView.insertMainStatement(ID,dataFormatCID,dbName,description,"CID will get added after the DB is fullfilled and the DB NFT creation",minimumRowsOnSubmission,"piece_cid"));
         mutate(tableIDs[2],tablelandView.insertAttributeStatement(ID ,"creator", Strings.toHexString(msg.sender)));
         
-        ITablelandTables.Statement[] memory statements;
+        ITablelandTables.Statement[] memory statements = new ITablelandTables.Statement[](categories.length);
 
         for(uint256 i = 0; i < categories.length; i++){
             statements[i].statement = (tablelandView.insertAttributeStatement(ID ,"category", categories[i]));
@@ -126,19 +125,25 @@ contract DB_NFT_V3 is ERC1155 , Ownable {
     }
 
     // We also need to call this function from the PKP because we need to set a fair royaltiesAddress splitter contract
-    function createDB_NFT(uint256 tokenId, string memory dbCID , uint256 mintPrice, address royaltiesAddress, bytes memory commP) public {
+    function createDB_NFT(uint256 tokenId, string memory dbCID , uint256 mintPrice, address royaltiesAddress, string memory piece_cid,  uint8 v, bytes32 r, bytes32 s) public {
         require(_exists(tokenId));
+
         string memory signMessage = string.concat(Strings.toString(tokenId),dbCID,Strings.toString(mintPrice),Strings.toHexString(royaltiesAddress));
         require(tablelandView.verifyString(signMessage, v, r, s, PKP));
-        // onlyPKP(msg.sender);
+
         require(!tokenInfoMap[tokenId].mintable && tokenInfoMap[tokenId].remainingRows <= 0 && tokenInfoMap[tokenId].creator == msg.sender);
         tokenInfoMap[tokenId].mintable = true;
         tokenInfoMap[tokenId].price = mintPrice;
         tokenInfoMap[tokenId].splitterContract = royaltiesAddress;
-        tokenInfoMap[tokenId].commP = commP;
-        string memory set = string.concat("dbCID='",dbCID,"'");
-        string memory filter = string.concat("tokenID=",Strings.toString(tokenId));
-        mutate(tableIDs[1],tablelandView.toUpdate(MAIN_TABLE_PREFIX,tableIDs[1], set, filter));
+
+        ITablelandTables.Statement[] memory statements = new ITablelandTables.Statement[](2);
+
+        statements[0].tableId = tableIDs[1];
+        statements[0].statement = tablelandView.toUpdate(MAIN_TABLE_PREFIX,tableIDs[1], string.concat("dbCID='",dbCID,"'"), string.concat("tokenID=",Strings.toString(tokenId)));
+
+        statements[1].tableId = tableIDs[1];
+        statements[1].statement = tablelandView.toUpdate(MAIN_TABLE_PREFIX,tableIDs[1], string.concat("piece_cid='",piece_cid,"'"), string.concat("tokenID=",Strings.toString(tokenId)));
+        mutate(statements);
     }
 
     // Give access to the submissions of an NFT and the NFT final DB to the contributors and to the Owner

@@ -28,7 +28,7 @@ contract tablelandView is  AxelarExecutable ,Ownable{
     string  private _baseURIString;
 
     string private constant MAIN_TABLE_PREFIX = "file_main";
-    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text";
+    string private constant MAIN_SCHEMA = "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text, piece_cid text";
 
     string private constant ATTRIBUTE_TABLE_PREFIX = "file_attribute";
     string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
@@ -62,12 +62,12 @@ contract tablelandView is  AxelarExecutable ,Ownable{
         return SQLHelpers.toUpdate(prefix,tableID, set, filter);
     }
     
-    function insertMainStatement(uint256 tokenid ,string memory dataFormatCID, string memory dbName,string memory description,string memory dbCID,uint256 minimumRowsOnSubmission) public view returns(string memory){
+    function insertMainStatement(uint256 tokenid ,string memory dataFormatCID, string memory dbName,string memory description,string memory dbCID,uint256 minimumRowsOnSubmission, string memory piece_cid) public view returns(string memory){
     return
     SQLHelpers.toInsert(
             MAIN_TABLE_PREFIX,
             mainID,
-            "tokenID, dataFormatCID, dbName, description, dbCID, minimumRowsOnSubmission",
+            "tokenID, dataFormatCID, dbName, description, dbCID, minimumRowsOnSubmission, piece_cid",
             string.concat(
                 SQLHelpers.quote(Strings.toString(tokenid)),
                 ",",
@@ -79,7 +79,9 @@ contract tablelandView is  AxelarExecutable ,Ownable{
                 ",",
                 SQLHelpers.quote(dbCID),
                 ",",
-                SQLHelpers.quote(Strings.toString(minimumRowsOnSubmission))
+                SQLHelpers.quote(Strings.toString(minimumRowsOnSubmission)),
+                ",",
+                SQLHelpers.quote(piece_cid)
             )
     );
     }

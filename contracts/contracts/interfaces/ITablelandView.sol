@@ -6,7 +6,7 @@ interface ITablelandView {
     
     function uri(uint256 tokenId) external view returns (string memory);
 
-    function insertMainStatement(uint256 tokenid ,string memory dataFormatCID, string memory DBname,string memory description,string memory metadataCID, uint256 minimumRowsOnSubmission) external view returns(string memory);
+    function insertMainStatement(uint256 tokenid ,string memory dataFormatCID, string memory DBname,string memory description,string memory metadataCID, uint256 minimumRowsOnSubmission, string memory piece_cid) external view returns(string memory);
 
     function insertAttributeStatement(uint256 tokenid ,string memory trait_type, string memory value1) external view returns(string memory);
 

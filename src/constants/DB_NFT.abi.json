@@ -271,9 +271,24 @@
                 "type": "address"
             },
             {
-                "internalType": "bytes",
-                "name": "commP",
-                "type": "bytes"
+                "internalType": "string",
+                "name": "piece_cid",
+                "type": "string"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
             }
         ],
         "name": "createDB_NFT",
@@ -448,6 +463,21 @@
                 "internalType": "uint256",
                 "name": "rows",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
             }
         ],
         "name": "submitData",
@@ -497,57 +527,6 @@
             "name": "",
             "type": "string"
         }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "name": "tokenInfoMap",
-        "outputs": [{
-                "internalType": "bytes",
-                "name": "commP",
-                "type": "bytes"
-            },
-            {
-                "internalType": "address",
-                "name": "creator",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "splitterContract",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "price",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "requiredRows",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "remainingRows",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "minimumRowsOnSubmission",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bool",
-                "name": "mintable",
-                "type": "bool"
-            }
-        ],
         "stateMutability": "view",
         "type": "function"
     },

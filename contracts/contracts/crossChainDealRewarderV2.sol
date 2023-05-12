@@ -33,27 +33,25 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
     uint256 bounty_tableID;
     string public bounty_tableName;
     string private constant BOUNTY_TABLE_PREFIX = "bounty";
-    string private constant BOUNTY_SCHEMA = "piece_cid blob, piece_cidIPFS_URL text, reward text, size text, creator text, key text";
+    string private constant BOUNTY_SCHEMA = "piece_cid text, location_ref text, reward text, donatedTokens text, size text";
+            // "piece_cid, location_ref, reward, donatedTokens, size",
 
     uint256 claim_tableID;
     string public claim_tableName;
     string private constant CLAIM_TABLE_PREFIX = "claim";
-    string private constant CLAIM_SCHEMA = "piece_cid blob, dealID text, client text, provider text";
+    string private constant CLAIM_SCHEMA = "piece_cid text, dealID text, client text, provider text, activationEpoch text, dealEndEpoch text";
 
     mapping(bytes => bounty) public pieceToBounty;
 
+    mapping(bytes => string) public pieceInfo;
+
     mapping(bytes => mapping(uint64 => bool)) public pieceToSPs;
 
-    mapping(address => uint) public userFunds;
-
-
-
-
-    function claimInsertion(bytes memory piece_cid, uint64 dealID, uint64 client, uint64 provider) internal view returns(string memory){
+    function claimInsertion(string memory piece_cid, uint64 dealID, uint64 client, uint64 provider, int64 activationEpoch, int64 dealEndEpoch) internal view returns(string memory){
         return SQLHelpers.toInsert(
             BOUNTY_TABLE_PREFIX,
             bounty_tableID,
-            "piece_cid, dealID, client, provider",
+            "piece_cid, dealID, client, provider, activationEpoch, dealEndEpoch",
             string.concat(
                 string(piece_cid),
                 ",",
@@ -61,28 +59,30 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
                 ",",
                 SQLHelpers.quote(Strings.toString(client)),
                 ",",
-                SQLHelpers.quote(Strings.toString(provider))
+                SQLHelpers.quote(Strings.toString(provider)),
+                ",",
+                SQLHelpers.quote(Strings.toString(uint(int(activationEpoch)))),
+                ",",
+                SQLHelpers.quote(Strings.toString(uint(int(dealEndEpoch))))
             )
         );
     }
 
-    function bountyInsertion(bytes memory piece_cid, address creator, string memory key, string memory piece_cidIPFS_URL, uint256 bountyreward, uint256 size) internal view returns(string memory){
+    function bountyInsertion(string memory piece_cid, string memory location_ref, uint256 bountyreward, uint256 size) internal view returns(string memory){
         return SQLHelpers.toInsert(
             BOUNTY_TABLE_PREFIX,
             bounty_tableID,
-            "piece_cid, piece_cidIPFS_URL, reward, size",
+            "piece_cid, location_ref, reward, donatedTokens, size",
             string.concat(
                 string(piece_cid),
                 ",",
-                SQLHelpers.quote(piece_cidIPFS_URL),
+                SQLHelpers.quote(location_ref),
                 ",",
                 SQLHelpers.quote(Strings.toString(bountyreward)),
                 ",",
-                SQLHelpers.quote(Strings.toString(size)),
+                SQLHelpers.quote(Strings.toString(0)),
                   ",",
-                SQLHelpers.quote(Strings.toHexString(creator)),
-                  ",",
-                SQLHelpers.quote(key)
+                SQLHelpers.quote(Strings.toString(size))
             )
         );
     }
@@ -125,9 +125,8 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
     /// @param bountyReward: reward for each client or storageProvider that will make a deal for that piece_cid
     /// @param minDealDays: minimum remaining deal accepted days for a client or SP to claim the bounty
     /// @param size: size of the file
-    function createBounty(bytes memory piece_cid, address creator, string memory piece_cidIPFS_URL ,uint256 bountyReward,int64 minDealDays,uint256 size) public {
+    function createBounty(string memory piece_cid, bytes memory piece_cid_bytes, address creator, string memory location_ref ,uint256 bountyReward,int64 minDealDays,uint256 size) public {
         require(pieceToBounty[piece_cid].created == false, "Bounty exists");
-        bytes32 hash = keccak256(abi.encode(piece_cid,msg.sender));
         // string memory key = bytes32ToString(hash);
         bounty memory newBounty =       
         bounty({
@@ -137,28 +136,15 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
                 created : true
                });
 
-        pieceToBounty[piece_cid] = newBounty;
+        // bytes memory bountyID = stringToBytes(piece_cid);       
+        pieceInfo[piece_cid_bytes] = piece_cid;
 
-        mutate(bounty_tableID, bountyInsertion( piece_cid, creator , key, piece_cidIPFS_URL, bountyReward, size )); 
+        pieceToBounty[bountyID] = newBounty;
+
+        mutate(bounty_tableID, bountyInsertion( piece_cid, creator , key, location_ref, bountyReward, size )); 
 
     }
 
-    // First string to bytes and then bytes to string to make the pieceCID 
-    // look similar but now us a real string 
-    // string => bytes
-    // pieceCID STRING  0x00000181E2039220206B86B273FF34FCE19D6B804EFF5A3F5747ADA4EAA22F1D49C01E52DDB7875B4B
-    // Bytes of pieceCID 0x307830303030303138314532303339323230323036423836423237334646333446434531394436423830344546463541334635373437414441344541413232463144343943303145353244444237383735423442
-    
-    // bytes of pieceCID to String and we take a string representation
-    // 
-    function stringToBytes(string memory input)public pure returns(bytes memory) {
-        bytes memory output = bytes(input);
-        return output;
-    }
-
-    function bytesToString(bytes memory output)public pure returns(string memory){
-            return string(output);
-    }
 
 
     /// @dev Funding a Bounty
@@ -179,9 +165,9 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
         // get deal client
         uint64 client = MarketAPI.getDealClient(deal_id);
         // get deal Term ( start - end )
-        int64 endOfDeal =  CommonTypes.ChainEpoch.unwrap(MarketAPI.getDealTerm(deal_id).end);
+        int64 dealEndEpoch =  CommonTypes.ChainEpoch.unwrap(MarketAPI.getDealTerm(deal_id).end);
         // dealDuration represents the remaining days of the deal
-        int64 dealDuration = endOfDeal - int64(uint64(block.number));
+        int64 dealDuration = dealEndEpoch - int64(uint64(block.number));
         // get deal Activation State
         int64 terminatedEpoch = CommonTypes.ChainEpoch.unwrap(MarketAPI.getDealActivation(deal_id).terminated);
         // get deal Activation State
@@ -195,8 +181,9 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
 
         reward(client, bountyReward);
         // piece_cidToDeals[piece_cid].add(uint256(deal_id));
-        pieceToBounty[piece_cid].donatedTokens = pieceToBounty[piece_cid].donatedTokens - pieceToBounty[piece_cid].bountyReward;
+        pieceToBounty[piece_cid].donatedTokens -= pieceToBounty[piece_cid].bountyReward;
 
+        mutate(bounty_tableID, claimInsertion(pieceInfo[piece_cid], deal_id, client, provider, activationEpoch, dealEndEpoch));
     }
 
     /// @dev authorizing a deal claim
@@ -207,10 +194,10 @@ contract DealRewardV2 is  IDealReward , AxelarExecutable{
     /// @param activationEpoch: used in combination with the dealDuration
     function authorizeDeal(bytes memory piece_cid, uint64 provider, int64 dealDuration, int64 terminated, int64 activationEpoch) internal view {
         require(pieceToBounty[piece_cid].created, "bounty on funding phase OR isFullyClaimed");
-        require((pieceToBounty[piece_cid].donatedTokens - pieceToBounty[piece_cid].bountyReward) > pieceToBounty[piece_cid].donatedTokens);
+        require((pieceToBounty[piece_cid].donatedTokens - pieceToBounty[piece_cid].bountyReward) >= pieceToBounty[piece_cid].donatedTokens, "bounty needs more funding to get claimed");
         require(!pieceToSPs[piece_cid][provider], "SP is already storing that file");
-        require(dealDuration - pieceToBounty[piece_cid].minDealDays > 0 ,"deal ends too soon");
-        require(terminated == 0 && activationEpoch > 0); 
+        require(dealDuration - pieceToBounty[piece_cid].minDealDays > 0 ,"deal ends too soon create a new one");
+        require(terminated == 0 && activationEpoch > 0, "deal terminated or not yet activated"); 
     }
 
     // /// @dev checking if a bounty is funded: used for the application logic
