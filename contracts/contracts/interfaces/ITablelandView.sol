@@ -22,4 +22,6 @@ interface ITablelandView {
 
     function toUpdate(string memory prefix, uint256 tableID,string memory set, string memory filter)external view returns(string memory);
 
+    function verifyString(string memory message, uint8 v, bytes32 r, bytes32 s, address pkp) external pure returns (bool res);
+
 }
