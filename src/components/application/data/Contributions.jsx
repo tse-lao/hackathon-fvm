@@ -20,31 +20,28 @@ export default function Contributions({ tokenID }) {
     }, [tokenID])
 
     return (
-        <div>
-            <div className="rounded-lg h-96 overflow-scroll">
-                {submissions.length > 0 ?
-                    submissions.map((submission, index) => (
-                        <div key={index} className="flex flex-row bg-white shadow-sm rounded-lg p-2 mt-2 hover:bg-cf-100">
-                            <div className="flex-grow">
-                                <h2 className="text-gray-900 text-lg title-font font-medium mb-2">{`Dataset ${submission.dataCID}`} </h2>
-                                <p className="leading-relaxed text-base">Rows: {submission.rows}</p>
-                                <p className="leading-relaxed text-base">Token: {submission.tokenID}</p>
-                                <p className="leading-relaxed text-base">Submitter: {submission.creator}</p>
-                                <a href={submission.metadataCID} className="mt-3 text-indigo-500 inline-flex items-center">View Dataset
-                                    <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-2" viewBox="0 0 24 24">
-                                        <path d="M5 12h14M12 5l7 7-7 7"></path>
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    )) : (
-                        <p>No contributions found</p>
-                    )
-                }
+        <div className="max-w-lg mx-auto">
+        <div className="divide-y divide-gray-200">
+            {submissions.length > 0 ? submissions.map((submission, index) => (
+                <a key={index} href={submission.metadataCID} className="block py-4 hover:bg-gray-100 transition-colors duration-150 cursor-pointer">
+                    <div className="text-gray-600 text-sm font-medium mb-1 text-indigo-500 overflow-hidden overflow-ellipsis whitespace-nowrap">{`${submission.dataCID}`}</div>
+                    <div className="grid grid-cols-2 gap-2 my-2 text-xs">
+                        <div className="font-semibold text-gray-500">Rows:</div>
+                        <div className="text-gray-900">{submission.rows}</div>
+                        <div className="font-semibold text-gray-500">Token:</div>
+                        <div className="text-gray-900">{submission.tokenID}</div>
+                        <div className="font-semibold text-gray-500">Submitter:</div>
+                        <div className="text-gray-900">{submission.creator}</div>
+                    </div>
+                </a>
+            )) : (
+                <div className="text-center py-8">
+                <p className="text-gray-500 text-xl font-medium">No contributions found</p>
+                <p className="text-gray-400 text-md">Check back later for new submissions.</p>
             </div>
+            )}
         </div>
-
-
-
+    </div>
+    
     )
 }

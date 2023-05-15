@@ -24,18 +24,25 @@ export const useContract = () => {
         return await tx.wait()
     }
 
+
     const submitData = async(tokenId: number, dataCID: String, rows: number, v: number, r: string,  s: string) => {
         const tx = await contract.submitData(tokenId, dataCID, rows, v , r , s, { gasLimit: 1000000 })
         return await tx.wait()
     }
 
 
+    //signature: 
     const createDB_NFT = async(tokenId: String, dbCID: String, mintPrice: number, royaltiesAddress: String, v: number, r: string,  s: string) => {
         const price = ethers.utils.parseEther(mintPrice.toString())
         const tx = await contract.createDB_NFT(tokenId, dbCID, price, royaltiesAddress, "0x00", v , r , s, { gasLimit: 1000000 })
         return await tx.wait()
     }
+    //  1. prepping <= data offchain
+    // 2. compute data offchain 
+    
+    
 
+    //NOT WORKING AT ALL == lilypad
     const executeCrossChainBacalhauJob = async(tokenId: number, _spec: String) => {
         const tx = await contract.executeCrossChainBacalhauJob("filecoin", crossChainBacalhauJobs_address, tokenId, _spec, { value: 1, gasLimit: 1000000 })
         return await tx.wait()
@@ -55,7 +62,6 @@ export const useContract = () => {
         const price = ethers.utils.parseEther(value.toString())
         const tx = await contract2.submitFunds({ value: price})
     }
-
     return {
         getCurrentTokenId,
         RequestDB,

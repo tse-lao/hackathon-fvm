@@ -1,14 +1,14 @@
 import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
-import FileStatus from '@/components/application/files/FileStatus';
 import useNftStorage from '@/hooks/useNftStorage';
 import { signAuthMessage } from '@/lib/createLighthouseApi';
-import readBlobAsJson, { analyzeJSONStructure, readBlobAsCsvToJson } from '@/lib/dataHelper';
+import readBlobAsJson, { analyzeJSONStructure, readTextAsJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
 import lighthouse from '@lighthouse-web3/sdk';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
 const fileDefault = {
@@ -20,29 +20,43 @@ const fileDefault = {
     "txHash": ""
 }
 
+// Declare mimeType as constants
+const MIMETYPE_IMAGE_JPEG = "image/jpeg";
+const MIMETYPE_IMAGE_PNG = "image/png";
+const MIMETYPE_APP_JSON = "application/json";
+const MIMETYPE_TEXT_PLAIN = "text/plain";
+const MIMETYPE_APP_CSV = "application/csv";
+
 export default function ViewFile() {
     const { cid } = useRouter().query;
     const { address } = useAccount();
-    const {uploadMetadata} = useNftStorage();
+    const { uploadMetadata } = useNftStorage();
 
     const [record, setRecord] = useState(
         {
             cid: "",
-            metadata: "", 
+            metadata: "",
         }
     );
 
     const [fileInfo, setFileInfo] = useState(fileDefault);
     const [fileURL, setFileURL] = useState(null);
-    const [fileData, setFileData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     //get the file info.
     useEffect(() => {
         const getFile = async () => {
-            setRecord({cid: cid, metadata: ""})
+            setRecord({ cid: cid, metadata: "" })
             const status = await lighthouse.getFileInfo(cid)
             setFileInfo(status.data);
+            
+            if(!status.data.encryption){
+                //TODO: Read the content of the CID and display it.
+                const file = cid.toString();
+                //read the content of this file 
+                cid
+                readContent(status.data.mimeType, file);
+            }
         }
 
         if (cid) { getFile(); setLoading(false) }
@@ -62,38 +76,53 @@ export default function ViewFile() {
 
         const fileType = fileInfo.mimeType;
         const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
-        setFileData(decrypted);
 
-        if (fileType == "image/png" || fileType == "image/jpeg") {
-            const url = URL.createObjectURL(decrypted);
-            setFileURL(url);
-        }
-        if (fileType == "application/json") {
-            await readBlobAsJson(decrypted, (error, json) => {
-                if (error) {
-                    console.error('Failed to read the Blob as JSON:', error);
-                } else {
-                    console.log('Parsed JSON:', json);
-                    setFileURL(json)
-                }
-            });
-        }
+        //setFileData(decrypted);
 
-        if (fileType == "application/csv") {
-
-            await readBlobAsCsvToJson(decrypted, (error, json) => {
-                if (error) {
-                    console.error('Failed to read the Blob as JSON:', error);
-                } else {
-                    console.log('Parsed JSON:', json);
-                    setFileURL(json)
-                }
-            });
-        }
-
+        readContent(fileType, decrypted);
 
     }
+    
+    
+    async function readContent(fileType, content){
+        switch (fileType) {
+            case MIMETYPE_IMAGE_JPEG:
+                let jpg = URL.createObjectURL(content);
+                setFileURL(jpg);
+            case MIMETYPE_IMAGE_PNG:
+                const url = URL.createObjectURL(content);
+                setFileURL(url);
+            case MIMETYPE_APP_JSON:
+                await readTextAsJson(content, (error, json) => {
+                    if (error) {
+                        toast.error('Failed to read the Blob as JSON:', error);
+                    } else {
 
+                        setFileURL(json)
+                    }
+                });
+            case MIMETYPE_TEXT_PLAIN:
+                await readTextAsJson(content, (error, json) => {
+                    if (error) {
+                        toast.error('Failed to read the Blob as JSON:', error);
+                    } else {
+    
+                        setFileURL(json)
+                    }
+                });
+            default: 
+                await readBlobAsJson(content, (error, json) => {
+                    if (error) {
+                        toast.error('Failed to read the Blob as JSON:', error);
+                    } else {
+
+                        setFileURL(json)
+                    }
+                });
+        }
+    }
+
+    //TODO: need to fix the download function for the file. 
     function download() {
         // Create an anchor element with the download attribute
         const link = document.createElement('a');
@@ -113,14 +142,8 @@ export default function ViewFile() {
 
     async function analyze() {
         const structure = analyzeJSONStructure(fileURL);
-        console.log(structure)
-      
         const metadata = await uploadMetadata(JSON.stringify(structure));
-        //we want to upload this record to polybase but also lighthouse.
-        console.log("SHOW METADATA:")
-        console.log(metadata);
-        
-       setRecord({
+        setRecord({
             cid: cid,
             metadata: metadata
         });
@@ -135,61 +158,49 @@ export default function ViewFile() {
             {loading ? <div>Loading...</div> : (
 
                 <div>
-                    <div className="sm:flex sm:items-center">
-                        <div className="sm:flex-auto">
-                            <h1 className="text-base font-semibold leading-6 text-gray-900">Your file</h1>
-                            <p className="mt-2 text-sm text-gray-700">
-                                Please find the file below. If its encrypted you need to sign it.
-                            </p>
+                    
+                        <div className="flex justify-between sm:flex sm:items-center mb-6">
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{fileInfo.fileName}</h1>
+                                <p className="mt-1 text-sm md:text-base text-gray-600">
+                                    {fileInfo.cid}
+                                </p>
+                            </div>
+                            <div className="space-x-4">
+                                <button
+                                    onClick={download}
+                                    className="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                    Download
+                                </button>
+                                <button
+                                    onClick={analyze}
+                                    className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border border-gray-300"
+                                >
+                                    Get Metadata
+                                </button>
+                            </div>
                         </div>
-                        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                            <button onClick={decrypt}
-                                className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >Decrypt</button>
 
-                            <button onClick={download}
-                                className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >Download</button>
-
-
-                            <button onClick={analyze}
-                                className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >Get Metadata</button>
-                        </div>
-                    </div>
-                    <div className="flex">
+                        <div className="flex flex-col md:flex-row mt-4 space-y-4 md:space-y-0 md:space-x-4">
                         {/* File content */}
-
-                        {fileInfo.encryption && !fileData ? (
-                            <div className="flex-1 p-4 bg-white border-r border-gray-200">
-                            <div className="prose prose-sm max-w-none">
-                                <SimpleDecrypted startDecrypt={decrypt} />
-                            </div>
+                        <div className="flex-grow p-4 bg-white shadow-sm rounded-lg mr-4">
+                            {fileInfo.encryption && fileURL == null ? (
+                                    <SimpleDecrypted startDecrypt={decrypt} />
+                            ) : (
+                                <div className="prose prose-sm max-w-none max-h-[600px] overflow-auto">
+                                    {fileInfo.mimeType == "image/jpeg" && <img src={fileURL} />}
+                                    {fileInfo.mimeType == "image/png" && <img src={fileURL} />}
+                                    {fileInfo.mimeType == "application/json" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
+                                    {fileInfo.mimeType == "text/plain" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
+                                </div>
+                            )}
                         </div>
-                        ) : (
-                            <div className="flex-1 p-4 bg-white border-r border-gray-200">
-                            <div className="prose prose-sm max-w-none">
-
-                                {fileInfo.mimeType == "image/jpeg" && fileURL && <img src={fileURL} />}
-                                {fileInfo.mimeType == "image/png" && <img src={fileURL} />}
-                                {fileInfo.mimeType == "application/json" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
-                            </div>
-                        </div>
-                            
-                        )}
-
-
+                    
                         {/* Sidebar */}
-                        <div className="w-120 p-4 bg-gray-100">
-                            <h2 className="text-xl font-semibold mb-4">File Information</h2>
-                            {address &&   <FileStatus cid={cid} address={address}/> }
-                          
-                            <FileDetailInformation detail={fileInfo} />
-
+                        <div className="w-120 p-4 bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">                          
+                            <FileDetailInformation detail={fileInfo} className="mt-4 mb-4" metadata={record.metadata} cid={cid} address={address}  />
                             <FileSharedWith cid={cid} />
-
-
-
                         </div>
                     </div>
                 </div>

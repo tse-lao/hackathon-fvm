@@ -1,87 +1,172 @@
+import { getLighthouse } from "@/lib/createLighthouseApi";
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import { ethers } from 'ethers';
-const PUBLIC_KEY ="0x04808e24bb109fac42882de0203d77f2ad60ffdbf7ff339d77036f71b35095198aa8cb2705030b4b1a206b066cb0bebd18b45353a79f150eebd6b1e986e97f5d32"
+import { toast } from "react-toastify";
+import { createJWTToken } from "./useLighthouse";
+const PUBLIC_KEY = "0x04808e24bb109fac42882de0203d77f2ad60ffdbf7ff339d77036f71b35095198aa8cb2705030b4b1a206b066cb0bebd18b45353a79f150eebd6b1e986e97f5d32"
 
 
-export async function litJsSdkLoaded( ) {
-    const client = new LitJsSdk.LitNodeClient({ litNetwork: "serrano" });
+export async function litJsSdkLoaded() {
+  const client = new LitJsSdk.LitNodeClient({ litNetwork: "serrano" });
 
-    await client.connect();
-    window.litNodeClient = client;
-  }
-  
-  //QmfYdvmY4cifjzis7zWq4UmhVYKJq5J3AiyEVBFRCwx1TB => validate
-  //cid => accept
-  //rows => accept
-  //pkp singing  => valide
-  
-  
-  export async function runLitProtocol(dataCID) {
-    // you need an AuthSig to auth with the nodes
-    // this will get it from metamask or any browser wallet
-    const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "mumbai" });
-    
-    console.log(authSig)
-    await litJsSdkLoaded();
+  await client.connect();
+  window.litNodeClient = client;
+}
 
-    const litCID = "QmanxAzq5LrkJdGWR1V8SWN8kpGVJawqnV9YoyMnMg9R9w";
+//QmfYdvmY4cifjzis7zWq4UmhVYKJq5J3AiyEVBFRCwx1TB => validate
+//cid => accept
+//rows => accept
+//pkp singing  => valide
 
-    //string to 8uint array 
-    const array  = dataCID.split('').map((char) => char.charCodeAt(0));
-    const encoder = new ethers.utils.AbiCoder();
-    
-    
-    const signingMessage = encoder.encode(["string"], [dataCID])
 
-    //turn back 
-    console.log(array);
-    const string = String.fromCharCode(...array);
-    
-    console.log(string == dataCID);
-    
-    console.log("string", string);
-    const results = await litNodeClient.executeJs({
-      ipfsId: litCID,
-      authSig,
-      jsParams: {
-        cid: dataCID, 
-        publicKey: PUBLIC_KEY,
-        sigName: "sig1",
-        toSign: array,
+export async function runLitProtocol(dataCID) {
+  // you need an AuthSig to auth with the nodes
+  // this will get it from metamask or any browser wallet
+  const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "mumbai" });
+
+  console.log(authSig)
+  await litJsSdkLoaded();
+
+  const litCID = "QmanxAzq5LrkJdGWR1V8SWN8kpGVJawqnV9YoyMnMg9R9w";
+
+  //string to 8uint array 
+  const array = dataCID.split('').map((char) => char.charCodeAt(0));
+  const encoder = new ethers.utils.AbiCoder();
+
+
+  const signingMessage = encoder.encode(["string"], [dataCID])
+
+  //turn back 
+  console.log(array);
+  const string = String.fromCharCode(...array);
+
+  console.log(string == dataCID);
+
+  console.log("string", string);
+  const results = await litNodeClient.executeJs({
+    ipfsId: litCID,
+    authSig,
+    jsParams: {
+      cid: dataCID,
+      publicKey: PUBLIC_KEY,
+      sigName: "sig1",
+      toSign: array,
+    },
+  });
+  console.log("results", results);
+  const { signatures, response } = results;
+  console.log("response", response);
+  console.log(signatures);
+
+
+  return signatures
+
+}
+
+
+export async function recoverAddress(dataCID) {
+  const str = dataCID;
+
+  const encoder = new ethers.utils.AbiCoder();
+
+
+  const signingMessage = encoder.encode(["string"], [str])
+  const verMessage = ethers.utils.keccak256(signingMessage)
+  // console.log(verMessage)
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const signature = await signer.signMessage(str);
+
+  //(bytes);
+  //ethers.utils.recoverAddress(signed, signature);
+  console.log(signature)
+  const sig = ethers.utils.splitSignature(signature);
+  console.log('r:', sig.r);
+  console.log('s:', sig.s);
+  console.log('v:', sig.v);
+}
+
+export async function validateInput(tokenID, cid, rows) {
+  const url = "http://localhost:4000"
+
+  const pUrl = "https://apollo-server-gateway.herokuapp.com/"
+
+  const query = `
+    query VerifyCID($tokenId: String!, $cid: String!, $rows: Int!) {
+      verifyCID(tokenID: $tokenId, cid: $cid, rows: $rows) {
+        r
+        v
+        s
+      }
+    }`
+
+  console.log(tokenID.toString(), cid, rows)
+  try {
+    const fetchCID = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    });
-    console.log("results", results);
-    const { signatures, response } = results;
-    console.log("response", response);
-    console.log(signatures);
+      body: JSON.stringify({
+        "query": query,
+        "variables": {
+          "tokenId": tokenID,
+          "cid": cid,
+          "rows": rows
+        }
+      }
+      )
+    })
 
-    
-    return signatures
+    const result = await fetchCID.json();
+    console.log(result);
+    return result.data.verifyCID;
 
+
+  } catch (e) {
+    console.log(e)
+    toast.error("Error 2: " + e)
   }
-  
-  
-  export async function recoverAddress(dataCID){
-    const str = dataCID;
-    
-    const encoder = new ethers.utils.AbiCoder();
-    
-    
-    const signingMessage = encoder.encode(["string"], [str])
-    const verMessage = ethers.utils.keccak256(signingMessage)
-   // console.log(verMessage)
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const signature = await signer.signMessage(str);
-    
-    //(bytes);
-//ethers.utils.recoverAddress(signed, signature);
-    console.log(signature)
-    const sig = ethers.utils.splitSignature(signature);
-    console.log('r:', sig.r);
-    console.log('s:', sig.s);
-    console.log('v:', sig.v);
+}
 
+export async function mintNFTDB(tokenID, creator) {
+  const getToken = await createJWTToken();
+  
+  console.log(creator);
+  const apiKey = await getLighthouse(creator);
+  console.log(apiKey);
+
+  const url = "http://localhost:4000"
+
+  const query = `
+    query Query($tokenId: String, $jwtToken: String, $creator: String, $apiKey: String) {
+      combineCIDForDB(tokenId: $tokenId, jwtToken: $jwtToken, creator: $creator, apiKey: $apiKey)
+    }
+    `
+  try {
+    const fetchCID = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "query": query,
+        "variables": {
+          "tokenId": tokenID,
+          "jwtToken": getToken,
+          "creator": creator,
+          "apiKey": apiKey,
+        }
+      })
+    })
     
-    
+    const result = await fetchCID.json();
+    console.log(result.data.combineCIDForDB);
+
+    return result.data.combineCIDForDB;
+  } catch (e) {
+    console.log(e)
+    toast.error("Error 2: " + e)
   }
+
+}

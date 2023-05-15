@@ -1,16 +1,16 @@
-import { readFileFromIPFS } from "@/hooks/useIPFS";
+import Contributions from "@/components/application/data/Contributions";
+import LoadingSpinner from "@/components/application/elements/LoadingSpinner";
+import GrantAccess from "@/components/application/request/GrantAccess";
+import { mintNFTDB } from "@/hooks/useLitProtocol";
 import { useTableland } from "@/hooks/useTableland";
 import Layout from "@/pages/Layout";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-
-import Contributions from "@/components/application/data/Contributions";
-import GrantAccess from "@/components/application/request/GrantAccess";
 import {
   CheckIcon,
   HandThumbUpIcon,
   UserIcon
 } from '@heroicons/react/20/solid';
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 
@@ -68,106 +68,124 @@ function classNames(...classes) {
 }
 
 export default function GetRequestDetails() {
-    const router = useRouter();
-    const {fetchTokenRequest, fetchDataSubmission} = useTableland();
-    const { db, tokenId } = router.query;
-    const [loading, setLoading] = useState(true);
-    const [metadata, setMetadata] = useState(null);
-    const {address} = useAccount();
-    const [data, setData] = useState(null);
-    const [showGrant, setShowGrant] = useState(false);
-
-        useEffect(() => {
-            const getMetadata = async(cid) => {
-                const metaResponse = await readFileFromIPFS(cid);
-                console.log(metaResponse);
-                setMetadata(metaResponse);
-            }
-            const getData = async() => {
-                const response = await fetchTokenRequest(tokenId);
-                // /console.log(response[0]);
-                console.log(response[0]);
-                setData(response[0])
-                
-                if(response[0].dataFormatCID){
-                    
-                    getMetadata(response[0].dataFormatCID);
-                }
-
-                
-                //we also want to read the file 
-            }
-            
-          
-            if(db && tokenId){getData(); setLoading(false)};
-        }, [db, tokenId])
+  const router = useRouter();
+  const { fetchTokenRequest, getRequestData } = useTableland();
+  const { db, tokenId } = router.query;
+  const [loading, setLoading] = useState(true);
+  const { address } = useAccount();
+  const [data, setData] = useState(null);
+  const [showGrant, setShowGrant] = useState(true);
+  const [creator, setCreator] = useState(null);
+  const [categories, setCategories] = useState([]);
 
 
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetchTokenRequest(tokenId);
+      setData(response[0])
+
+      const jsonObject = await getRequestData(tokenId);
+      let tempCat = []
+      for (var i = 0; i < jsonObject.length; i++) {
+        if (jsonObject[i].trait_type == "category") {
+          tempCat.push(jsonObject[i].value)
+        }
+        if (jsonObject[i].trait_type == "creator") {
+          setCreator(jsonObject[i].value)
+        }
+      }
+
+      setCategories(tempCat)
+    }
+    if (db && tokenId) { getData(); setLoading(false) };
+  }, [db, tokenId])
+
+
+  const mintNFT = async () => {
+
+    const result = await mintNFTDB(tokenId, address);
+
+   console.log(result);
+
+
+    //now we can call the useTableland function with the backend. 
     
-    return (
-        <Layout title="Request">
-   
+    //  const encryption = await lighthouse.fetchEncryptionKey("QmdWcYRHtRytGJu3eymCQmTVbWcHMpSaHqcFPYx7WEGGNG", creator, getToken);
+    //    const decrypt = await lighthouse.decryptFile("QmdWcYRHtRytGJu3eymCQmTVbWcHMpSaHqcFPYx7WEGGNG", encryption.data.key);
+
+  }
 
 
-        <main className="py-10">
-          {/* Page header */}
-          <div className="mx-auto max-w-3xl px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
-            <div className="flex items-center space-x-5">
-             
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{db}</h1>
-                <p className="text-sm font-medium text-gray-500">
-                  {tokenId}
-                </p>
-              </div>
-            </div>
-            <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-3 sm:space-y-0 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
-             
-              <button
-                type="button"
-                onClick={() => setShowGrant(!showGrant)}
-                className="inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-              >
-                Create new Data Set
-              </button>
+  if (loading) return (
+    <Layout title="Request">
+      <LoadingSpinner loadingText="loading the page..." />
+    </Layout>
+  );
+
+  return (
+    <Layout title="Request">
+      <main className="py-10">
+        {/* Page header */}
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+          <div className="flex items-center space-x-5">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{db}</h1>
+              <p className="text-sm font-medium text-gray-500">
+                {creator && (creator)}
+              </p>
             </div>
           </div>
+          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-x-3 sm:space-y-0 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
 
-          <div className="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-2 lg:col-start-1">
-              {/* Description list*/}
-              
-              {data && (
-                <section aria-labelledby="applicant-information-title">
+            {creator && address && creator.toLowerCase() == address.toLowerCase() && (
+              <button
+                type="button"
+                onClick={mintNFT}
+                className="inline-flex items-center justify-center flex-col rounded-md bg-cf-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cf-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              >
+                <div><span>4/100</span></div>
+                <div>Start Minting</div>
+              </button>
+
+            )}
+
+          </div>
+        </div>
+
+        <div className="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2 lg:col-start-1">
+            {/* Description list*/}
+
+            {data && (
+              <section aria-labelledby="applicant-information-title">
                 <div className="bg-white shadow sm:rounded-lg">
-                  <div className="px-4 py-5 sm:px-6">
-                    <h2 id="applicant-information-title" className="text-lg font-medium leading-6 text-gray-900">
-                      {data.dbName} - {data.tokenID}
-                    </h2>
-                    <p className="mt-1 max-w-2xl text-sm text-gray-500">Find here an overview of all the requested data.</p>
-                  </div>
                   <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
                     <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                       <div className="sm:col-span-1">
                         <dt className="text-sm font-medium text-gray-500">Categories</dt>
-                        <dd className="mt-1 text-sm text-gray-900"></dd>
+                        <dd className="mt-1 text-sm text-gray-900">
+                          {categories && categories.map((category, index) => (
+
+                            <span className="inline-block px-3 py-1 mx-1 text-sm font-semibold text-white bg-indigo-500 rounded-full"
+
+                              key={index}>{category}</span>
+
+                          )
+                          )}
+                        </dd>
                       </div>
                       <div className="sm:col-span-1">
                         <dt className="text-sm font-medium text-gray-500">Min rows required</dt>
                         <dd className="mt-1 text-sm text-gray-900">{data.minimumRowsOnSubmission}</dd>
                       </div>
-                      <div className="sm:col-span-1">
+                      <div className="sm:col-span-2">
                         <dt className="text-sm font-medium text-gray-500">Metadata Format</dt>
                         <dd className="mt-1 text-sm text-gray-900 overflow-scroll">{data.dataFormatCID}</dd>
-                      </div>
-                      <div className="sm:col-span-1">
-                        <dt className="text-sm font-medium text-gray-500">Submit before</dt>
-                        <dd className="mt-1 text-sm text-gray-900">now..</dd>
                       </div>
                       <div className="sm:col-span-2">
                         <dt className="text-sm font-medium text-gray-500">Description</dt>
                         <dd className="mt-1 text-sm text-gray-900">
-                        {data.description}
+                          {data.description}
                         </dd>
                       </div>
 
@@ -176,97 +194,93 @@ export default function GetRequestDetails() {
 
                 </div>
               </section>
-              )}
-              
+            )}
 
-              {/* Comments*/}
-              <section aria-labelledby="notes-title">
-                <div className="bg-white shadow sm:overflow-hidden sm:rounded-lg">
-                  <div className="divide-y divide-gray-200">
-                    <div className="px-4 py-5 sm:px-6">
-                      <h2 id="notes-title" className="text-lg font-medium text-gray-900">
-                        Contributions
-                      </h2>
-                    </div>
-                    <div className="px-4 py-6 sm:px-6">
-                        {data && (<Contributions tokenID={data.tokenID}/>)}
-                    </div>
+
+            {/* Comments*/}
+            <section aria-labelledby="notes-title">
+              <div className="bg-white shadow sm:overflow-hidden sm:rounded-lg">
+                <div className="divide-y divide-gray-200">
+                  <div className="p-0">
+                    {data && (<Contributions tokenID={data.tokenID} />)}
                   </div>
-
                 </div>
-              </section>
-            </div>
 
-            <section aria-labelledby="timeline-title" className="lg:col-span-1 lg:col-start-3">
+              </div>
+            </section>
+          </div>
+
+          <section aria-labelledby="timeline-title" className="lg:col-span-1 lg:col-start-3">
             <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-            {showGrant ? (
-                <GrantAccess tokenID={data.tokenID} setShowGrant={setShowGrant} address={address}/>
-            ): (
-                <div>
-                <h2 id="timeline-title" className="text-lg font-medium text-gray-900">
-                  Contract Interactions
-                </h2>
 
-                {/* Activity Feed */}
-                <div className="mt-6 flow-root">
-                  <ul role="list" className="-mb-8">
-                    {timeline.map((item, itemIdx) => (
-                      <li key={item.id}>
-                        <div className="relative pb-8">
-                          {itemIdx !== timeline.length - 1 ? (
-                            <span
-                              className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
-                              aria-hidden="true"
-                            />
-                          ) : null}
-                          <div className="relative flex space-x-3">
-                            <div>
+              {showGrant && data ? (
+                <GrantAccess tokenID={data.tokenID} setShowGrant={setShowGrant} address={address} creator={creator} />
+              ) : (
+                <div>
+                  <h2 id="timeline-title" className="text-lg font-medium text-gray-900">
+                    Contract Interactions
+                  </h2>
+
+                  {/* Activity Feed */}
+                  <div className="mt-6 flow-root">
+                    <ul role="list" className="-mb-8">
+                      {timeline.map((item, itemIdx) => (
+                        <li key={item.id}>
+                          <div className="relative pb-8">
+                            {itemIdx !== timeline.length - 1 ? (
                               <span
-                                className={classNames(
-                                  item.type.bgColorClass,
-                                  'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white'
-                                )}
-                              >
-                                <item.type.icon className="h-5 w-5 text-white" aria-hidden="true" />
-                              </span>
-                            </div>
-                            <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                                className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
+                                aria-hidden="true"
+                              />
+                            ) : null}
+                            <div className="relative flex space-x-3">
                               <div>
-                                <p className="text-sm text-gray-500">
-                                  {item.content}{' '}
-                                  <a href="#" className="font-medium text-gray-900">
-                                    {item.target}
-                                  </a>
-                                </p>
+                                <span
+                                  className={classNames(
+                                    item.type.bgColorClass,
+                                    'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white'
+                                  )}
+                                >
+                                  <item.type.icon className="h-5 w-5 text-white" aria-hidden="true" />
+                                </span>
                               </div>
-                              <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                                <time dateTime={item.datetime}>{item.date}</time>
+                              <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                                <div>
+                                  <p className="text-sm text-gray-500">
+                                    {item.content}{' '}
+                                    <a href="#" className="font-medium text-gray-900">
+                                      {item.target}
+                                    </a>
+                                  </p>
+                                </div>
+                                <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                                  <time dateTime={item.datetime}>{item.date}</time>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="mt-6 flex flex-col justify-stretch">
+                    <button
+                      type="button"
+                      className="inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                    >
+                      Display all interactions
+                    </button>
+                  </div>
                 </div>
-                <div className="mt-6 flex flex-col justify-stretch">
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                  >
-                    Display all interactions
-                  </button>
-                </div>
-              </div>
-            )}
+              )}
             </div>
-             
-            </section>
-          </div>
-        </main>
-                
 
-        </Layout>
+          </section>
+        </div>
+      </main>
 
-    )
+
+    </Layout>
+
+  )
 }

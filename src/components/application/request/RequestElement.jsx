@@ -11,10 +11,9 @@ export default function RequestElement({ index, request }) {
       <h2 className="text-xl font-semibold mb-2">{request.dbName}</h2>
       <p className="text-gray-600">{request.description}</p>
       
-      <span>0 /{request.minRowsOnSubmission}</span>
+      <span>0 /{request.minimumRowsOnSubmission}</span>
       
     </div>
   </a >
   )
 }
-

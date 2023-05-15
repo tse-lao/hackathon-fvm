@@ -1,7 +1,7 @@
-import Polybase from "@/components/connections/Polybase";
+import Lighthouse from "@/components/connections/Lighthouse";
+import Link from "next/link";
 import { useState } from "react";
 import Layout from "../Layout";
-
 const connections = [
     {
         id: 1,
@@ -17,7 +17,7 @@ const connections = [
     },
     {
         id: 3,
-        name: "Fitbit",
+        name: "Strava",
         status: "not_connected",
         category: "health",
     },
@@ -32,7 +32,7 @@ const connections = [
         name: "MyOtherBank",
         status: "logged_in",
         category: "banking",
-        component: <Polybase />,
+        component: <Lighthouse />,
     }
 ];
 
@@ -52,61 +52,63 @@ export default function Connections() {
     });
 
     return (
-        <Layout active="Connections">
-        <main className="min-h-screen py-6 flex flex-col justify-center sm:py-12">
-        <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-
-            <div className="mx-auto">
-              <div className="text-center mb-6">
-                <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-
-                {/* Filter */}
-                <div className="mt-4">
-                  <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="category">
-                    Filter by category
-                  </label>
-                  <select
-                    id="category"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:shadow-outline"
-                  >
-                    {categories.map((category) => (
-                      <option key={category.value} value={category.value}>
-                        {category.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Connections */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                {filteredConnections.map((connection) => (
-                  <div
-                    key={connection.id}
-                    className="p-4 bg-white rounded-lg shadow-md border border-gray-200"
-                  >
-                    {connection.component ?
-                    connection.component :
-                (
-                    <div>
-                    <h2 className="text-xl font-semibold mb-2">{connection.name}</h2>
-                    <p className="text-gray-600">Status: {connection.status.replace("_", " ")}</p>
-                    <p className="text-sm text-gray-400 mt-2">
-                      Category: {categories.find((category) => category.value === connection.category).label}
-                    </p>
-                    </div>
-                )}
-                  
+      <Layout active="Connections">
+          <main className="min-h-screen py-6 flex flex-col  sm:py-12">
+              <div className="px-4 sm:px-6 lg:px-8">
+                  <div className="flex justify-between items-center mb-6">
+                      <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+  
+                      {/* Filter */}
+                      <div className="w-64">
+                      <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="category">
+                          Filter by category
+                      </label>
+                      <select
+                          id="category"
+                          value={selectedCategory}
+                          onChange={(e) => setSelectedCategory(e.target.value)}
+                          className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:shadow-outline"
+                      >
+                          {categories.map((category) => (
+                          <option key={category.value} value={category.value}>
+                              {category.label}
+                          </option>
+                          ))}
+                      </select>
+                      </div>
                   </div>
-                ))}
-       
+  
+                  {/* Connections */}
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
+                      {filteredConnections.map((connection) => (
+                        <Link key={connection.id} href={`/connections/${connection.name.toLowerCase()}`}>
+
+                      <div
+                          key={connection.id}
+                          className="p-4 bg-white rounded-lg shadow-md border border-gray-200 cursor-pointer hover:bg-cf-100"
+                      >
+                          {connection.component ?
+                          connection.component :
+                      (
+                          <div>
+                          <h2 className="text-lg font-medium mb-2 text-gray-700 overflow-hidden overflow-ellipsis whitespace-nowrap">{connection.name}</h2>
+                          <p className="text-gray-600">Status: {connection.status.replace("_", " ")}</p>
+                          <p className="text-sm text-gray-400 mt-2">
+                              Category: {categories.find((category) => category.value === connection.category).label}
+                          </p>
+                          </div>
+                      )}
+                      
+                      </div>
+                        </Link>
+                      ))}
+              
+                  </div>
               </div>
-            </div>
-        </div>
-      </main>
-          
-        </Layout>
-    )
+          </main>
+      </Layout>
+  )
+  
+  
 }

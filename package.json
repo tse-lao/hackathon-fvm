@@ -26,6 +26,8 @@
 
     "@heroicons/react": "^2.0.17",
 
+    "@lighthouse-web3/kavach": "^0.1.2",
+
     "@lighthouse-web3/sdk": "^0.2.3",
 
     "@lit-protocol/auth-browser": "^2.1.160",
@@ -38,6 +40,8 @@
 
     "@polybase/client": "^0.5.0",
 
+    "@polybase/eth": "^0.5.0",
+
     "@polybase/react": "^0.5.0",
 
     "@rainbow-me/rainbowkit": "^0.12.12",
@@ -47,6 +51,8 @@
     "@walletconnect/web3wallet": "^1.7.0",
 
     "autoprefixer": "^10.4.8",
+
+    "axios": "^1.4.0",
 
     "clsx": "^1.2.1",
 
@@ -59,6 +65,8 @@
     "ipfs-http-client": "^60.0.0",
 
     "next": "^12.3.0",
+
+    "next-connect": "^1.0.0",
 
     "nft.storage": "^7.0.3",
 
@@ -77,6 +85,8 @@
     "react-toastify": "^9.1.2",
 
     "tailwindcss": "^3.1.8",
+
+    "twitter-lite": "^1.1.0",
 
     "use-debounce": "^8.0.4",
 

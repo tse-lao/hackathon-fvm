@@ -1,7 +1,10 @@
-import { formatBytes, formatDate } from "@/lib/helpers"
+import { formatBytes, formatDate } from "@/lib/helpers";
+import { useAccount } from "wagmi";
+import FileStatus from "./FileStatus";
 
 
-export default function FileDetailInformation({detail}) {
+export default function FileDetailInformation({detail, metadata, cid}) {
+  const {address} = useAccount();
 
   /* publicKey: '0xa3c960b3ba29367ecbcaf1430452c6cd7516f588',
   fileName: 'flow1.png',
@@ -17,11 +20,8 @@ export default function FileDetailInformation({detail}) {
     
     
   return (
+
     <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-    <div className="flex justify-between py-3 text-sm font-medium">
-      <dt className="text-gray-500">Filename</dt>
-      <dd className="text-gray-900">{detail.fileName}</dd>
-    </div>
     <div className="flex justify-between py-3 text-sm font-medium">
     <dt className="text-gray-500">Size</dt>
     <dd className="text-gray-900">{formatBytes(detail.fileSizeInBytes)}</dd>
@@ -43,10 +43,6 @@ export default function FileDetailInformation({detail}) {
       <dd className="text-gray-900">{formatDate(detail.createdAt, "yyyy-MM-dd HH:mm:ss")}</dd>
     </div>
     )}
-    <div className="flex justify-between py-3 text-sm font-medium">
-      <dt className="text-gray-500">Cid</dt>
-      <dd className="text-gray-900">{detail.cid}</dd>
-    </div>
     {detail.lastUpdate && (
       <div className="flex justify-between py-3 text-sm font-medium">
       <dt className="text-gray-500">Updated at</dt>
@@ -56,7 +52,13 @@ export default function FileDetailInformation({detail}) {
 
     <div className="flex justify-between py-3 text-sm font-medium">
       <dt className="text-gray-500">Encryption</dt>
-      {detail.encryption ? <dd className="text-gray-900">Yes</dd> : <dd className="text-gray-900">No</dd>}
+      {detail.encryption ? <dd className="text-cf-500">Yes</dd> : <dd className="text-red-900">No</dd>}
+    </div>
+    <div className="flex justify-between py-3 text-sm font-medium">
+      <dt className="text-gray-500">Metadata</dt>
+      <dd className="text-gray-900">
+        {address && <FileStatus metadata={metadata} cid={cid} address={address}/> }
+        </dd>
     </div>
   </dl>
   )

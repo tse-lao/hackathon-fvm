@@ -1,7 +1,9 @@
 
 import Papa from 'papaparse';
 
+import { NFTStorage } from 'nft.storage';
 import { Configuration, OpenAIApi } from "openai";
+import { toast } from 'react-toastify';
 
 const configuration = new Configuration({
   apiKey: "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",
@@ -10,28 +12,54 @@ const openai = new OpenAIApi(configuration);
 
 
 export default
-    function readBlobAsJson(blob, callback) {
-    const reader = new FileReader();
+  function readBlobAsJson(blob, callback) {
+  const reader = new FileReader();
 
-    // Define the onload event handler
-    reader.onload = function (event) {
-        try {
-            const json = JSON.parse(event.target.result);
-            callback(null, json);
-        } catch (error) {
-            callback(error);
-        }
-    };
+  // Define the onload event handler
+  reader.onload = function (event) {
+    try {
+      const json = JSON.parse(event.target.result);
+      callback(null, json);
+    } catch (error) {
+      callback(error);
+    }
+  };
 
-    // Define the onerror event handler
-    reader.onerror = function () {
-        callback(reader.error);
-    };
+  // Define the onerror event handler
+  reader.onerror = function () {
+    callback(reader.error);
+  };
 
-    // Read the Blob as a text string
-    reader.readAsText(blob);
-    
-    return reader;
+  // Read the Blob as a text string
+  reader.readAsText(blob);
+
+  return reader;
+}
+
+export function readTextAsJson(blob, callback) {
+  let reader = new FileReader();
+  reader.readAsText(blob, 'UTF-8');
+
+  reader.onload = function (event) {
+    try {
+      console.log(event.target.result)
+      const json = JSON.parse(event.target.result);
+      console.log(json)
+      callback(null, json);
+    } catch (error) {
+      callback(error);
+    }
+  };
+
+  // Define the onerror event handler
+  reader.onerror = function () {
+    callback(reader.error);
+  };
+
+  // Read the Blob as a text string
+
+  return reader;
+
 }
 
 
@@ -70,7 +98,7 @@ export function readBlobAsCsvToJson(blob, callback) {
 export function analyzeJSONStructure(json) {
   function analyzeNode(node, path = []) {
     let structure = {};
-    
+
     let count = 0;
 
     if (Array.isArray(node)) {
@@ -98,7 +126,7 @@ export function analyzeJSONStructure(json) {
   return analyzeNode(json);
 }
 
-async function checkOpenAI(){
+async function checkOpenAI() {
   if (!configuration.apiKey) {
     res.status(500).json({
       error: {
@@ -110,14 +138,14 @@ async function checkOpenAI(){
 
 }
 
-export async function categorizeData(json){
-  
+export async function categorizeData(json) {
+
   checkOpenAI();
   const jsonData = JSON.stringify(json, null, 2);
 
   const prompt = `Analyze and categorize the following JSON data:\n\n${jsonData}\n\nAnalysis:`;
 
-  
+
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
@@ -125,7 +153,7 @@ export async function categorizeData(json){
       temperature: 0.6,
     });
     res.status(200).json({ result: completion.data.choices[0].text });
-  } catch(error) {
+  } catch (error) {
     // Consider adjusting the error handling logic for your use case
     if (error.response) {
       console.error(error.response.status, error.response.data);
@@ -164,5 +192,40 @@ export function readJSONFromFileInput(fileInput, callback) {
 
   // Read the file as text using the reader
   reader.readAsText(file);
+}
+
+export async function getMetadataFromFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', async () => {
+      try {
+        const json = JSON.parse(reader.result);
+        const metadata = analyzeJSONStructure(json);
+        const result = await getMetadataCID(metadata);
+        console.log(result);
+        resolve(result);
+      } catch (error) {
+        toast.error(error);
+        reject(error.message);
+      }
+    });
+
+    reader.addEventListener('error', () => {
+      reject(new Error('Error reading file'));
+    });
+
+    reader.readAsText(file);
+  });
+}
+
+export async function getMetadataCID(file){
+  const blob = new Blob([file], { type: "application/json" })
+
+  const { cid } = await NFTStorage.encodeBlob(blob)
+
+
+  //return await storage.storeBlob(blob)
+  return  cid.toString()
 }
 

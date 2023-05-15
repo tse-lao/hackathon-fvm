@@ -1,5 +1,4 @@
-import { DB_main, data_contribution } from '../constants/tableland';
-
+import { DB_attribute, DB_main, data_contribution } from '../constants/tableland';
 export const useTableland = () => {
 
     const fetchTokenRequest = (tokenID) => {
@@ -81,9 +80,35 @@ export const useTableland = () => {
           }
         });
       };
+      
+      const getRequestData = (tokenID) => {
+        return new Promise(async (resolve, reject) => {
+
+          const url = "https://testnets.tableland.network/api/v1/query"
+          const params = new URLSearchParams({
+            statement: `select trait_type, value FROM  ${DB_main} JOIN ${DB_attribute}  WHERE  ${DB_main}.tokenID = ${tokenID} and ${DB_attribute}.tokenID = ${tokenID}`
+          });
+          
+          try {
+            const response =  await fetch(`${url}?${params.toString()}`, {
+              headers: {
+                Accept: 'application/json',
+              },
+            });
+            
+            console.log(response);
+      
+      
+            const data = await response.json();
+            resolve(data);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      };
     return {
         fetchTokenRequest,
         fetchTokenRequestByCID,
-        fetchDataSubmission
+        fetchDataSubmission, getRequestData
     }
 }
