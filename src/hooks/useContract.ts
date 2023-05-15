@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { useSigner } from "wagmi";
-import { DBAbi, DB_NFT_address, crossChainBacalhauJobsAbi, crossChainBacalhauJobs_address } from "../constants";
+import { DBAbi, DB_NFT_address, crossChainBacalhauJobsAbi, crossChainBacalhauJobs_address,splitImplementation,helper,TWFactoryAbi,TWFactoryAddress, helperAbi, splitterAbi } from "../constants";
 
 
 export const useContract = () => {
@@ -8,6 +8,9 @@ export const useContract = () => {
 
     const contract = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
     const contract2 = new ethers.Contract(crossChainBacalhauJobs_address, crossChainBacalhauJobsAbi, signer!)
+    const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, signer!)
+    const helperContract = new ethers.Contract(helper, helperAbi,signer!)
+
 
     const getCurrentTokenId = async() => {
         return await contract.totalSupply()
@@ -22,6 +25,37 @@ export const useContract = () => {
         //read dataFormatCID from the contract.
         const tx = await contract.RequestDB(dataFormatCID, DBname, description, categories, requiredRows,minimumRowsOnSubmission, { gasLimit: 1000000 })
         return await tx.wait()
+    }
+
+
+    // get internal transaction by transaction hash to get the deployed splitter contract  https://docs.polygonscan.com/v/mumbai-polygonscan/api-endpoints/accounts#get-internal-transactions-by-transaction-hash
+    const CreateSpitter = async(defaultAdmin : string, _payees : string[], _shares: string[])=>{
+        var bytecode = "0xb1a14437"
+        var initCode = await helperContract.getInitCode(bytecode,defaultAdmin,[],_payees,_shares);
+        var salt = "0x3335363138373637000000000000000000000000000000000000000000000000";
+        const tx = await TWFactory.deployProxyByImplementation(splitImplementation,initCode,salt );
+        return await tx.wait();
+    }
+
+    const getPayeesCount = async(splitterAddress: string, ) => {
+        var splitterInstance = new ethers.Contract(splitterAddress, splitterAbi,signer!)
+        return await splitterInstance.payeeCount()
+
+    }
+
+    const getPayee = async(splitterAddress: string, index: number) => {
+        var splitterInstance = new ethers.Contract(splitterAddress, splitterAbi,signer!)
+        return await splitterInstance.payee(index)
+    }
+
+    const getPayeeShares = async(splitterAddress: string, address: string ) => {
+        var splitterInstance = new ethers.Contract(splitterAddress, splitterAbi,signer!)
+        return await splitterInstance.shares(address)
+    }
+
+    const distributeShares = async(splitterAddress: string,) => {
+        var splitterInstance = new ethers.Contract(splitterAddress, splitterAbi,signer!)
+        const tx = await splitterInstance.distribute()
     }
 
     const submitData = async(tokenId: number, dataCID: String, rows: number, v: number, r: string,  s: string) => {
@@ -65,6 +99,11 @@ export const useContract = () => {
         executeCrossChainBacalhauJob,
         submitFunds,
         balanceOf,
-        hasAccess
+        hasAccess,
+        CreateSpitter,
+        getPayeesCount,
+        getPayee,
+        getPayeeShares,
+        distributeShares
     }
 }

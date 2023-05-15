@@ -28,9 +28,6 @@ contract DealClient is AxelarExecutable, Ownable, IDealClient{
     ITablelandTables private tablelandContract;
 
     mapping(address => uint) public userFunds;
-    mapping(string => bool) private allowedSourceChains;
-    mapping(string => bool) private allowedSourceAddresses;
-    mapping(string => string) private chainToAddress;
 
     IAxelarGasService public immutable gasService;
 
@@ -45,10 +42,8 @@ contract DealClient is AxelarExecutable, Ownable, IDealClient{
     address public constant MARKET_ACTOR_ETH_ADDRESS = address(0xff00000000000000000000000000000000000005);
     address public constant DATACAP_ACTOR_ETH_ADDRESS = address(0xfF00000000000000000000000000000000000007);
 
-    mapping(bytes32 => RequestIdx) public dealRequestIdx; // contract deal id -> deal index
-    DealRequest[] public dealRequests;
-
     mapping(bytes => RequestId) public pieceRequests; // piece_cid -> dealProposalID
+    mapping(bytes => mapping( bytes32 => bool)) pieceRequests;
     mapping(bytes => ProviderSet) public pieceProviders; // piece_cid -> provider
     // We can yse this one instead the above one bc we will store everything on tableland
     mapping(bytes => mapping(bytes => bool)) private pieceproviders;
@@ -57,6 +52,12 @@ contract DealClient is AxelarExecutable, Ownable, IDealClient{
     // We can yse this one instead the above one bc we will store everything on tableland
     mapping(bytes => EnumerableSet.UintSet) private piecedeals;
     mapping(bytes => Status) public pieceStatus;
+
+    struct pieceMaterialized {
+      bool materialized;
+      uint256 timestamp;
+    }
+    mapping(bytes => pieceMaterialized) public pieceDealInfo;
     
     uint256 request_tableID;
     string public request_tableName;
@@ -152,11 +153,8 @@ contract DealClient is AxelarExecutable, Ownable, IDealClient{
 
         // Handles calls created by setAndSend. Updates this contract's value
     function _execute(
-        string calldata sourceChain_,
-        string calldata sourceAddress_,
         bytes calldata payload_
-    ) internal override {
-        require(allowedSourceAddresses[sourceAddress_] && allowedSourceChains[sourceChain_]);
+    ) internal {
         string memory _spec;
         uint256 tokenId;
         address sender;
@@ -174,12 +172,6 @@ contract DealClient is AxelarExecutable, Ownable, IDealClient{
         to.transfer(userFunds[msg.sender]);
     }
 
-    function addSourceChains(string memory new_sourceChain, string memory new_sourceAddress) public onlyOwner{
-        chainToAddress[new_sourceChain] = new_sourceAddress;
-        allowedSourceAddresses[new_sourceAddress] = true;
-        allowedSourceChains[new_sourceChain] = true;
-    }
- 
 
   function getProviderSet(
     bytes calldata cid
@@ -193,15 +185,6 @@ contract DealClient is AxelarExecutable, Ownable, IDealClient{
     return pieceRequests[cid];
   }
 
-  function dealsLength() public view returns (uint256) {
-    return dealRequests.length;
-  }
-
-  function getDealByIndex(
-    uint256 index
-  ) public view returns (DealRequest memory) {
-    return dealRequests[index];
-  }
 
   function makeDealProposal(
     DealRequest calldata deal,
@@ -213,20 +196,17 @@ contract DealClient is AxelarExecutable, Ownable, IDealClient{
     //     pieceStatus[deal.piece_cid] == Status.DealActivated) {
     //   revert("deal with this pieceCid already published");
     // }
-
-    uint256 index = dealRequests.length;
-    dealRequests.push(deal);
+ 
 
     // creates a unique ID for the deal proposal -- there are many ways to do this
     bytes32 id = keccak256(
-      abi.encodePacked(block.timestamp, creator, index)
+      abi.encodePacked(block.timestamp, creator)
     );
 
     mutate(request_tableID, requestInsertion(pieceCID, deal.extra_params.location_ref, deal.extra_params.car_size, deal.piece_size,deal.storage_price_per_epoch,block.timestamp,creator,index));
 
-    dealRequestIdx[id] = RequestIdx(index, true);
-
     pieceRequests[deal.piece_cid] = RequestId(id, true);
+    piecerequests[deal.piece_cid][id] = true;
     pieceStatus[deal.piece_cid] = Status.RequestSubmitted;
 
     // writes the proposal metadata to the event log
