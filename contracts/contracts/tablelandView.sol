@@ -176,12 +176,15 @@ contract tablelandView is  AxelarExecutable ,Ownable{
     function createCrossChainBounty(
         string calldata destinationChain,
         string calldata destinationAddress,
-        uint256 tokenId,
-        string memory _spec,
-        string memory jobId
+        string memory piece_cid,
+        bytes memory piece_cid_bytes,
+        string memory location_ref,
+        uint256 bountyReward,
+        int64 minAcceptedDealDuration,
+        uint256 size
     ) public payable {
         require(DB_NFT.balanceOf(msg.sender, tokenId) > 0);
-        bytes memory payload = abi.encode(tokenId, _spec, jobId, msg.sender);
+        bytes memory payload = abi.encode(piece_cid, piece_cid_bytes, location_ref, bountyReward, minAcceptedDealDuration, size);
         if (msg.value > 0) {
             gasService.payNativeGasForContractCall{ value: msg.value }(
                 address(this),
