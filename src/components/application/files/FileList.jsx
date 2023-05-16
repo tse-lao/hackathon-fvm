@@ -1,3 +1,4 @@
+import { getLighthouse } from '@/lib/createLighthouseApi';
 import lighthouse from '@lighthouse-web3/sdk';
 import { useEffect, useState } from "react";
 import UploadModal from "../../UploadModal";
@@ -16,6 +17,11 @@ export default function FileList({ address }) {
         
         const getFiles = async () => {
             const uploads = await lighthouse.getUploads(address);
+            const apiKey = await getLighthouse(address);
+            const authToken = await lighthouse.dataDepotAuth(apiKey)
+            console.log(authToken);
+            const carFiles = await lighthouse.viewCarFiles(1, authToken.data.access_token)
+            console.log(carFiles);
             setFiles(uploads.data.fileList)
             setTotalFiles(uploads.data.totalFiles)
 

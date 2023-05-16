@@ -1,35 +1,17 @@
-import { DB_main } from "@/constants";
+import { getAllNFTs } from "@/hooks/useTableland";
 import { useEffect, useState } from "react";
+import Filters from "../overlay/Filters";
 import RequestElement from "./RequestElement";
+
 export default function ListRequest() {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
-    
+
     useEffect(() => {
 
         const getData = async() => {
-            const url = 'https://testnets.tableland.network/api/v1/query';
-            const params = new URLSearchParams({
-              statement: `select * from ${DB_main}`
-            });
-            
-            fetch(`${url}?${params.toString()}`, {
-              headers: {
-                'Accept': 'application/json'
-              }
-            })
-              .then(response => response.json())
-              .then(data => {
-                if(data != "Row not found"){
-                  setData(data)
-                  console.log(data);
-                }
-               
-                setLoading(false);
-            })
-              .catch(error => console.error(error));
-              
-           
+          const dataSets = await getAllNFTs(false);
+          setData(dataSets)
         }
         
         getData();
@@ -37,14 +19,20 @@ export default function ListRequest() {
     
       
     
-    if(loading) return <div>Loading...</div>
     return (
-        <div>
+      <div className="flex flex-col">      
+      <Filters name="Data Requests"/>
+
+
+      <main className="flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {data.length > 0 ? data.map((request, index) => (
                 <RequestElement index={index} request={request} key={index} />
             )): (<p>No data found!</p>)}
             
 
+        </div>
+        </main>
         </div>
    
         

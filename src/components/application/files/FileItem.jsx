@@ -20,7 +20,7 @@ export default function FileItem  ({ file }) {
     <>
       <div
         key={file.id}
-        className="flex items-center justify-between cursor-pointer hover:bg-gray-100 rounded-lg p-2"
+        className="bg-white flex items-center justify-between cursor-pointer hover:bg-gray-100 rounded-lg p-2"
         onClick={handleClick}
       >
         <div className="flex items-center">

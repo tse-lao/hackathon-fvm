@@ -1,8 +1,11 @@
+import { getLighthouse } from '@/lib/createLighthouseApi'
 import { formatBytes } from '@/lib/helpers'
 import { Dialog, Transition } from '@headlessui/react'
 import { HeartIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import lighthouse from '@lighthouse-web3/sdk'
+import axios from 'axios'
 import { Fragment, useEffect, useState } from 'react'
+import { useAccount } from 'wagmi'
 import FileDealStatus from './FileDealStatus'
 import FileDetailInformation from './FileDetailInformation'
 import FileSharedWith from './FileSharedWith'
@@ -11,12 +14,14 @@ export default function FileDetail({file, changeModalState}) {
   const [open, setOpen] = useState(true)
   const [loading, setLoading] = useState(true)
   const [dealStatus, setDealStatus] = useState(null)
+const {address} = useAccount()
   
-  
+
   useEffect(() => {
     setLoading(true);
     
     const getDealStatus = async () => {
+      console.log(file.status)
       if(file.status != "queued"){
       const status = await lighthouse.dealStatus(file.cid)
       console.log(status)
@@ -32,12 +37,33 @@ export default function FileDetail({file, changeModalState}) {
   
   const getCar = async () => {
     
-    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_API_KEY;
+    const apiKey = await getLighthouse(address);
     const authToken = await lighthouse.dataDepotAuth(apiKey)
     
     console.log(authToken)
   // Create CAR
     const response = await lighthouse.createCar("https://gateway.lighthouse.storage/ipfs/"+file.cid, authToken.data.access_token)
+    
+    try {
+      const endpoint = `https://data-depot.lighthouse.storage/api/upload/upload_files`
+      const FormData = eval(`require`)('form-data')
+      const fs = eval(`require`)('fs')
+      
+      
+      
+      
+      const response = await axios.post(endpoint, formData, {
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        headers: {
+          ...formData.getHeaders(),
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
+      return { data: response.data }
+    } catch (error) {
+      throw new Error(error)
+    }
     
     console.log(response)
     

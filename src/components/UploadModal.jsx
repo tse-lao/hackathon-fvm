@@ -1,6 +1,9 @@
+
 import { getLighthouse, signAuthMessage } from '@/lib/createLighthouseApi';
+import { getMetadataFromFile, readFSStream } from '@/lib/dataHelper';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
 import lighthouse from '@lighthouse-web3/sdk';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
@@ -65,6 +68,8 @@ export default function UploadModal({ onClose }) {
             }catch(e){
                 toast.error(e.message)
             }
+            
+    
      
         }
         
@@ -103,11 +108,54 @@ export default function UploadModal({ onClose }) {
                 );
                 
                 
-                window.location.reload();
+               // window.location.reload();
     
         }catch(e){
             toast.error(e.message)
         }
+        
+        const apiKey = await getLighthouse(address);
+        const authToken = await lighthouse.dataDepotAuth(apiKey)
+        
+
+        try {
+            const endpoint = `https://data-depot.lighthouse.storage/api/upload/upload_files`
+            const url = await readFSStream(mockEvent.target.files[0]);
+
+            const formData = new FormData();
+            formData.append('file', url)
+            
+            
+        /*     await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${authToken.data.access_token}`,
+                    ...formData.getHeaders(),
+                }
+            }); */
+
+            console.log(authToken.data.access_token)
+     const response = await axios.post(endpoint, formData, {
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity,
+                headers: {
+                    Authorization: `Bearer ${authToken.data.access_token}`,
+                },
+            })
+            console.log("CAR REPONSE")
+            console.log(response)
+            
+            const files = await lighthouse.viewCarFiles(1, authToken.data.access_token)
+            console.log("FILES")
+            console.log(files)
+            //return { data: response.data.message } 
+        } catch (error) {
+            throw new Error(error)
+        }
+
+        
+        getMetadataFromFile(carFile);
+        console.log(carFile);
     }
 
     }

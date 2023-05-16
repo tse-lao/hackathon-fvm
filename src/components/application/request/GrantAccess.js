@@ -87,13 +87,14 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator }) 
             <p className="text-gray-400 text-md">Please add some data.</p>
           </div>
         )}
-        <button
-          className="mt-4 w-full bg-indigo-500 text-white rounded-md px-4 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-50"
-          onClick={provideAccess}
-        >
-          Provide Access
-        </button>
+      
       </div>
+      <button
+      className="mt-4 w-full bg-indigo-500 text-white rounded-md px-4 py-2 text-sm font-semibold shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-50"
+      onClick={provideAccess}
+    >
+      Provide Access
+    </button>
     </div>
 
 

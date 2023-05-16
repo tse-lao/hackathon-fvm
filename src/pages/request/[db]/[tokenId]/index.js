@@ -1,16 +1,19 @@
 import Contributions from "@/components/application/data/Contributions";
 import LoadingSpinner from "@/components/application/elements/LoadingSpinner";
 import GrantAccess from "@/components/application/request/GrantAccess";
-import { mintNFTDB } from "@/hooks/useLitProtocol";
-import { useTableland } from "@/hooks/useTableland";
+import { useContract } from "@/hooks/useContract";
+import { getSignature, retrieveMergeCID } from "@/hooks/useLitProtocol";
+import { getContributionSplit, getNFTDetail, getRequestData } from "@/hooks/useTableland";
 import Layout from "@/pages/Layout";
 import {
   CheckIcon,
   HandThumbUpIcon,
   UserIcon
 } from '@heroicons/react/20/solid';
+import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 
 
@@ -63,13 +66,13 @@ const timeline = [
 ]
 
 
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function GetRequestDetails() {
   const router = useRouter();
-  const { fetchTokenRequest, getRequestData } = useTableland();
   const { db, tokenId } = router.query;
   const [loading, setLoading] = useState(true);
   const { address } = useAccount();
@@ -77,12 +80,13 @@ export default function GetRequestDetails() {
   const [showGrant, setShowGrant] = useState(true);
   const [creator, setCreator] = useState(null);
   const [categories, setCategories] = useState([]);
+  const { CreateSpitter, createDB_NFT } = useContract();
 
 
   useEffect(() => {
     const getData = async () => {
-      const response = await fetchTokenRequest(tokenId);
-      setData(response[0])
+      const response = await getNFTDetail(tokenId);
+      setData(response)
 
       const jsonObject = await getRequestData(tokenId);
       let tempCat = []
@@ -103,15 +107,68 @@ export default function GetRequestDetails() {
 
   const mintNFT = async () => {
 
-    const result = await mintNFTDB(tokenId, address);
-
-   console.log(result);
-
-
-    //now we can call the useTableland function with the backend. 
     
-    //  const encryption = await lighthouse.fetchEncryptionKey("QmdWcYRHtRytGJu3eymCQmTVbWcHMpSaHqcFPYx7WEGGNG", creator, getToken);
-    //    const decrypt = await lighthouse.decryptFile("QmdWcYRHtRytGJu3eymCQmTVbWcHMpSaHqcFPYx7WEGGNG", encryption.data.key);
+    //
+    
+    const contributors = await getContributionSplit(tokenId);
+    
+    let contract = "0x;"
+    let mergedCID = "Qm"
+    
+    try {
+      const hash = await CreateSpitter(address, contributors.contributors, contributors.percentage);
+      console.log(hash);
+      
+      contract = hash.events[0].data.replace("0x000000000000000000000000", "0x");
+      console.log(contract);
+      toast.success("Succesfully generated splitter on address: ", contract);
+      
+    }catch(e){
+      toast.error("Error generating splitter.")
+      console.log(e);
+    }
+    
+    try{
+      const result = await retrieveMergeCID(tokenId, address);
+      console.log(result)
+      mergedCID = result;
+      toast.success("Succesfully merged CID: " +  mergedCID);
+    }catch(e){
+      toast.error("Error merging CID.")
+      console.log(e);
+    }
+    
+    const mintPrice = 0.001;
+    
+    const price = ethers.utils.parseEther(mintPrice.toString())
+
+
+    if(mergedCID == "Qm" || contract == "0x"){
+      toast.error("Error generating CID or splitter.")
+      return;
+    }
+
+        
+    console.log(tokenId)
+    console.log(mergedCID)
+    console.log(mintPrice)
+    console.log(contract)
+    
+    const toSign = tokenId.concat("", mergedCID).concat("", price).concat("", contract);
+
+    console.log(toSign);
+    const sign = await getSignature(toSign);
+    
+     try{
+      await createDB_NFT(tokenId, mergedCID, mintPrice, contract, sign.v, sign.r, sign.s)
+      toast.success("Succesfully minted NFT.")
+    }
+    catch(e){
+      console.log(e)
+      toast.error("Error on minting NFT.")
+    }
+    //console.log(result);s
+
 
   }
 

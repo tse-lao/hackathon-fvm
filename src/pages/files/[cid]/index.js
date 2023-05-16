@@ -1,15 +1,19 @@
+
 import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
 import useNftStorage from '@/hooks/useNftStorage';
-import { signAuthMessage } from '@/lib/createLighthouseApi';
+import { getLighthouse, signAuthMessage } from '@/lib/createLighthouseApi';
 import readBlobAsJson, { analyzeJSONStructure, readTextAsJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
 import lighthouse from '@lighthouse-web3/sdk';
+import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
+
+
 
 const fileDefault = {
     "fileSizeInBytes": "",
@@ -49,8 +53,8 @@ export default function ViewFile() {
             setRecord({ cid: cid, metadata: "" })
             const status = await lighthouse.getFileInfo(cid)
             setFileInfo(status.data);
-            
-            if(!status.data.encryption){
+
+            if (!status.data.encryption) {
                 //TODO: Read the content of the CID and display it.
                 const file = cid.toString();
                 //read the content of this file 
@@ -82,9 +86,9 @@ export default function ViewFile() {
         readContent(fileType, decrypted);
 
     }
-    
-    
-    async function readContent(fileType, content){
+
+
+    async function readContent(fileType, content) {
         switch (fileType) {
             case MIMETYPE_IMAGE_JPEG:
                 let jpg = URL.createObjectURL(content);
@@ -106,11 +110,11 @@ export default function ViewFile() {
                     if (error) {
                         toast.error('Failed to read the Blob as JSON:', error);
                     } else {
-    
+
                         setFileURL(json)
                     }
                 });
-            default: 
+            default:
                 await readBlobAsJson(content, (error, json) => {
                     if (error) {
                         toast.error('Failed to read the Blob as JSON:', error);
@@ -149,6 +153,48 @@ export default function ViewFile() {
         });
     }
 
+    async function createCar() {
+        const apiKey = await getLighthouse(address);
+        const authToken = await lighthouse.dataDepotAuth(apiKey)
+
+        console.log(authToken)
+        // Create CAR
+       // const response = await lighthouse.createCar("https://gateway.lighthouse.storage/ipfs/" + file.cid, authToken.data.access_token)
+
+        try {
+            const endpoint = `https://data-depot.lighthouse.storage/api/upload/upload_files`
+
+
+            const formData = new FormData();
+            formData.append('file', fileURL);
+            
+            
+        /*     await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${authToken.data.access_token}`,
+                    ...formData.getHeaders(),
+                }
+            }); */
+
+            console.log(authToken.data.access_token)
+     const response = await axios.post(endpoint, fileURL, {
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity,
+                headers: {
+                    ...formData.getHeaders(),
+                    Authorization: `Bearer ${authToken.data.access_token}`,
+                },
+            })
+            return { data: response.data.message } 
+        } catch (error) {
+            throw new Error(error)
+        }
+
+
+    }
+
+
 
 
 
@@ -158,35 +204,35 @@ export default function ViewFile() {
             {loading ? <div>Loading...</div> : (
 
                 <div>
-                    
-                        <div className="flex justify-between sm:flex sm:items-center mb-6">
-                            <div>
-                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{fileInfo.fileName}</h1>
-                                <p className="mt-1 text-sm md:text-base text-gray-600">
-                                    {fileInfo.cid}
-                                </p>
-                            </div>
-                            <div className="space-x-4">
-                                <button
-                                    onClick={download}
-                                    className="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                    Download
-                                </button>
-                                <button
-                                    onClick={analyze}
-                                    className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border border-gray-300"
-                                >
-                                    Get Metadata
-                                </button>
-                            </div>
-                        </div>
 
-                        <div className="flex flex-col md:flex-row mt-4 space-y-4 md:space-y-0 md:space-x-4">
+                    <div className="flex justify-between sm:flex sm:items-center mb-6">
+                        <div>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{fileInfo.fileName}</h1>
+                            <p className="mt-1 text-sm md:text-base text-gray-600">
+                                {fileInfo.cid}
+                            </p>
+                        </div>
+                        <div className="space-x-4">
+                            <button
+                                onClick={createCar}
+                                className="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                                Create Car
+                            </button>
+                            <button
+                                onClick={analyze}
+                                className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border border-gray-300"
+                            >
+                                Get Metadata
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row mt-4 space-y-4 md:space-y-0 md:space-x-4">
                         {/* File content */}
                         <div className="flex-grow p-4 bg-white shadow-sm rounded-lg mr-4">
                             {fileInfo.encryption && fileURL == null ? (
-                                    <SimpleDecrypted startDecrypt={decrypt} />
+                                <SimpleDecrypted startDecrypt={decrypt} />
                             ) : (
                                 <div className="prose prose-sm max-w-none max-h-[600px] overflow-auto">
                                     {fileInfo.mimeType == "image/jpeg" && <img src={fileURL} />}
@@ -196,10 +242,10 @@ export default function ViewFile() {
                                 </div>
                             )}
                         </div>
-                    
+
                         {/* Sidebar */}
-                        <div className="w-120 p-4 bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">                          
-                            <FileDetailInformation detail={fileInfo} className="mt-4 mb-4" metadata={record.metadata} cid={cid} address={address}  />
+                        <div className="w-120 p-4 bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">
+                            <FileDetailInformation detail={fileInfo} className="mt-4 mb-4" metadata={record.metadata} cid={cid} address={address} />
                             <FileSharedWith cid={cid} />
                         </div>
                     </div>

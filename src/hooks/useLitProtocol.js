@@ -2,10 +2,9 @@ import { getLighthouse } from "@/lib/createLighthouseApi";
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import { ethers } from 'ethers';
 import { toast } from "react-toastify";
+import { useContract } from "./useContract";
 import { createJWTToken } from "./useLighthouse";
 const PUBLIC_KEY = "0x04808e24bb109fac42882de0203d77f2ad60ffdbf7ff339d77036f71b35095198aa8cb2705030b4b1a206b066cb0bebd18b45353a79f150eebd6b1e986e97f5d32"
-
-
 export async function litJsSdkLoaded() {
   const client = new LitJsSdk.LitNodeClient({ litNetwork: "serrano" });
 
@@ -18,6 +17,7 @@ export async function litJsSdkLoaded() {
 //rows => accept
 //pkp singing  => valide
 
+// Use the CreateSpitter function from useContract
 
 export async function runLitProtocol(dataCID) {
   // you need an AuthSig to auth with the nodes
@@ -129,12 +129,9 @@ export async function validateInput(tokenID, cid, rows) {
   }
 }
 
-export async function mintNFTDB(tokenID, creator) {
+export async function retrieveMergeCID(tokenID, creator) {
   const getToken = await createJWTToken();
-  
-  console.log(creator);
   const apiKey = await getLighthouse(creator);
-  console.log(apiKey);
 
   const url = "http://localhost:4000"
 
@@ -143,6 +140,8 @@ export async function mintNFTDB(tokenID, creator) {
       combineCIDForDB(tokenId: $tokenId, jwtToken: $jwtToken, creator: $creator, apiKey: $apiKey)
     }
     `
+    
+    
   try {
     const fetchCID = await fetch(url, {
       method: "POST",
@@ -161,12 +160,91 @@ export async function mintNFTDB(tokenID, creator) {
     })
     
     const result = await fetchCID.json();
+    console.log(result)
     console.log(result.data.combineCIDForDB);
+  
+    //get all the creators and add them with a percentage back. 
+    
+    //
 
     return result.data.combineCIDForDB;
   } catch (e) {
     console.log(e)
     toast.error("Error 2: " + e)
+    
+    return null;
   }
 
+}
+
+export async function mintNFTDB (tokenID, txHash,  creator, mintPrice) {
+  //const mergedCID = await retrieveMergeCID(tokenID, creator);
+  const {createDB_NFT} = useContract();
+  const mergedCID = "QmYnnwvyU6GhbPdHfzTBmrQdDTnYzBiNgSAykC9qnuhK1v";
+  if(mergedCID == null) {
+    toast.error("Error 2: no merged..")
+    return null;
+  }
+  //
+  
+
+  
+  const txContract = "0x94ac8ca31d45204323b3e1ea62d588088daabd88"
+  getSignature();
+  
+  
+  const toSign = tokenID.concat("", mergedCID).concat("", mintPrice).concat("", txContract);
+
+  const sign = await getSignature(toSign);
+  
+  
+
+  const result = await createDB_NFT(tokenID, mergedCID, mintPrice, hardCodedAddress, sign.r, sign.s, sign.v, txContract, creator)
+  console.log(result);
+  //sign the input TODO: needs to be implemented in the backend for 
+  // tokenid, dbCID, mintPrice, address
+  
+  return true;
+  
+}
+
+export async function getSignature(message){
+  
+  const url = "http://localhost:4000"
+  
+  const query = `
+  query SignMessage($message: String) {
+    signMessage(message: $message) {
+      r
+      s
+      v
+    }
+  }
+    `
+    
+    try {
+      const getSignature = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "query": query,
+          "variables": {
+            "message": message,
+          }
+        })  
+      })
+        
+      const result = await getSignature.json();
+      console.log(result.data.signMessage);
+      return result.data.signMessage;
+    } catch (e) {
+      console.log(e)
+      toast.error("Error 2: " + e)
+        
+      return null;
+    }
+    
+  
 }

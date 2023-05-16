@@ -28,12 +28,15 @@ export const useContract = () => {
     }
 
 
+    const randomSalt = async() => {
+        return await ethers.utils.randomBytes(32);
+    }
 
     // get internal transaction by transaction hash to get the deployed splitter contract  https://docs.polygonscan.com/v/mumbai-polygonscan/api-endpoints/accounts#get-internal-transactions-by-transaction-hash
     const CreateSpitter = async(defaultAdmin : string, _payees : string[], _shares: string[])=>{
         var bytecode = "0xb1a14437"
         var initCode = await helperContract.getInitCode(bytecode,defaultAdmin,[],_payees,_shares);
-        var salt = "0x3335363138373637000000000000000000000000000000000000000000000000";
+        var salt = randomSalt();
         const tx = await TWFactory.deployProxyByImplementation(splitImplementation,initCode,salt );
         return await tx.wait();
     }
@@ -69,6 +72,7 @@ export const useContract = () => {
     //signature: 
     const createDB_NFT = async(tokenId: String, dbCID: String, mintPrice: number, royaltiesAddress: String, v: number, r: string,  s: string) => {
         const price = ethers.utils.parseEther(mintPrice.toString())
+    
         const tx = await contract.createDB_NFT(tokenId, dbCID, price, royaltiesAddress, "0x00", v , r , s, { gasLimit: 1000000 })
         return await tx.wait()
     }

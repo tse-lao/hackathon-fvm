@@ -80,6 +80,10 @@
 
     "react-dom": "18.2.0",
 
+    "react-multi-select-component": "^4.3.4",
+
+    "react-slider": "^2.0.4",
+
     "react-tagsinput": "^3.20.1",
 
     "react-toastify": "^9.1.2",

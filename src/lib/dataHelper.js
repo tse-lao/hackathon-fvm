@@ -194,6 +194,27 @@ export function readJSONFromFileInput(fileInput, callback) {
   reader.readAsText(file);
 }
 
+export function readFSStream(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', async () => {
+      try {
+        resolve(reader.result);
+      } catch (error) {
+        toast.error(error);
+        reject(error.message);
+      }
+    });
+
+    reader.addEventListener('error', () => {
+      reject(new Error('Error reading file'));
+    });
+
+    reader.readAsText(file);
+  });
+}
+
 export async function getMetadataFromFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

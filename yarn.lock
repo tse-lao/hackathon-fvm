@@ -6226,6 +6226,11 @@ react-is@^16.13.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-multi-select-component@^4.3.4:
+  version "4.3.4"
+  resolved "https://registry.npmjs.org/react-multi-select-component/-/react-multi-select-component-4.3.4.tgz"
+  integrity sha512-Ui/bzCbROF4WfKq3OKWyQJHmy/bd1mW7CQM+L83TfiltuVvHElhKEyPM3JzO9urIcWplBUKv+kyxqmEnd9jPcA==
+
 react-native-fetch-api@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/react-native-fetch-api/-/react-native-fetch-api-3.0.0.tgz"
@@ -6251,6 +6256,13 @@ react-remove-scroll@2.5.4:
     tslib "^2.1.0"
     use-callback-ref "^1.3.0"
     use-sidecar "^1.1.2"
+
+react-slider@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.npmjs.org/react-slider/-/react-slider-2.0.4.tgz"
+  integrity sha512-sWwQD01n6v+MbeLCYthJGZPc0kzOyhQHyd0bSo0edg+IAxTVQmj3Oy4SBK65eX6gNwS9meUn6Z5sIBUVmwAd9g==
+  dependencies:
+    prop-types "^15.8.1"
 
 react-style-singleton@^2.2.1:
   version "2.2.1"
