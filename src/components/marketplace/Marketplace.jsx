@@ -87,12 +87,7 @@ const Marketplace = () => {
 
     const fetchData = async () => {
       setLoading(true)
-      if(selectedCategory != ''){
-        const result = await filteredWithCategories(true, selectedCategory);
      
-        setDatasets(result);
-        setLoading(false);
-      }
       const marketplace = await getAllNFTs(true);
      
       setDatasets(marketplace);
@@ -102,19 +97,9 @@ const Marketplace = () => {
     fetchData();
     
     
-  }, [selectedCategory]);
+  }, []);
 
-  const fetchDatasets = () => {
-    return new Promise((resolve) => {
-      const datasets =
-        /* The JSON dataset provided earlier */
-        sets
 
-      setTimeout(() => {
-        resolve(datasets);
-      }, 500);
-    });
-  };
 
  // Method to handle multiple categories selection
 /*  const handleCategoryClick = (category) => {
@@ -130,9 +115,19 @@ const Marketplace = () => {
 }; */
 const handleCategoryChange = (event) => {
   setSelectedCategory(event);
+  if(event != ''){
+    changeDB(event);
+  }
 }
 
 
+const changeDB = async (event) => {
+  setLoading(true)
+  console.log(event);
+  const marketplace = await filteredWithCategories(true, event);
+  setDatasets(marketplace);
+  setLoading(false);
+}
 
   if (loading) return <LoadingSpinner msg="Loading Marketplace" />;
   return (

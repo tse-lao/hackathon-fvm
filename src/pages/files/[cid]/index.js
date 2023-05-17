@@ -2,12 +2,11 @@
 import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
-import useNftStorage from '@/hooks/useNftStorage';
-import { getLighthouse, signAuthMessage } from '@/lib/createLighthouseApi';
+import useNftStorage, { readEncryptFile } from '@/hooks/useNftStorage';
+import { signAuthMessage } from '@/lib/createLighthouseApi';
 import readBlobAsJson, { analyzeJSONStructure, readTextAsJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
 import lighthouse from '@lighthouse-web3/sdk';
-import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -154,44 +153,10 @@ export default function ViewFile() {
     }
 
     async function createCar() {
-        const apiKey = await getLighthouse(address);
-        const authToken = await lighthouse.dataDepotAuth(apiKey)
-
-        console.log(authToken)
-        // Create CAR
-       // const response = await lighthouse.createCar("https://gateway.lighthouse.storage/ipfs/" + file.cid, authToken.data.access_token)
-
-        try {
-            const endpoint = `https://data-depot.lighthouse.storage/api/upload/upload_files`
-
-
-            const formData = new FormData();
-            formData.append('file', fileURL);
-            
-            
-        /*     await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${authToken.data.access_token}`,
-                    ...formData.getHeaders(),
-                }
-            }); */
-
-            console.log(authToken.data.access_token)
-     const response = await axios.post(endpoint, fileURL, {
-                maxContentLength: Infinity,
-                maxBodyLength: Infinity,
-                headers: {
-                    ...formData.getHeaders(),
-                    Authorization: `Bearer ${authToken.data.access_token}`,
-                },
-            })
-            return { data: response.data.message } 
-        } catch (error) {
-            throw new Error(error)
-        }
-
-
+        //we want to create ht car het 
+        
+        const getCar = await readEncryptFile(cid);
+        console.log(getCar)
     }
 
 

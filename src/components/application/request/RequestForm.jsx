@@ -7,9 +7,10 @@ import TagsInput from "react-tagsinput";
 import 'react-tagsinput/react-tagsinput.css';
 import { toast } from "react-toastify";
 import LoadingSpinner from "../elements/LoadingSpinner";
+import CreateOverlay from "../overlay/CreateOverlay";
 
 
-export default function DataRequestForm({ onClose }) {
+export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
   const [formData, setFormData] = useState({
     name: "",
     categories: [],
@@ -85,7 +86,7 @@ export default function DataRequestForm({ onClose }) {
 
 
   return (
-
+<CreateOverlay title="Create a DB Request" onClose={onClose} getOpen={getOpen} changeOpen={changeOpen}>
     <div className="space-y-4">
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -172,6 +173,6 @@ export default function DataRequestForm({ onClose }) {
         Submit
       </button>
     </div>
-
+</CreateOverlay>
   );
 };

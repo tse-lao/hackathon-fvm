@@ -1,6 +1,6 @@
 
-import CreateOverlay from "@/components/application/overlay/CreateOverlay";
 import ListRequest from "@/components/application/request/ListRequest";
+import DataRequestForm from "@/components/application/request/RequestForm";
 import { useState } from "react";
 import Layout from "../Layout";
 
@@ -55,7 +55,7 @@ export default function Request() {
       onClick={() => setOpenModal(true)}
       className="bg-indigo-500 hover:bg-indigo-700 self-end text-white font-bold py-2 px-4 rounded-full"
     >
-      <CreateOverlay changeOpen={changeOpen} getOpen={openModal} />
+      <DataRequestForm changeOpen={changeOpen} getOpen={openModal} />
 
       Create Request
     </button>

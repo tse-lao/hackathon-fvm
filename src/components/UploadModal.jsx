@@ -1,6 +1,6 @@
 
 import { getLighthouse, signAuthMessage } from '@/lib/createLighthouseApi';
-import { getMetadataFromFile, readFSStream } from '@/lib/dataHelper';
+import { readFSStream } from '@/lib/dataHelper';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
 import lighthouse from '@lighthouse-web3/sdk';
 import axios from 'axios';
@@ -16,6 +16,7 @@ export default function UploadModal({ onClose }) {
     const [encryption, setEncryption] = useState(true)
     const { address } = useAccount();
 
+    const [uploadedProgress, setUploadedProgress] = useState(0);
     const uploadedFiles = [];
 
     useEffect(() => {
@@ -51,6 +52,9 @@ export default function UploadModal({ onClose }) {
 
         let api = await getLighthouse(address);
         
+        const apiKey = await getLighthouse(address);
+        const authToken = await lighthouse.dataDepotAuth(apiKey)
+        
         for(let i = 0; i < files.length; i++) {
             const mockEvent = {
                 target: {
@@ -58,25 +62,72 @@ export default function UploadModal({ onClose }) {
                 },
                 persist: () => {},
             };
+            
+ 
+    
+    
+    
+                const endpoint = `https://data-depot.lighthouse.storage/api/upload/upload_files`
+                //const content = await readFSStream(mockEvent.target.files[0]);
+                
+                toast.info(authToken.data.access_token)
+                
+                const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InRzZS1sYW8iLCJhdmF0YXJVUkwiOiJodHRwczovL2F2YXRhcnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3UvMTA2NjUzMzU5P3Y9NCIsImlhdCI6MTY4NDI3MDk0MCwiZXhwIjoxNjg1OTk4OTQwfQ.v3ph47ry4wi5z_XucAYcCPnXKWKuHx169JsMZjWyJ94"
+              
+                try {
+                    var form = new FormData();
+                    files.map((item) => {
+                        form.append("file", item);
+                    });
+                
+                    const config = {
+                        onUploadProgress: (progressEvent) => {
+                        let percentageUploaded =
+                            (progressEvent?.loaded / progressEvent?.total) * 100;
+                
+                        setUploadedProgress(percentageUploaded.toFixed(2));
+                        },
+                    };
+                    let response = await axios.post(
+                        `${endpoint}`,
+                        form,
+                        config, 
+                        {headers: {
+                            Authorization: `Bearer ${authToken.data.access_token}`,
+                        }},
+                    );
+                
+                    if (response["status"] === 200) {
+                        console.log(response?.data?.message, "success");
+                    }
+                    } catch (error) {
+                    console.log(`Something Went Wrong : ${error}`, "error");
+                    }
+    
 
-            try{
+        /*     try{
                 
                 const output = await lighthouse.upload(mockEvent, api, progressCallback);
                 
                 toast.success("Succesfully uploaded the files");
-                window.location.reload();
+               // window.location.reload();
             }catch(e){
                 toast.error(e.message)
             }
             
-    
+     */
      
         }
+        
+     
+               
+   
         
         toast.success("Succesfully uploaded the files");
 
     }
 
+    
     const uploadFileEncrypted = async () => {
         /*
            uploadEncrypted(e, accessToken, publicKey, signedMessage, uploadProgressCallback)
@@ -98,7 +149,7 @@ export default function UploadModal({ onClose }) {
                 persist: () => {},
             };
                 
-            try {
+     /*        try {
                 const response = await lighthouse.uploadEncrypted(
                     mockEvent,
                     api,
@@ -112,50 +163,70 @@ export default function UploadModal({ onClose }) {
     
         }catch(e){
             toast.error(e.message)
-        }
+        } */
         
         const apiKey = await getLighthouse(address);
         const authToken = await lighthouse.dataDepotAuth(apiKey)
-        
 
-        try {
+
+        //88a435ac.75ac6eac41a04a5196f2a7487c2ab186
+
             const endpoint = `https://data-depot.lighthouse.storage/api/upload/upload_files`
-            const url = await readFSStream(mockEvent.target.files[0]);
-
-            const formData = new FormData();
-            formData.append('file', url)
+            const content = await readFSStream(mockEvent.target.files[0]);
             
+            //convert content to utf8Array
+            const utf8Array = new TextEncoder().encode(content);
+            console.log(utf8Array)
+            console.log(content)
+             const formData = new FormData();
+            formData.append('file', utf8Array)
             
-        /*     await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${authToken.data.access_token}`,
-                    ...formData.getHeaders(),
+          
+            try {
+                var form = new FormData();
+                mockEvent.map((item) => {
+                    form.append("file", item);
+                });
+                
+                console.log(form);
+            
+                const config = {
+                    onUploadProgress: (progressEvent) => {
+                    let percentageUploaded =
+                        (progressEvent?.loaded / progressEvent?.total) * 100;
+            
+                    setUploadedProgress(percentageUploaded.toFixed(2));
+                    },
+                };
+                
+                let response = await fetch(endpoint,{
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${authToken.data.access_token}`,
+                    },
+                    body: formData
+                })
+                console.log(response)
+               /*  let response = await axios.post(
+                    endpoint,
+                    form, 
+                    {
+                        headers: {
+                        Authorization: `Bearer ${authToken.data.access_token}`,
+                 }});
+                  */
+            
+                if (response["status"] === 200) {
+                    console.log(response?.data?.message, "success");
                 }
-            }); */
+                } catch (error) {
+                console.log(`Something Went Wrong : ${error}`, "error");
+                }
 
-            console.log(authToken.data.access_token)
-     const response = await axios.post(endpoint, formData, {
-                maxContentLength: Infinity,
-                maxBodyLength: Infinity,
-                headers: {
-                    Authorization: `Bearer ${authToken.data.access_token}`,
-                },
-            })
-            console.log("CAR REPONSE")
-            console.log(response)
             
-            const files = await lighthouse.viewCarFiles(1, authToken.data.access_token)
-            console.log("FILES")
-            console.log(files)
-            //return { data: response.data.message } 
-        } catch (error) {
-            throw new Error(error)
-        }
 
-        
-        getMetadataFromFile(carFile);
-        console.log(carFile);
+        /* getMetadataFromFile(carFile);
+        console.log(carFile); */
     }
 
     }
@@ -186,7 +257,7 @@ export default function UploadModal({ onClose }) {
                                     id="image"
                                     name="image"
                                     multiple
-                                    accept="application/json, application/csv"
+                                    accept="*"
                                     onChange={e => upload(e)}
                                     className="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />

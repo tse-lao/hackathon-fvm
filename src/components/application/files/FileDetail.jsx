@@ -3,7 +3,6 @@ import { formatBytes } from '@/lib/helpers'
 import { Dialog, Transition } from '@headlessui/react'
 import { HeartIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import lighthouse from '@lighthouse-web3/sdk'
-import axios from 'axios'
 import { Fragment, useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
 import FileDealStatus from './FileDealStatus'
@@ -39,34 +38,9 @@ const {address} = useAccount()
     
     const apiKey = await getLighthouse(address);
     const authToken = await lighthouse.dataDepotAuth(apiKey)
-    
-    console.log(authToken)
-  // Create CAR
-    const response = await lighthouse.createCar("https://gateway.lighthouse.storage/ipfs/"+file.cid, authToken.data.access_token)
-    
-    try {
-      const endpoint = `https://data-depot.lighthouse.storage/api/upload/upload_files`
-      const FormData = eval(`require`)('form-data')
-      const fs = eval(`require`)('fs')
-      
-      
-      
-      
-      const response = await axios.post(endpoint, formData, {
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-        headers: {
-          ...formData.getHeaders(),
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
-      return { data: response.data }
-    } catch (error) {
-      throw new Error(error)
-    }
-    
-    console.log(response)
-    
+    console.log(authToken.data.access_token)
+    const files = await lighthouse.viewCarFiles(1, authToken.data.access_token)
+    console.log(files)
   }
   
   const handleOpenState = () => {

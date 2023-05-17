@@ -278,7 +278,7 @@ export async function filteredWithCategories(request,category){
           FROM file_main_80001_6097 JOIN file_attribute_80001_6098
               ON file_main_80001_6097.tokenID = file_attribute_80001_6098.tokenID
               ${category ? `WHERE file_attribute_80001_6098.value = ${category}`: ''}
-        
+          
 
           
           
@@ -336,6 +336,7 @@ export async function getNFTDetail(tokenID, categories) {
       statement: `SELECT json_object(
               'tokenID', file_main_80001_6097.tokenID,
               'dbName', dbName,
+              'dataFormatCID', dataFormatCID,
               'description', description,
                   'dbCID', dbCID,
                           'minimumRowsOnSubmission', minimumRowsOnSubmission,

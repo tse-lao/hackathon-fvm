@@ -1,7 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment, useEffect, useState } from 'react'
-import DataRequestForm from '../request/RequestForm'
 
 const team = [
     {
@@ -41,7 +40,7 @@ const team = [
     },
 ]
 
-export default function CreateOverlay({ getOpen, changeOpen }) {
+export default function CreateOverlay({ title, getOpen, changeOpen, children }) {
     const [open, setOpen] = useState(false)
 
     useEffect(() => {
@@ -77,7 +76,7 @@ export default function CreateOverlay({ getOpen, changeOpen }) {
                                             <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                                                 <div className="flex items-center justify-between">
                                                     <Dialog.Title className="text-base font-semibold leading-6 text-white">
-                                                        Create new Request
+                                                        {title}
                                                     </Dialog.Title>
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <button
@@ -92,12 +91,12 @@ export default function CreateOverlay({ getOpen, changeOpen }) {
                                                 </div>
                                                 <div className="mt-1">
                                                     <p className="text-sm text-indigo-300">
-                                                        Create here you new request.
+                                                       Please fill in the form and click submit.
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className="flex flex-1 flex-col justify-between p-8">
-                                                <DataRequestForm />
+                                               {children}
                                             </div>
                                         </div>
                                         <div className="flex flex-shrink-0 justify-end px-4 py-4">

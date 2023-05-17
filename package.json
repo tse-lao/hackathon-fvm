@@ -26,6 +26,8 @@
 
     "@heroicons/react": "^2.0.17",
 
+    "@ipld/car": "^5.1.1",
+
     "@lighthouse-web3/kavach": "^0.1.2",
 
     "@lighthouse-web3/sdk": "^0.2.3",
@@ -64,7 +66,7 @@
 
     "ipfs-http-client": "^60.0.0",
 
-    "next": "^12.3.0",
+    "next": "^13.4.2",
 
     "next-connect": "^1.0.0",
 
@@ -76,9 +78,9 @@
 
     "postcss-focus-visible": "^6.0.4",
 
-    "react": "18.2.0",
+    "react": "^18.2.0",
 
-    "react-dom": "18.2.0",
+    "react-dom": "^18.2.0",
 
     "react-multi-select-component": "^4.3.4",
 

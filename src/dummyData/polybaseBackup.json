@@ -1,0 +1,177 @@
+@public
+collection Profile {
+
+  id: string;
+
+  publicKey: PublicKey;
+  name?: string; 
+  age?: number; 
+  connections?: {
+    application:string;
+    value: string;
+  };
+
+  constructor (id: string) {
+    this.id = id;
+    this.publicKey = ctx.publicKey;
+  }
+
+
+    function setName (name: string) {
+    if (ctx.publicKey != this.publicKey) {
+      error('You are not the creator of this record.');
+    }
+    this.name = name;
+  }
+}
+
+@public 
+collection DataRequest{
+  id: string; 
+  publicKey: PublicKey;
+  metadata: string;
+  name: string;
+  requireVerified?: boolean; 
+  active: boolean;
+  createdAt: string;
+  updatedAt?: number;
+  submissions?: {
+    owner: PublicKey;
+    cid: string;
+    verified?:boolean;
+    addedAt: number; //will be a timestamp
+  };
+
+  constructor(id:string,name: string, metadata: string, active: boolean, requiredVerified: boolean, createdAt: string){
+    this.id = id;
+    this.name = name;
+    this.publicKey = ctx.publicKey;
+    this.metadata = metadata;
+    this.active = active;
+    this.requiredVerified= requiredVerified;
+    this.createdAt= createdAt;
+  }
+
+  createSubmission (cid:string, verified: boolean) {
+   this.submissions.push({
+     owner: ctx.publicKey, 
+       cid: cid, 
+      verified: verified
+   });
+  }
+}
+
+@public
+collection Folder{
+  id: string;
+  owner: string;
+  name: string;
+  parent: string;
+  updatedAt: string;
+  files: File[];
+  subFolder: Folder[];
+
+  constructor (id :string, name: string, owner: string, updatedAt: string ,parent: string){
+    this.id = id;
+    this.name = name;
+
+    if(parent){
+      this.parent = parent;
+    }
+
+    this.updatedAt = updatedAt;
+    this.owner = owner;
+    this.subFolder = [];
+    this.files = [];
+  } 
+
+  @index(owner, name);
+  @index(id, owner);
+  @index(owner, name, parent);
+
+   addFolder (folder: Folder) {
+      this.subFolder.push(folder);
+  }
+
+  del () {
+    if (owner != ctx.auth) {
+      throw error();
+    }
+    selfdestruct();
+  }
+
+}
+
+@public
+collection File{
+
+  creator: PublicKey;
+  id: string;
+  name: string;
+  cid: string;
+  metadata: string;
+  addedAt?:string;
+  owner: string;
+  categories: string[];
+
+  constructor(id: string,name:string,  cid: string, metadata:string, categories: string[], addedAt: string, owner: string){
+    this.id = id;
+    this.categories = categories;
+    this.cid = cid;
+    this.name = name;
+    this.metadata = metadata;
+    this.addedAt = addedAt;
+    this.creator = ctx.publicKey;
+    this.owner = owner;
+  }
+
+
+
+   @index(cid, owner);
+  @index(metadata, owner);
+
+}
+
+@public
+collection Jobs{
+  creator: PublicKey;
+  id: string;
+  name: string;
+  description: string;
+  jobCid: string;
+  dataFormat: string;
+  createdAt?:string;
+  owner: string;
+  categories: string[];
+
+  constructor(id: string, name:string, description:string, jobCid: string, dataFormat:string, categories: string[], createdAt:string, owner: string){
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.jobCid = jobCid;
+    this.dataFormat = dataFormat;
+    this.categories = categories;
+    this.createdAt = createdAt;
+    this.creator = ctx.publicKey;
+    this.owner = owner;
+  }
+
+  @index(jobCid, owner);
+  @index(metadata, owner);
+  @index(dataFormat);
+
+}
+
+
+
+collection SharedFile{
+  id: string;
+  sharedTo: PublicKey;
+  cid: string;
+
+  constructor(id: string, sharedTo: PublicKey, cid: string){
+    this.id = id;
+    this.cid = cid;
+    this.sharedTo = sharedTo;
+  }
+}

@@ -1,3 +1,6 @@
+import { readFromCID } from "@/hooks/useNftStorage";
+import { useEffect, useState } from "react";
+import LoadingSpinner from "../application/elements/LoadingSpinner";
 
 const json = 
     [
@@ -212,10 +215,34 @@ const json =
           ]
         }
     ]
-export default function DataFormatPreview() {
+export default function DataFormatPreview({cid}) {
+  //read the CID 
+  const [data, setData] = useState(null);
+const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    
+    // mread the from nft storage. 
+    const readData = async () => {
+      setLoading(true);
+      const result = await readFromCID(cid)
+      setData(result);
+      
+      console.log(result)
+      console.log(result);
+      setLoading(false);
+    }
+    
+    console.log(cid)
+    if(!cid) return;
+    readData();
+  }, [cid])
+  
+  
+  if(loading) { return <LoadingSpinner /> }
   return (
-    <pre className="overflow-auto max-h-96 p-6 text-sm">
-        {JSON.stringify(json, null, 1)}
+    <pre className="overflow-auto max-h-96 p-6 text-xs">
+        {JSON.stringify(data, null, 1)}
     </pre>
   )
 }

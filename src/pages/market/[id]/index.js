@@ -58,7 +58,7 @@ export default function TokenID() {
             {/* Product image */}
             <div className="lg:col-span-4 lg:row-end-1">
               <div className="aspect-h-3 aspect-w-4 overflow-hidden rounded-lg bg-gray-100">   
-                    <DataFormatPreview format={detail.dataFormatCID} />
+                    {detail.dataFormatCID && <DataFormatPreview cid={detail.dataFormatCID} /> }
               </div>
             </div>
   
