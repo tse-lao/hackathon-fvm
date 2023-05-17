@@ -6,14 +6,17 @@ import {IAxelarGasService} from '@axelar-network/axelar-gmp-sdk-solidity/contrac
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 import '@tableland/evm/contracts/utils/SQLHelpers.sol';
+import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
 import '@openzeppelin/contracts/token/ERC1155/IERC1155.sol';
 
 /** @title DB_NFT. */
 /// @author Nick Lionis (github handle : nijoe1 )
 /// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
 /// All the data inside the tables are pointing on an IPFS CID.
-contract tablelandView is AxelarExecutable, Ownable {
-    address contractManager;
+contract TablelandStorage is AxelarExecutable, Ownable {
+    ITablelandTables private tablelandContract;
+
+    // address contractManager;
 
     string main;
     string attribute;
@@ -23,6 +26,8 @@ contract tablelandView is AxelarExecutable, Ownable {
     uint256 contributionID;
 
     string[] private createStatements;
+    string[] public tables;
+    uint256[] private tableIDs;
 
     IAxelarGasService public immutable gasService;
     IERC1155 public DB_NFT;
@@ -44,10 +49,34 @@ contract tablelandView is AxelarExecutable, Ownable {
 
     // "0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6"
     constructor(
-        // address gateway_,
-        // address gasReceiver_
-    ) AxelarExecutable(0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B) {
-        gasService = IAxelarGasService(0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6);
+        address gateway_,
+        address gasReceiver_
+    ) AxelarExecutable(gateway_) {
+        gasService = IAxelarGasService(gasReceiver_);
+        tablelandContract = TablelandDeployments.get();
+
+        createStatements.push(
+            SQLHelpers.toCreateFromSchema(SUBMISSION_SCHEMA, SUBMISSION_TABLE_PREFIX)
+        );
+        createStatements.push(SQLHelpers.toCreateFromSchema(MAIN_SCHEMA, MAIN_TABLE_PREFIX));
+        createStatements.push(
+            SQLHelpers.toCreateFromSchema(ATTRIBUTE_SCHEMA, ATTRIBUTE_TABLE_PREFIX)
+        );
+
+        tableIDs = tablelandContract.create(address(this), createStatements);
+
+        tables.push(SQLHelpers.toNameFromId(SUBMISSION_TABLE_PREFIX, tableIDs[0]));
+        tables.push(SQLHelpers.toNameFromId(MAIN_TABLE_PREFIX, tableIDs[1]));
+        tables.push(SQLHelpers.toNameFromId(ATTRIBUTE_TABLE_PREFIX, tableIDs[2]));
+
+        setTableInfo(
+            tables[0],
+            tableIDs[0],
+            tables[1],
+            tableIDs[1],
+            tables[2],
+            tableIDs[2]
+        );
         _baseURIString = 'https://testnets.tableland.network/api/v1/query?statement=';
     }
 
@@ -62,7 +91,7 @@ contract tablelandView is AxelarExecutable, Ownable {
         uint256 mainId,
         string memory attributeName,
         uint256 attributeId
-    ) public onlyDBNFT {
+    ) internal {
         contribution = contributionName;
         main = mainName;
         attribute = attributeName;
@@ -71,24 +100,22 @@ contract tablelandView is AxelarExecutable, Ownable {
         attributeID = attributeId;
     }
 
-    modifier onlyDBNFT() {
-        if (!(contractManager == address(0))) {
-            revert();
-        }
-        _;
-    }
+    // modifier onlyDBNFT() {
+    //     if (!(contractManager == address(0))) {
+    //         revert();
+    //     }
+    //     _;
+    // }
 
-    function setContractManager(address manager) public onlyOwner {
-        contractManager = manager;
-    }
+    // function setContractManager(address manager) public onlyOwner {
+    //     contractManager = manager;
+    // }
 
     function toUpdate(
-        string memory prefix,
-        uint256 tableID,
         string memory set,
         string memory filter
-    ) public view returns (string memory) {
-        return SQLHelpers.toUpdate(prefix, tableID, set, filter);
+    ) public onlyOwner{
+        mutate(mainID , SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, mainID, set, filter));
     }
 
     function insertMainStatement(
@@ -100,9 +127,9 @@ contract tablelandView is AxelarExecutable, Ownable {
         uint256 minimumRowsOnSubmission,
         uint256 requiredRows,
         string memory piece_cid
-    ) public view returns (string memory) {
-        return
-            SQLHelpers.toInsert(
+    ) public onlyOwner{
+        
+             mutate(mainID, SQLHelpers.toInsert(
                 MAIN_TABLE_PREFIX,
                 mainID,
                 'tokenID, dataFormatCID, dbName, description, dbCID, minimumRowsOnSubmission, requiredRows, piece_cid',
@@ -123,7 +150,12 @@ contract tablelandView is AxelarExecutable, Ownable {
                     ',',
                     SQLHelpers.quote(piece_cid)
                 )
-            );
+            ));
+    }
+
+
+    function mutate(uint256 tableId, string memory statement) internal {
+        tablelandContract.mutate(address(this), tableId, statement);
     }
 
     function insertSubmissionStatement(
@@ -131,9 +163,9 @@ contract tablelandView is AxelarExecutable, Ownable {
         string memory dataCID,
         uint256 rows,
         address creator
-    ) public view returns (string memory) {
-        return
-            SQLHelpers.toInsert(
+    ) public  onlyOwner{
+        
+            mutate(contributionID, SQLHelpers.toInsert(
                 SUBMISSION_TABLE_PREFIX,
                 contributionID,
                 'tokenID, dataCID, rows, creator',
@@ -146,15 +178,15 @@ contract tablelandView is AxelarExecutable, Ownable {
                     ',',
                     SQLHelpers.quote(Strings.toHexString(creator))
                 )
-            );
+            ));
     }
 
     function insertAttributeStatement(
         uint256 tokenid,
         string memory trait_type,
         string memory value
-    ) public view returns (string memory) {
-        return
+    ) public onlyOwner{
+        mutate(attributeID,
             SQLHelpers.toInsert(
                 ATTRIBUTE_TABLE_PREFIX,
                 attributeID,
@@ -166,7 +198,7 @@ contract tablelandView is AxelarExecutable, Ownable {
                     ',',
                     SQLHelpers.quote(value)
                 )
-            );
+            ));
     }
 
     /// @notice Overriten URI function of the ERC1155 to fit Tableland based NFTs
@@ -341,7 +373,7 @@ contract tablelandView is AxelarExecutable, Ownable {
         return ecrecover(check, v, r, s) == pkp;
     }
 
-    function sendViaCall(address payable _to) external payable {
+    function sendViaCall(address payable _to) public payable {
         // Call returns a boolean value indicating success or failure.
         // This is the current recommended method to use.
         (bool sent, bytes memory data) = _to.call{value: msg.value}('');
