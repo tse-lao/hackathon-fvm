@@ -1,20 +1,11 @@
 [{
         "inputs": [{
-            "internalType": "contract ITablelandView",
-            "name": "tablelandview",
+            "internalType": "contract ITablelandStorage",
+            "name": "tablelandStorage",
             "type": "address"
         }],
         "stateMutability": "nonpayable",
         "type": "constructor"
-    },
-    {
-        "inputs": [{
-            "internalType": "uint256",
-            "name": "chainid",
-            "type": "uint256"
-        }],
-        "name": "ChainNotSupported",
-        "type": "error"
     },
     {
         "anonymous": false,
@@ -298,6 +289,43 @@
     },
     {
         "inputs": [{
+                "internalType": "string",
+                "name": "dbCID",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "piece_cid",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "dataFormatCID",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "dbName",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "internalType": "string[]",
+                "name": "categories",
+                "type": "string[]"
+            }
+        ],
+        "name": "createOpenDataSet",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
                 "internalType": "address",
                 "name": "contributor",
                 "type": "address"
@@ -501,36 +529,6 @@
         "type": "function"
     },
     {
-        "inputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "name": "tableIDs",
-        "outputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "name": "tables",
-        "outputs": [{
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "totalSupply",
         "outputs": [{
@@ -548,6 +546,43 @@
             "type": "address"
         }],
         "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "dbCID",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "piece_cid",
+                "type": "string"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
+            }
+        ],
+        "name": "updateDB_NFT",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

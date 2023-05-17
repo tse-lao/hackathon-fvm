@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.17;
 
-interface ITablelandView {
-    function uri(uint256 tokenId) external view returns (string memory);
+interface ITablelandStorage {
+    function uri(uint256 tokenId) external view returns (string memory) ;
 
     function insertMainStatement(
         uint256 tokenid,
@@ -14,38 +14,36 @@ interface ITablelandView {
         uint256 minimumRowsOnSubmission,
         uint256 requiredRows,
         string memory piece_cid
-    ) external view returns (string memory);
+    ) external ;
 
     function insertAttributeStatement(
         uint256 tokenid,
         string memory trait_type,
         string memory value1
-    ) external view returns (string memory);
+    ) external ;
 
     function insertSubmissionStatement(
         uint256 tokenid,
         string memory metadataCID,
         uint256 rows,
         address creator
-    ) external view returns (string memory);
+    ) external ;
 
-    function getCreateSubmission() external view returns (string memory);
+    function getCreateSubmission() external ;
 
-    function getCreateMain() external view returns (string memory);
+    function getCreateMain() external ;
 
-    function getCreateAttribute() external view returns (string memory);
+    function getCreateAttribute() external ;
 
     function toNameFromId(
         string memory prefix,
         uint256 tableID
-    ) external view returns (string memory);
+    ) external ;
 
     function toUpdate(
-        string memory prefix,
-        uint256 tableID,
         string memory set,
         string memory filter
-    ) external view returns (string memory);
+    ) external ;
 
     function verifyString(
         string memory message,

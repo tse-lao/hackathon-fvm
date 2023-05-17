@@ -1,26 +1,49 @@
-require("@nomiclabs/hardhat-ethers");
-require("@openzeppelin/hardhat-upgrades");
-require("@nomiclabs/hardhat-etherscan");
+require("@nomicfoundation/hardhat-toolbox")
+require("hardhat-deploy")
+require("hardhat-deploy-ethers")
+require("./tasks")
+require("dotenv").config()
 
+const PRIVATE_KEY = process.env.PRIVATE_KEY
+    /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-    solidity: "0.8.17",
-    settings: {
-        optimizer: {
-            enabled: true,
-            runs: 10
-        }
+    solidity: {
+        version: "0.8.17",
+        settings: {
+            optimizer: {
+                enabled: true,
+                runs: 1000,
+                details: { yul: false },
+            },
+        },
     },
+    defaultNetwork: "mumbai",
     networks: {
-        mumbai: {
-            url: `https://polygon-mumbai.g.alchemy.com/v2/ZiPX0JtXnVqQ56RGdvdy8mvCOs4ZDchO`,
-            accounts: ["304030045e69a283fbc39a3f1b7b281ede03afdefa6f480a682e8974bc20b547"],
+        localnet: {
+            chainId: 31415926,
+            url: "http://127.0.0.1:1234/rpc/v1",
+            accounts: [PRIVATE_KEY],
         },
         hyperspace: {
-            url: ``,
-            accounts: ["304030045e69a283fbc39a3f1b7b281ede03afdefa6f480a682e8974bc20b547"],
+            chainId: 3141,
+            url: "https://api.hyperspace.node.glif.io/rpc/v1",
+            accounts: [PRIVATE_KEY],
+        },
+        filecoinmainnet: {
+            chainId: 314,
+            url: "https://api.node.glif.io",
+            accounts: [PRIVATE_KEY],
+        },
+        mumbai: {
+            chainId: 80001,
+            url: `https://polygon-mumbai.g.alchemy.com/v2/ZiPX0JtXnVqQ56RGdvdy8mvCOs4ZDchO`,
+            accounts: [PRIVATE_KEY],
         },
     },
-    etherscan: {
-        apiKey: "",
+    paths: {
+        sources: "./contracts",
+        tests: "./test",
+        cache: "./cache",
+        artifacts: "./artifacts",
     },
 }

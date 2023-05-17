@@ -3,20 +3,7 @@ pragma solidity ^0.8.13;
 
 interface IDealClient {
 
-    struct RequestId {
-      bytes32 requestId;
-      bool valid;
-    }
-    
-    struct RequestIdx {
-      uint256 idx;
-      bool valid;
-    }
-    
-    struct ProviderSet {
-      bytes provider;
-      bool valid;
-    }
+
     
     // User request for this contract to make a deal. This structure is modelled after Filecoin's Deal
     // Proposal, but leaves out the provider, since any provider can pick up a deal broadcast by this
@@ -44,6 +31,7 @@ interface IDealClient {
       bool remove_unsealed_copy;
     }
     
+    
     event ReceivedDataCap(string received);
     event DealProposalCreate(
         bytes32 indexed id,
@@ -57,7 +45,14 @@ interface IDealClient {
         RequestSubmitted,
         DealPublished,
         DealActivated,
-        DealTerminated
+        DealTerminated,
+        RequestTimeout
+    }
+    
+    struct currentRequestInfo {
+        bytes32 currentRequestID;
+        uint256 dealid;
+        Status status;
     }
 
 
