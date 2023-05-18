@@ -17,7 +17,9 @@ module.exports = {
             },
         },
     },
-    defaultNetwork: "mumbai",
+    // defaultNetwork: "mumbai",
+    defaultNetwork: "hyperspace",
+
     networks: {
         localnet: {
             chainId: 31415926,

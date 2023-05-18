@@ -7,10 +7,10 @@ import {IAxelarGasService} from '@axelar-network/axelar-gmp-sdk-solidity/contrac
 import '@tableland/evm/contracts/utils/TablelandDeployments.sol';
 import '@tableland/evm/contracts/utils/SQLHelpers.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
-import './LilypadEventsUpgradeable.sol';
-import './LilypadCallerInterface.sol';
+import './base/LilypadEventsUpgradeable.sol';
+import './interfaces/LilypadCallerInterface.sol';
 
-contract crossChainBacalhauJobs is
+contract crossChainTablelandBacalhauJobs is
     AxelarExecutable,
     LilypadCallerInterface,
     Ownable
@@ -31,7 +31,7 @@ contract crossChainBacalhauJobs is
     string public tableName;
     string private constant COMPUTATION_TABLE_PREFIX = 'computation';
     string private constant COMPUTATION_SCHEMA =
-        'tokenID text, spec text, bridgeJobId text, jobId text, resultCID text, creator text';
+        'specStart text, input text, specEnd text, bridgeJobId text, jobId text, resultCID text, creator text';
 
     // Gateway = 0xe432150cce91c13a887f7D836923d5597adD8E31 & gasReceiver = 0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
     // lillypad bridge = 0x489656E4eDDD9c88F5Fe863bDEd9Ed0Dc29B224c,0xe432150cce91c13a887f7D836923d5597adD8E31,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
@@ -81,25 +81,30 @@ contract crossChainBacalhauJobs is
     }
 
     function executeJOB(
-        uint256 tokenID,
-        string memory _spec,
+        string memory input,
+        string memory _specStart,
+        string memory _specEnd,
         string memory jobId,
         address sender
-    ) internal {
-        require(
-            userFunds[sender] >= lilypadFee,
+    ) public {
+        // require(
+        //     userFunds[sender] >= lilypadFee,
+        //     'Not enough to run Lilypad job'
+        // );
+
+        require(address(this).balance>= lilypadFee,
             'Not enough to run Lilypad job'
         );
-        // TODO: spec -> do proper json encoding, look out for quotes in _prompt
+
         uint bridgeJobId = bridge.runLilypadJob{value: lilypadFee}(
             address(this),
-            _spec,
+            string.concat(_specStart,input,_specEnd),
             uint8(LilypadResultType.CID)
         );
         require(bridgeJobId > 0, "job didn't return a value");
         mutate(
             tableID,
-            computationInsertion(tokenID, _spec, bridgeJobId, jobId, sender)
+            computationInsertion(_specStart, input, _specEnd, bridgeJobId, jobId, sender)
         );
     }
 
@@ -114,7 +119,7 @@ contract crossChainBacalhauJobs is
         require(_resultType == LilypadResultType.CID);
         string memory set = string.concat("resultCID='", _result, "'");
         string memory filter = string.concat(
-            'jobId=',
+            "jobId=",
             Strings.toString(_jobId)
         );
         mutate(
@@ -131,7 +136,7 @@ contract crossChainBacalhauJobs is
         require(_from == address(bridge)); //really not secure
         string memory set = string.concat("resultCID='", _errorMsg, "'");
         string memory filter = string.concat(
-            'jobId=',
+            "jobId=",
             Strings.toString(_jobId)
         );
         mutate(
@@ -142,23 +147,25 @@ contract crossChainBacalhauJobs is
 
     // Handles calls created by setAndSend. Updates this contract's value
     function _execute(
-        string calldata sourceChain_,
-        string calldata sourceAddress_,
+        // string calldata sourceChain_,
+        // string calldata sourceAddress_,
         bytes calldata payload_
-    ) internal override {
-        require(
-            allowedSourceAddresses[sourceAddress_] &&
-                allowedSourceChains[sourceChain_]
-        );
-        string memory _spec;
+    ) internal {
+        // require(
+        //     allowedSourceAddresses[sourceAddress_] &&
+        //         allowedSourceChains[sourceChain_]
+        // );
+        string memory input;
+        string memory _specStart;
+        string memory _specEnd;
         string memory jobId;
-        uint256 tokenId;
         address sender;
-        (tokenId, _spec, jobId, sender) = abi.decode(
+        (_specStart, input,_specEnd, jobId, sender) = abi.decode(
             payload_,
-            (uint256, string, string, address)
+            (string, string, string, string, address)
         );
-        executeJOB(tokenId, _spec, jobId, sender);
+
+        executeJOB(_specStart, input, _specEnd,jobId, sender);
     }
 
     function addSourceChains(
@@ -171,8 +178,9 @@ contract crossChainBacalhauJobs is
     }
 
     function computationInsertion(
-        uint256 tokenId,
-        string memory _spec,
+        string memory specStart,
+        string memory input,
+        string memory specEnd,
         uint256 bridgeJobId,
         string memory jobId,
         address creator
@@ -181,21 +189,35 @@ contract crossChainBacalhauJobs is
             SQLHelpers.toInsert(
                 COMPUTATION_TABLE_PREFIX,
                 tableID,
-                'tokenID, spec, bridgeJobId, jobId, resultCID, creator',
+                "specStart, input, specEnd, bridgeJobId, jobId, resultCID, creator",
                 string.concat(
-                    SQLHelpers.quote(Strings.toString(tokenId)),
-                    ',',
-                    SQLHelpers.quote(_spec),
-                    ',',
+                    SQLHelpers.quote(specStart),
+                    ",",
+                    SQLHelpers.quote(input),
+                    ",",
+                    SQLHelpers.quote(specEnd),
+                    ",",
                     SQLHelpers.quote(Strings.toString(bridgeJobId)),
-                    ',',
+                    ",",
                     SQLHelpers.quote(jobId),
-                    ',',
-                    SQLHelpers.quote('pending'),
-                    ',',
+                    ",",
+                    SQLHelpers.quote("pending"),
+                    ",",
                     SQLHelpers.quote(Strings.toHexString(creator))
                 )
             );
+    }
+
+    function JobResult(string memory resultCID,uint256 jobID) public{
+        string memory set = string.concat("resultCID='", resultCID, "'");
+        string memory filter = string.concat(
+            "jobId=",
+            Strings.toString(jobID)
+        );
+        mutate(
+            tableID,
+            SQLHelpers.toUpdate(COMPUTATION_TABLE_PREFIX, tableID, set, filter)
+        );
     }
 
     function mutate(uint256 tableId, string memory statement) internal {

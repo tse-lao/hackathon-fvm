@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@tableland/evm/contracts/utils/SQLHelpers.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -16,7 +15,7 @@ import "./interfaces/ITablelandStorage.sol";
 // DB Versioning that will also include timestampt
 // To allow to create open non encrypted DBs without requirun=ing contributions ...abi
 // A licence field
-contract DB_NFT_V3 is ERC1155, Ownable {
+contract DB_NFT is ERC1155, Ownable {
     ITablelandStorage private TablelandStorage;
     using Counters for Counters.Counter;
     using EnumerableSet for EnumerableSet.UintSet;
@@ -41,52 +40,10 @@ contract DB_NFT_V3 is ERC1155, Ownable {
 
     mapping(string => EnumerableSet.UintSet) private submittedCIDtoTokens;
 
-    string private _baseURIString;
-
-    // string private constant MAIN_TABLE_PREFIX = "file_main";
-    // string private constant MAIN_SCHEMA =
-    //     "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text, requiredRows text, piece_cid text";
-
-    // string private constant ATTRIBUTE_TABLE_PREFIX = "file_attribute";
-    // string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
-
-    // string private constant SUBMISSION_TABLE_PREFIX = "data_contribution";
-    // string private constant SUBMISSION_SCHEMA =
-    //     "tokenID text, dataCID text, rows text, creator text";
-
-    // string[] private createStatements;
-    // string[] public tables;
-    // uint256[] public tableIDs;
     address public PKP;
 
-    // Gateway = 0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B & gasReceiver = 0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
-    // 0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
     constructor(ITablelandStorage tablelandStorage) ERC1155("") {
         TablelandStorage = tablelandStorage;
-        // tablelandContract = TablelandDeployments.get();
-
-        // createStatements.push(
-        //     SQLHelpers.toCreateFromSchema(SUBMISSION_SCHEMA, SUBMISSION_TABLE_PREFIX)
-        // );
-        // createStatements.push(SQLHelpers.toCreateFromSchema(MAIN_SCHEMA, MAIN_TABLE_PREFIX));
-        // createStatements.push(
-        //     SQLHelpers.toCreateFromSchema(ATTRIBUTE_SCHEMA, ATTRIBUTE_TABLE_PREFIX)
-        // );
-
-        // tableIDs = tablelandContract.create(address(this), createStatements);
-
-        // tables.push(SQLHelpers.toNameFromId(SUBMISSION_TABLE_PREFIX, tableIDs[0]));
-        // tables.push(SQLHelpers.toNameFromId(MAIN_TABLE_PREFIX, tableIDs[1]));
-        // tables.push(SQLHelpers.toNameFromId(ATTRIBUTE_TABLE_PREFIX, tableIDs[2]));
-
-        // tablelandStorage.setTableInfo(
-        //     tables[0],
-        //     tableIDs[0],
-        //     tables[1],
-        //     tableIDs[1],
-        //     tables[2],
-        //     tableIDs[2]
-        // );
     }
 
     function RequestDB(
@@ -97,8 +54,7 @@ contract DB_NFT_V3 is ERC1155, Ownable {
         uint256 requiredRows,
         uint256 minimumRowsOnSubmission
     ) public {
-        // function RequestDB(string memory dataFormatCID , string memory dbName , string memory description , string[] memory categories, uint256 requiredRows, uint256 minimumRowsOnSubmission, address[] allowed) public {
-        // REQUIRE MORE THAN 1 ROWS
+
         require(requiredRows > 0);
         tokenID.increment();
         uint256 tokenId = tokenID.current();
@@ -106,9 +62,7 @@ contract DB_NFT_V3 is ERC1155, Ownable {
         tokenInfoMap[tokenId].remainingRows = requiredRows;
         tokenInfoMap[tokenId].minimumRowsOnSubmission = minimumRowsOnSubmission;
         tokenInfoMap[tokenId].creator = msg.sender;
-        // for(uint256 i = 0; i < allowed.length; i++){
-        //     tokenInfoMap[ID].allowedAddresses.add(allowed[i]);
-        // }
+
         TablelandStorage.insertMainStatement(
             tokenId,
             dataFormatCID,
@@ -125,20 +79,10 @@ contract DB_NFT_V3 is ERC1155, Ownable {
             "creator",
             Strings.toHexString(msg.sender)
         );
-        // ITablelandTables.Statement[] memory statements = new ITablelandTables.Statement[](
-        //     categories.length
-        // );
 
         for (uint256 i = 0; i < categories.length; i++) {
             TablelandStorage.insertAttributeStatement(tokenId, "category", categories[i]);
         }
-
-        // statements[categories.length].statement = tablelandStorage.insertMainStatement(tokenId,dataFormatCID,dbName,description,"CID will get added after the DB is fullfilled and the DB NFT creation",minimumRowsOnSubmission,requiredRows,"piece_cid");
-        // statements[categories.length].tableId = tableIDs[1];
-
-        // statements[categories.length+1].statement = tablelandStorage.insertAttributeStatement(tokenId ,"creator", Strings.toHexString(msg.sender));
-        // statements[categories.length+1].tableId = tableIDs[2];
-        // mutate(statements);
     }
 
     function submitData(
@@ -157,10 +101,7 @@ contract DB_NFT_V3 is ERC1155, Ownable {
             Strings.toString(rows)
         );
         require(TablelandStorage.verifyString(signMessage, v, r, s, PKP));
-        // onlyPKP(msg.sender);
-        // if(tokenInfoMap[tokenId].allowedAddresses.length > 0){
-        //     require(tokenInfoMap[tokenId].allowedAddresses.contains(msg.sender));
-        // }
+
         require(tokenInfoMap[tokenId].minimumRowsOnSubmission <= rows, "sumbit more data");
         require(!submittedCIDtoTokens[dataCID].contains(tokenId), "DB already has that CID");
         submissionsNumberByID[tokenId][msg.sender] =
@@ -327,14 +268,6 @@ contract DB_NFT_V3 is ERC1155, Ownable {
     function _exists(uint256 tokenId) internal view returns (bool) {
         return tokenId <= tokenID.current();
     }
-
-    // function mutate(uint256 tableId, string memory statement) internal {
-    //     tablelandContract.mutate(address(this), tableId, statement);
-    // }
-
-    // function mutate(ITablelandTables.Statement[] memory statements) internal {
-    //     tablelandContract.mutate(address(this), statements);
-    // }
 
     function assignNewPKP(address newPKP) public onlyOwner {
         PKP = newPKP;

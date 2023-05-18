@@ -1,11 +1,6 @@
 [{
         "inputs": [{
                 "internalType": "address",
-                "name": "_bridgeContractAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
                 "name": "gateway_",
                 "type": "address"
             },
@@ -56,48 +51,108 @@
         "type": "event"
     },
     {
-        "inputs": [{
-                "internalType": "string",
-                "name": "resultCID",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "jobID",
-                "type": "uint256"
-            }
-        ],
-        "name": "JobResult",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "string",
-                "name": "new_sourceChain",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "new_sourceAddress",
-                "type": "string"
-            }
-        ],
-        "name": "addSourceChains",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [],
-        "name": "bridgeAddress",
+        "name": "DB_NFT",
         "outputs": [{
-            "internalType": "address",
+            "internalType": "contract IERC1155",
             "name": "",
             "type": "address"
         }],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "string",
+                "name": "destinationChain",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "destinationAddress",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "piece_cid",
+                "type": "string"
+            },
+            {
+                "internalType": "bytes",
+                "name": "piece_cid_bytes",
+                "type": "bytes"
+            },
+            {
+                "internalType": "string",
+                "name": "location_ref",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "bountyReward",
+                "type": "uint256"
+            },
+            {
+                "internalType": "int64",
+                "name": "minAcceptedDealDuration",
+                "type": "int64"
+            },
+            {
+                "internalType": "uint256",
+                "name": "size",
+                "type": "uint256"
+            }
+        ],
+        "name": "createCrossChainBounty",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "string",
+                "name": "destinationChain",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "destinationAddress",
+                "type": "string"
+            },
+            {
+                "internalType": "bytes",
+                "name": "piece_cid",
+                "type": "bytes"
+            },
+            {
+                "internalType": "string",
+                "name": "label",
+                "type": "string"
+            },
+            {
+                "internalType": "uint64",
+                "name": "piece_size",
+                "type": "uint64"
+            },
+            {
+                "internalType": "int64",
+                "name": "end_epoch",
+                "type": "int64"
+            },
+            {
+                "internalType": "string",
+                "name": "location_ref",
+                "type": "string"
+            },
+            {
+                "internalType": "uint64",
+                "name": "car_size",
+                "type": "uint64"
+            }
+        ],
+        "name": "createCrossChainDealRequest",
+        "outputs": [],
+        "stateMutability": "payable",
         "type": "function"
     },
     {
@@ -130,6 +185,16 @@
     {
         "inputs": [{
                 "internalType": "string",
+                "name": "destinationChain",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "destinationAddress",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
                 "name": "input",
                 "type": "string"
             },
@@ -147,16 +212,11 @@
                 "internalType": "string",
                 "name": "jobId",
                 "type": "string"
-            },
-            {
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
             }
         ],
-        "name": "executeJOB",
+        "name": "executeCrossChainBacalhauJob",
         "outputs": [],
-        "stateMutability": "nonpayable",
+        "stateMutability": "payable",
         "type": "function"
     },
     {
@@ -219,68 +279,97 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "getLilypadFee",
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "tokenid",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "trait_type",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "value",
+                "type": "string"
+            }
+        ],
+        "name": "insertAttributeStatement",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [{
-                "internalType": "address",
-                "name": "_from",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
-                "name": "_jobId",
+                "name": "tokenid",
                 "type": "uint256"
             },
             {
                 "internalType": "string",
-                "name": "_errorMsg",
+                "name": "dataFormatCID",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "dbName",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "dbCID",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "minimumRowsOnSubmission",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "requiredRows",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "piece_cid",
                 "type": "string"
             }
         ],
-        "name": "lilypadCancelled",
+        "name": "insertMainStatement",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "lilypadFee",
-        "outputs": [{
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [{
-                "internalType": "address",
-                "name": "_from",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
-                "name": "_jobId",
+                "name": "tokenid",
                 "type": "uint256"
             },
             {
-                "internalType": "enum LilypadResultType",
-                "name": "_resultType",
-                "type": "uint8"
+                "internalType": "string",
+                "name": "dataCID",
+                "type": "string"
             },
             {
-                "internalType": "string",
-                "name": "_result",
-                "type": "string"
+                "internalType": "uint256",
+                "name": "rows",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "creator",
+                "type": "address"
             }
         ],
-        "name": "lilypadFulfilled",
+        "name": "insertSubmissionStatement",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -305,42 +394,67 @@
     },
     {
         "inputs": [{
-            "internalType": "address",
-            "name": "_newAddress",
+            "internalType": "address payable",
+            "name": "_to",
             "type": "address"
         }],
-        "name": "setBridgeAddress",
+        "name": "sendViaCall",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "contract IERC1155",
+            "name": "nft",
+            "type": "address"
+        }],
+        "name": "setContract",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [{
-            "internalType": "address",
-            "name": "_eventsAddress",
-            "type": "address"
+            "internalType": "string",
+            "name": "baseURI",
+            "type": "string"
         }],
-        "name": "setLPEventsAddress",
+        "name": "setTableURI",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "submitFunds",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "tableName",
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "name": "tables",
         "outputs": [{
             "internalType": "string",
             "name": "",
             "type": "string"
         }],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "string",
+                "name": "set",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "filter",
+                "type": "string"
+            }
+        ],
+        "name": "toUpdate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -356,24 +470,53 @@
     },
     {
         "inputs": [{
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-        }],
-        "name": "userFunds",
-        "outputs": [{
             "internalType": "uint256",
-            "name": "",
+            "name": "tokenId",
             "type": "uint256"
+        }],
+        "name": "uri",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
         }],
         "stateMutability": "view",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "withdrawFunds",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "inputs": [{
+                "internalType": "string",
+                "name": "message",
+                "type": "string"
+            },
+            {
+                "internalType": "uint8",
+                "name": "v",
+                "type": "uint8"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "r",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "s",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "address",
+                "name": "pkp",
+                "type": "address"
+            }
+        ],
+        "name": "verifyString",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "res",
+            "type": "bool"
+        }],
+        "stateMutability": "pure",
         "type": "function"
     }
 ]
