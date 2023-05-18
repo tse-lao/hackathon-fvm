@@ -13,13 +13,13 @@ import {CommonTypes} from '@zondax/filecoin-solidity/contracts/v0.8/types/Common
 import {BigNumbers, BigNumber} from '@zondax/solidity-bignumber/src/BigNumbers.sol';
 import {BigInts} from '@zondax/filecoin-solidity/contracts/v0.8/utils/BigInts.sol';
 import {FilAddresses} from '@zondax/filecoin-solidity/contracts/v0.8/utils/FilAddresses.sol';
-import './interfaces/IDealClient.sol';
+import '../interfaces/IDealClient.sol';
 
 /** @title DB_NFT. */
 /// @author Nick Lionis (github handle : nijoe1 )
 /// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
 /// All the data inside the tables are pointing on an IPFS CID.
-contract dealTablelandView is IDealClient, Ownable {
+contract dealTablelandStorage is IDealClient, Ownable {
     ITablelandTables private tablelandContract;
     using CBOR for CBOR.CBORBuffer;
     using AccountCBOR for *;
@@ -29,7 +29,7 @@ contract dealTablelandView is IDealClient, Ownable {
 
     string private constant REQUEST_TABLE_PREFIX = 'request';
     string private constant REQUEST_SCHEMA =
-        'piece_cid text, location_ref text, car_size text, piece_size text, storage_price_per_epoch text, timestampt text, creator text, index text';
+        'piece_cid text, location_ref text, car_size text, piece_size text, storage_price_per_epoch text, timestampt text, creator text';
 
     string private constant DEAL_TABLE_PREFIX = 'deal';
     string private constant DEAL_SCHEMA =
@@ -46,6 +46,7 @@ contract dealTablelandView is IDealClient, Ownable {
     // 0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
     constructor() {
         _baseURIString = 'https://testnets.tableland.network/api/v1/query?statement=';
+
         tablelandContract = TablelandDeployments.get();
 
         createStatements.push(
@@ -105,11 +106,12 @@ contract dealTablelandView is IDealClient, Ownable {
         buf.writeBool(true);
         return buf.data();
     }
+    
 
     function toUpdateStatus(
         string memory status,
         uint256 dealID
-    ) public {
+    ) public onlyOwner{
          mutate(tableIDs[1],SQLHelpers.toUpdate(DEAL_TABLE_PREFIX, tableIDs[1], string.concat("status='", status, "'"), string.concat('dealID=', Strings.toString(dealID))));
     }
 
@@ -121,7 +123,7 @@ contract dealTablelandView is IDealClient, Ownable {
         uint64 piece_size,
         uint256 timestampt,
         address creator
-    ) public {
+    ) public onlyOwner{
         mutate(
             tableIDs[0],
             SQLHelpers.toInsert(
@@ -151,7 +153,7 @@ contract dealTablelandView is IDealClient, Ownable {
         string memory piece_cid,
         uint64 dealID,
         string memory status
-    ) public {
+    ) public onlyOwner{
         mutate(
             tableIDs[1],
             SQLHelpers.toInsert(

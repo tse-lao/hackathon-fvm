@@ -5,7 +5,7 @@ import './IDealClient.sol';
 import {MarketTypes} from '@zondax/filecoin-solidity/contracts/v0.8/types/MarketTypes.sol';
 import {AccountTypes} from '@zondax/filecoin-solidity/contracts/v0.8/types/AccountTypes.sol';
 
-interface IDealTablelandView is IDealClient {
+interface IDealTablelandStorage is IDealClient {
     // function toUpdate(string memory prefix, uint256 tableID,string memory set, string memory filter)external view returns(string memory);
 
     function dealInsertion(

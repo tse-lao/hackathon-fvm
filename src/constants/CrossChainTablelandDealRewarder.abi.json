@@ -1,0 +1,414 @@
+[{
+        "inputs": [{
+                "internalType": "address",
+                "name": "gateway_",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "gasReceiver_",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [{
+            "internalType": "int256",
+            "name": "errorCode",
+            "type": "int256"
+        }],
+        "name": "ActorError",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ActorNotFound",
+        "type": "error"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "chainid",
+            "type": "uint256"
+        }],
+        "name": "ChainNotSupported",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "FailToCallActor",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidAddress",
+        "type": "error"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint64",
+            "name": "",
+            "type": "uint64"
+        }],
+        "name": "InvalidCodec",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidResponseLength",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotApprovedByGateway",
+        "type": "error"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "balance",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "name": "NotEnoughBalance",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "bytes",
+                "name": "commP",
+                "type": "bytes"
+            }
+        ],
+        "name": "CommpProposed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+            "indexed": false,
+            "internalType": "bytes",
+            "name": "commP",
+            "type": "bytes"
+        }],
+        "name": "bountyCreated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+            "indexed": false,
+            "internalType": "bytes",
+            "name": "commP",
+            "type": "bytes"
+        }],
+        "name": "bountyFullyFunded",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "bounty_tableName",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint64",
+                "name": "method",
+                "type": "uint64"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "flags",
+                "type": "uint64"
+            },
+            {
+                "internalType": "uint64",
+                "name": "codec",
+                "type": "uint64"
+            },
+            {
+                "internalType": "bytes",
+                "name": "params",
+                "type": "bytes"
+            },
+            {
+                "internalType": "uint64",
+                "name": "id",
+                "type": "uint64"
+            }
+        ],
+        "name": "call_actor_id",
+        "outputs": [{
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            },
+            {
+                "internalType": "int256",
+                "name": "",
+                "type": "int256"
+            },
+            {
+                "internalType": "uint64",
+                "name": "",
+                "type": "uint64"
+            },
+            {
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint64",
+            "name": "deal_id",
+            "type": "uint64"
+        }],
+        "name": "claim_bounty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "claim_tableName",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "string",
+                "name": "piece_cid",
+                "type": "string"
+            },
+            {
+                "internalType": "bytes",
+                "name": "piece_cid_bytes",
+                "type": "bytes"
+            },
+            {
+                "internalType": "string",
+                "name": "location_ref",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "bountyReward",
+                "type": "uint256"
+            },
+            {
+                "internalType": "int64",
+                "name": "minAcceptedDealDuration",
+                "type": "int64"
+            },
+            {
+                "internalType": "uint256",
+                "name": "size",
+                "type": "uint256"
+            }
+        ],
+        "name": "createBounty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "bytes32",
+                "name": "commandId",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "string",
+                "name": "sourceChain",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "sourceAddress",
+                "type": "string"
+            },
+            {
+                "internalType": "bytes",
+                "name": "payload",
+                "type": "bytes"
+            }
+        ],
+        "name": "execute",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "bytes32",
+                "name": "commandId",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "string",
+                "name": "sourceChain",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "sourceAddress",
+                "type": "string"
+            },
+            {
+                "internalType": "bytes",
+                "name": "payload",
+                "type": "bytes"
+            },
+            {
+                "internalType": "string",
+                "name": "tokenSymbol",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "executeWithToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "bytes",
+            "name": "piece_cid",
+            "type": "bytes"
+        }],
+        "name": "fundBounty",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "gasService",
+        "outputs": [{
+            "internalType": "contract IAxelarGasService",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "gateway",
+        "outputs": [{
+            "internalType": "contract IAxelarGateway",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "bytes",
+            "name": "",
+            "type": "bytes"
+        }],
+        "name": "pieceInfo",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "bytes",
+            "name": "",
+            "type": "bytes"
+        }],
+        "name": "pieceToBounty",
+        "outputs": [{
+                "internalType": "uint256",
+                "name": "bountyReward",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "donatedTokens",
+                "type": "uint256"
+            },
+            {
+                "internalType": "int64",
+                "name": "minDealDays",
+                "type": "int64"
+            },
+            {
+                "internalType": "bool",
+                "name": "created",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+            },
+            {
+                "internalType": "uint64",
+                "name": "",
+                "type": "uint64"
+            }
+        ],
+        "name": "pieceToSPs",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
