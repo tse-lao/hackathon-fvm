@@ -36,6 +36,8 @@ export default function Profile() {
         mounted && setLoading(false)
     }
     
+    
+  if(address === undefined) { return <Layout active="Dashboard"><div className="text-center">Please connect your wallet</div></Layout>}
   if(loading) { return <div>Loading...</div> }
     
   return (
