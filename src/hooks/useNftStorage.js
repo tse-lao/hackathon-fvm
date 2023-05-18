@@ -40,6 +40,26 @@ export async function readFromCID(cid){
     
 }
 
+export async function blobFromCID(cid){
+    const endpoint = `https://nftstorage.link/ipfs/${cid}`
+
+    let blob = await fetch(endpoint).then(r => r.blob());
+    
+    
+    
+    return new Promise((resolve, reject) => {
+        readTextAsJson(blob, (error, jsonData) => {
+            if (error) {
+                resolve(null)
+            } else {
+                resolve(jsonData)
+            }
+        });
+    })
+  ;
+    
+}
+
 export async function readEncryptFile(cid){
     const endpoint = `https://gateway.lighthouse.storage/ipfs/${cid}`
    

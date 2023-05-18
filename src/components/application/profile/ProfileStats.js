@@ -1,10 +1,9 @@
-import { countContributions } from '@/hooks/useTableland';
 import { formatBytes } from '@/lib/helpers';
 import lighthouse from '@lighthouse-web3/sdk';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
-export default function ProfileStats({address }) {
+export default function ProfileStats({ address }) {
   const [stats, setStats] = useState([
     { name: 'Data Used', current: 'loading...', total: 'loading...' },
     { name: 'Contributions', current: 'loading...' },
@@ -21,30 +20,31 @@ export default function ProfileStats({address }) {
           current: formatBytes(balance.data.dataUsed),
           total: formatBytes(balance.data.dataLimit)
         })
-      
-      const totalContributions = await countContributions(address);
-      console.log(totalContributions)
-      
+
+      const res = await fetch(`/api/tableland/contributions/count?creator=${address}`);
+      const data = await res.json();
+      console.log(data.result)
+
       newStats.push(
         {
           name: 'Contributions',
-          current: totalContributions,
-          
-        });
-      
+          current: data.result,
 
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        const userBalance = await provider.getBalance(address) 
-        newStats.push(
-          {
-            name: 'Balance',
-            current: parseFloat(ethers.utils.formatEther(userBalance, 'ether')).toFixed(6),
-          }
-        )
-        //get current ETH balance
+        });
+
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const userBalance = await provider.getBalance(address)
+      newStats.push(
+        {
+          name: 'Balance',
+          current: parseFloat(ethers.utils.formatEther(userBalance, 'ether')).toFixed(6),
+        }
+      )
+      //get current ETH balance
       setStats(newStats)
     }
-    if(address){
+    if (address) {
       getBalance()
     }
   }, [address])
@@ -58,7 +58,7 @@ export default function ProfileStats({address }) {
         {stats.map((item, index) => (
           <div key={index} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
             <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
-            <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.current}  {item.total &&<span className="text-sm font-md text-gray-500">/ {item.total}</span>}</dd>
+            <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.current}  {item.total && <span className="text-sm font-md text-gray-500">/ {item.total}</span>}</dd>
           </div>
         ))}
       </dl>

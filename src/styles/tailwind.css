@@ -19,6 +19,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes changeColor {
+  0% { color: #52b36d; }
+  25% { color: #4faa6d; }
+  50% { color: #406c72; }
+  75% { color: #333776; }
+  100% { color: #302878; }
+}
+
+.loading-icon {
+  animation: changeColor 2s linear infinite;
+}
+
+
 
 #__next {
   min-height: 100%;

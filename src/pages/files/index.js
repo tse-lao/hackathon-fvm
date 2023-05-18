@@ -26,7 +26,7 @@ export default function Files() {
             <Layout title='Files' active="Files">
             
                 <main className='flex flex-col gap-12'>
-                
+
                 {organised ? <FileList address={address} /> : <Drive address={address} />}
                 </main>
             </Layout>

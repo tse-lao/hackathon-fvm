@@ -3,6 +3,7 @@ import lighthouse from '@lighthouse-web3/sdk';
 import Link from 'next/link';
 import { useEffect, useState } from "react";
 import UploadModal from "../../UploadModal";
+import LoadingSpinner from '../elements/LoadingSpinner';
 import FileItem from './FileItem';
 
 
@@ -10,6 +11,7 @@ export default function FileList({ address }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [files, setFiles] = useState([])
     const [totalFiles, setTotalFiles] = useState(0)
+    const [loading,setLoading] = useState(true)
 
 
 
@@ -17,6 +19,7 @@ export default function FileList({ address }) {
         
         
         const getFiles = async () => {
+            setLoading(true)
             const uploads = await lighthouse.getUploads(address);
             const apiKey = await getLighthouse(address);
             const authToken = await lighthouse.dataDepotAuth(apiKey)
@@ -25,6 +28,7 @@ export default function FileList({ address }) {
             console.log(carFiles);
             setFiles(uploads.data.fileList)
             setTotalFiles(uploads.data.totalFiles)
+            setLoading(false)
 
             /*    data: {
                    fileList: [
@@ -86,19 +90,20 @@ export default function FileList({ address }) {
             <div className="mt-4 sm:flex sm:items-center">
                 {isModalOpen && <UploadModal onClose={closeModal} />}
             </div>
+          
             <div className="mt-8 flow-root">
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
                             <div className="min-w-full divide-y divide-gray-300">
-                                {totalFiles > 0 ?
+                                {totalFiles > 0 && !loading ?
                                     files.map((item) =>
                                         <FileItem file={item} key={item.id} />
                                     ) : (
-
                                         <div className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            No files found
+                                        {loading ? <LoadingSpinner /> : <span>No files found</span>}
                                         </div>
+                                        
                                     )}
                             </div>
                         </div>
