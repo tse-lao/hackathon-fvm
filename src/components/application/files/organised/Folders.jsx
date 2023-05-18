@@ -5,13 +5,13 @@ import CreateFolderModal from './CreateFolderModal';
 import Folder from './Folder';
 import folders from './data/folders.json';
 
-function Folders() {
+function Folders({address}) {
   const [expandedFolders, setExpandedFolders] = useState({ [folders[0].id]: true });
   const [modalOpen, setModalOpen] = useState(false);
   
   const polybase = usePolybase();
   const { data, error, loading } =
-    useCollection(polybase.collection("Folder"));
+    useCollection(polybase.collection("File").where("owner", "==", address));
 
 
     
@@ -22,11 +22,9 @@ function Folders() {
   
 
   const setOpenModal = () => {
-    console.log(data);
       setModalOpen(!modalOpen);
   }
   function handleToggle(id) {
-    console.log(id)
     setExpandedFolders((prevState) => ({
       ...prevState,
       [id]: !prevState[id],
@@ -40,8 +38,8 @@ function Folders() {
     {data && data.data.map((folder) => (
         console.log(folder),
         <Folder
-            key={folder.id}
-            folder={folder}
+            key={folder.data.id}
+            folder={folder.data}
             isExpanded={expandedFolders[folder.id]}
             onToggle={handleToggle}
         />
@@ -55,10 +53,8 @@ function Folders() {
         />
       ))}
       
-      {modalOpen && (
-        <CreateFolderModal changeOpenModal={setOpenModal}/>
-)}
-<QuickAddButton setOpenModal={setOpenModal}/>
+      {modalOpen && <CreateFolderModal changeOpenModal={setOpenModal}/> }
+      <QuickAddButton setOpenModal={setOpenModal}/>
     </div>
     
     

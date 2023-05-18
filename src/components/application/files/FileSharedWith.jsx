@@ -92,38 +92,24 @@ export default function FileSharedWith({ cid }) {
             {
                 id: 1,
                 chain: "Mumbai",
-                method: "getOwner",
+                method: "hasAccess",
                 standardContractType: "Custom",
-                contractAddress: contractAddress,
+                contractAddress: "0x780077307BE090E24Eb2Ed0d70393711Cc986540",
                 returnValueTest: {
-                    comparator: "==",
-                    value: address
+                comparator: "==",
+                value: "true"
                 },
-                parameters: [],
-                inputArrayType: [],
-                outputType: "address"
-            },
-            {
-                id: 2,
-                chain: "Mumbai",
-                method: "totalCount",
-                standardContractType: "Custom",
-                contractAddress: contractAddress,
-                returnValueTest: {
-                    comparator: ">=",
-                    value: minCount
-                },
-                parameters: [],
-                inputArrayType: [],
-                outputType: "uint256"
-            },
+                parameters: [":userAddress", 1],
+                inputArrayType: ["address", "uint256"],
+                outputType: "bool"
+            } 
         ];
 
 
 
         // Aggregator is what kind of operation to apply to access conditions
         // Suppose there are two conditions then you can apply ([1] and [2]), ([1] or [2]), !([1] and [2]).
-        const aggregator = "([1] and [2])";
+        const aggregator = "([1])";
         const { publicKey, signedMessage } = await signAuthMessage();
 
         /*
@@ -218,6 +204,10 @@ export default function FileSharedWith({ cid }) {
                 </div>
 
             )}
+            
+            <button onClick={e => applyAccessConditions()}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+            >Apply Access Conditions</button>
 
 
 

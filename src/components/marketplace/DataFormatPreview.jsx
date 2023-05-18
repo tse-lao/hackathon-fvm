@@ -228,12 +228,9 @@ const [loading, setLoading] = useState(true);
       const result = await readFromCID(cid)
       setData(result);
       
-      console.log(result)
-      console.log(result);
       setLoading(false);
     }
-    
-    console.log(cid)
+
     if(!cid) return;
     readData();
   }, [cid])

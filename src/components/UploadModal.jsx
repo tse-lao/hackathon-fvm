@@ -1,9 +1,9 @@
 
+import { uploadCarFile } from '@/hooks/useLighthouse';
 import { getLighthouse, signAuthMessage } from '@/lib/createLighthouseApi';
 import { readFSStream } from '@/lib/dataHelper';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
 import lighthouse from '@lighthouse-web3/sdk';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
@@ -31,10 +31,19 @@ export default function UploadModal({ onClose }) {
 
 
     const upload = async (e) => {
+              
+        const apiKey = await getLighthouse(address);
+        const authToken = await lighthouse.dataDepotAuth(apiKey)
+        
+        console.log(e.target.files);
+        
+        
         const tempFiles = [...files]
         for (let i = 0; i < e.target.files.length; i++) {
             tempFiles.push(e.target.files[i])
         }
+        console.log(tempFiles)
+        const upload = await uploadCarFile(tempFiles, progressCallback, authToken.data.access_token)
 
         setFiles(tempFiles);
     
@@ -55,6 +64,8 @@ export default function UploadModal({ onClose }) {
         const apiKey = await getLighthouse(address);
         const authToken = await lighthouse.dataDepotAuth(apiKey)
         
+        
+        
         for(let i = 0; i < files.length; i++) {
             const mockEvent = {
                 target: {
@@ -63,9 +74,12 @@ export default function UploadModal({ onClose }) {
                 persist: () => {},
             };
             
+            const response = await lighthouse.createCar(mockEvent, authToken.data.access_token);
+            
+            console.log(response)
  
     
-    
+/*     
     
                 const endpoint = `https://data-depot.lighthouse.storage/api/upload/upload_files`
                 //const content = await readFSStream(mockEvent.target.files[0]);
@@ -73,7 +87,7 @@ export default function UploadModal({ onClose }) {
                 toast.info(authToken.data.access_token)
                 
                 const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InRzZS1sYW8iLCJhdmF0YXJVUkwiOiJodHRwczovL2F2YXRhcnMuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3UvMTA2NjUzMzU5P3Y9NCIsImlhdCI6MTY4NDI3MDk0MCwiZXhwIjoxNjg1OTk4OTQwfQ.v3ph47ry4wi5z_XucAYcCPnXKWKuHx169JsMZjWyJ94"
-              
+            
                 try {
                     var form = new FormData();
                     files.map((item) => {
@@ -103,7 +117,7 @@ export default function UploadModal({ onClose }) {
                     } catch (error) {
                     console.log(`Something Went Wrong : ${error}`, "error");
                     }
-    
+     */
 
         /*     try{
                 

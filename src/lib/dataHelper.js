@@ -42,9 +42,9 @@ export function readTextAsJson(blob, callback) {
 
   reader.onload = function (event) {
     try {
-      console.log(event.target.result)
+
       const json = JSON.parse(event.target.result);
-      console.log(json)
+
       callback(null, json);
     } catch (error) {
       callback(error);
@@ -224,7 +224,6 @@ export async function getMetadataFromFile(file) {
         const json = JSON.parse(reader.result);
         const metadata = analyzeJSONStructure(json);
         const result = await getMetadataCID(metadata);
-        console.log(result);
         resolve(result);
       } catch (error) {
         toast.error(error);

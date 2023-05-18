@@ -149,12 +149,25 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
         ></textarea>
       </div>
       {loadingFile ? <LoadingSpinner loadingText='uploading metadata' /> :
-        (
-          <div>
-            <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">
-              {metadata ? <a href={`https://gateway.ipfs.io/ipfs/${metadata}`}
-              className="text-indigo-600 hover:text-indigo-500"
-              >Preview metadata</a> : "Upload to get metadata"}
+        metadata ? (
+                <div>
+                <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">Preview
+              </label>
+              <a href={`https://gateway.ipfs.io/ipfs/${metadata}`}
+              className="text-indigo-600 hover:text-indigo-500" target="_blank" rel="noreferrer"
+              >Click here to see metadata</a>
+              <button
+                onClick={() => setMetadata(null)}
+                
+                className="text-red-500"
+              >Remove</button>
+            </div>
+              
+              
+              ) : (
+                <div>
+                <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">
+                Upload to get metadata
             </label>
             <input
               type="file"

@@ -11,8 +11,7 @@ export default function Contributions({ tokenID }) {
             const response = await fetchDataSubmission(tokenID);
             
             if(response != "Row not found"){
-                 
-                console.log(response);
+
                 setSubmissions(response)
             }
            
@@ -26,10 +25,10 @@ export default function Contributions({ tokenID }) {
 
             {submissions.length > 0 ? submissions.map((submission, index) => (
                
-                    <DataContributor contribution={submission} />
+                    <DataContributor key={index} contribution={submission} />
                
             )) : (
-                <div className="text-center py-8">
+            <div className="text-center py-8">
                 <p className="text-gray-500 text-xl font-medium">No contributions found</p>
                 <p className="text-gray-400 text-md">Check back later for new submissions.</p>
             </div>

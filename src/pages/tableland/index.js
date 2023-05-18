@@ -9,10 +9,10 @@ export const data_contribution = "data_contribution_80001_6096 "
 export const DB_main = "file_main_80001_6097"
 export const DB_attribute = "file_attribute_80001_6098"
 const databases = [
-    "file_main_80001_6097", 
+    "file_main_80001_6135", 
     "computation_3141_15", 
-    "data_contribution_80001_6096", 
-    "file_attribute_80001_6098",
+    "data_contribution_80001_6134", 
+    "file_attribute_80001_6136",
 ]
 
 export default function TableLand() {

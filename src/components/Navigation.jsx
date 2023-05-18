@@ -1,10 +1,12 @@
 /* 交流QQ群:七5457三七7八 */
+import { useIsMounted } from '@/hooks/useIsMounted'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Fragment } from 'react'
 import { useAccount } from 'wagmi'
 import { Logo } from './Logo'
+import Avatar from './application/elements/Avatar'
 import Lighthouse from './connections/Lighthouse'
 import Polybase from './connections/Polybase'
 
@@ -14,7 +16,7 @@ function classNames(...classes) {
 
 export default function Navigation({active}) {
   const {address} = useAccount();
-
+  const mounted = useIsMounted();
 
   return (
     <Disclosure as="nav" className="bg-white shadow">
@@ -115,7 +117,9 @@ export default function Navigation({active}) {
                 <div>
                   <Menu.Button className="flex rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     <span className="sr-only">Open user menu</span>
-                    <img className="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1634896941598-b6b500a502a7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1356&q=80" alt="" />
+                    <div className="h-8 w-8 rounded-full">
+                    {mounted && <Avatar size={6} className="rounded-full" address={address} /> }
+                    </div> 
                   </Menu.Button>
                 </div>
 

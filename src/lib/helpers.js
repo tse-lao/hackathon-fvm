@@ -27,4 +27,17 @@ export function formatBytes(bytes) {
     
     return format;
   }
+  export function getCurrentDateAsString() {
+    const currentDate = new Date();
+  
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-based
+    const year = currentDate.getFullYear().toString();
+    const hour = currentDate.getHours().toString().padStart(2, '0');
+    const minute = currentDate.getMinutes().toString().padStart(2, '0');
+  
+    const dateString = `${day}-${month}-${year}-${hour}-${minute}`;
+  
+    return dateString;
+  }
   

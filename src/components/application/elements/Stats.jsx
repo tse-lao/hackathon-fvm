@@ -32,6 +32,7 @@ export default function Stats({ address }) {
 
       setStats(newStats)
     }
+    
     getBalance()
   }, [])
 
@@ -51,5 +52,3 @@ export default function Stats({ address }) {
     </div>
   )
 }
-
-/* 交流QQ群:7五45737七八 */

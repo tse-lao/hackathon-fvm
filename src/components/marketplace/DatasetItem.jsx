@@ -1,15 +1,17 @@
+import { ethers } from 'ethers';
 import Link from 'next/link';
-
 const DatasetItem = ({ dataset }) => {
+  
+  const priceAttribute = dataset.attributes.find(attr => attr.trait_type === 'price');
+
   return (
     <Link href={`/market/${dataset.tokenID}`}>
       <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
       <div className="flex flex-row justify-between mt-2 items-center">
         <div className="px-6 pt-4 pb-2 items-start	">
           <h3 className="text-xl font-semibold mb-2 group-hover:text-indigo-500">{dataset.dbName}</h3>
-          <span className="text-cf-600 font-medium text-lg ">
-              0.001
-              {dataset.mintPrice} <span className="text-gray-700 ">CFX</span>
+          <span className="text-cf-600 font-medium text-md ">
+              { ethers.utils.formatUnits(priceAttribute.value)} <span className="text-gray-700 ">MATIC</span>
             </span>
         </div>
         <div className="px-6 pt-4 pb-2 ">
@@ -29,7 +31,7 @@ const DatasetItem = ({ dataset }) => {
                 <strong>Totals Rows:</strong> {dataset.minimumRowsOnSubmission}
               </p>
               <p className="text-sm text-gray-700">
-                <strong>Contributions:</strong> 1.000.000{dataset.totalContributions}
+                <strong>Contributions:</strong> {dataset.totalContributions}
               </p>
             </div>
 

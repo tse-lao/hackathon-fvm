@@ -11,7 +11,7 @@ export default function DataContributor({ contribution }) {
             <div className="flex space-x-4 text-sm text-gray-500">
                 <div className="flex py-4">
 
-                    <Avatar creator={contribution.creator} height={64} width={64} className="h-10 w-10 rounded-full bg-gray-100" />
+                    <Avatar creator={contribution.creator} size={8} />
                 </div>
                 <div className={classNames(contribution.index === 1 ? '' : 'border-t border-gray-200', 'py-3')}>
                     <h3 className="font-medium text-gray-900">{contribution.creator}</h3>

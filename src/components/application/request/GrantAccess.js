@@ -4,6 +4,7 @@ import { validateInput } from "@/hooks/useLitProtocol";
 import { useDocument, usePolybase } from "@polybase/react";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import LoadingSpinner from "../elements/LoadingSpinner";
 
 export default function GrantAccess({ tokenID, metadataCID, address, creator }) {
   const polybase = usePolybase();
@@ -13,10 +14,8 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator }) 
   const [selectedOptions, setSelectedOptions] = useState([]);
   const { submitData } = useContract();
 
-  if (loading) return <div>Loading...</div>
+  if (loading) return <LoadingSpinner msg="loading files" />
   if (error) return <div>Error: {error.message}</div>
-
-
 
   const handleCheckboxChange = (e) => {
     const checkedValue = e.target.value;

@@ -23,6 +23,10 @@ export function readFileFromIPFS(cid) {
   });
 }
 
+export function readFile(content){
+  
+}
+
 
 
 export async function storeCarFile(filename){

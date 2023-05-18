@@ -1,5 +1,6 @@
 import { getLighthouse } from '@/lib/createLighthouseApi';
 import lighthouse from '@lighthouse-web3/sdk';
+import Link from 'next/link';
 import { useEffect, useState } from "react";
 import UploadModal from "../../UploadModal";
 import FileItem from './FileItem';
@@ -62,7 +63,8 @@ export default function FileList({ address }) {
                         Below find all the files uploaded by you.
                     </p>
                 </div>
-                <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex gap-2">
+            
                     <button
                         type="button"
                         onClick={openModal}
@@ -71,7 +73,16 @@ export default function FileList({ address }) {
                         Add file
                     </button>
                 </div>
+                
+
             </div>
+            <Link href="/files/car">
+                <span
+                className="block rounded-md text-indigo-600 px-3 py-2 text-center text-sm font-semibold text-whitehover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+                Go to CAR Files
+                </span>
+                </Link>
             <div className="mt-4 sm:flex sm:items-center">
                 {isModalOpen && <UploadModal onClose={closeModal} />}
             </div>

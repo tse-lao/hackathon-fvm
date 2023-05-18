@@ -71,7 +71,6 @@ const fetchDataSubmission = (tokenID) => {
         },
       });
 
-      console.log(response);
 
 
       const data = await response.json();
@@ -97,9 +96,6 @@ const getRequestData = (tokenID) => {
         },
       });
 
-      console.log(response);
-
-
       const data = await response.json();
       resolve(data);
     } catch (error) {
@@ -110,7 +106,7 @@ const getRequestData = (tokenID) => {
 
 
 const getContributionSplit = (tokenID) => {
-
+  const url = "http://localhost:4000"
   const query = `
         query GetContributors($tokenId: String) {
           getContributors(tokenID: $tokenId) {
@@ -134,7 +130,6 @@ const getContributionSplit = (tokenID) => {
         })
       });
       const data = await result.json();
-      console.log(data.data.getContributors);
       resolve(data.data.getContributors);
     } catch (e) {
       reject(e);
@@ -219,7 +214,7 @@ export async function getAllNFTs(request) {
     const url = 'https://testnets.tableland.network/api/v1/query';
     const params = new URLSearchParams({
       statement: `SELECT json_object(
-              'tokenID', file_main_80001_6097.tokenID,
+              'tokenID', ${DB_main}.tokenID,
               'dbName', dbName,
               'description', description,
               'dbCID', dbCID,
@@ -232,10 +227,10 @@ export async function getAllNFTs(request) {
                 )
               )
             )
-          FROM file_main_80001_6097 JOIN file_attribute_80001_6098
-              ON file_main_80001_6097.tokenID = file_attribute_80001_6098.tokenID
-              ${request ? ` WHERE file_main_80001_6097.piece_cid != 'piece_cid'` : ''}  
-          GROUP BY file_main_80001_6097.tokenID`,
+          FROM ${DB_main} JOIN ${DB_attribute}
+              ON ${DB_main}.tokenID = ${DB_attribute}.tokenID
+              ${request ? ` WHERE ${DB_main}.piece_cid != 'piece_cid'` : ''}  
+          GROUP BY ${DB_main}.tokenID`,
       extract: true, format: "objects", unwrap: false
     });
 
@@ -249,7 +244,6 @@ export async function getAllNFTs(request) {
 
 
       const data = await response.json();
-      console.log(data);
       resolve(data);
     } catch (error) {
       reject(error);
@@ -262,7 +256,7 @@ export async function filteredWithCategories(request,category){
     const url = 'https://testnets.tableland.network/api/v1/query';
     const params = new URLSearchParams({
       statement: `SELECT json_object(
-              'tokenID', file_main_80001_6097.tokenID,
+              'tokenID', ${DB_main}.tokenID,
               'dbName', dbName,
               'description', description,
                   'dbCID', dbCID,
@@ -275,9 +269,9 @@ export async function filteredWithCategories(request,category){
                 )
               )
             )
-          FROM file_main_80001_6097 JOIN file_attribute_80001_6098
-              ON file_main_80001_6097.tokenID = file_attribute_80001_6098.tokenID
-              ${category ? `WHERE file_attribute_80001_6098.value = ${category}`: ''}
+          FROM ${DB_main} JOIN ${DB_attribute}
+              ON ${DB_main}.tokenID = ${DB_attribute}.tokenID
+              ${category ? `WHERE ${DB_attribute}.value = ${category}`: ''}
           
 
           
@@ -296,7 +290,6 @@ export async function filteredWithCategories(request,category){
 
 
       const data = await response.json();
-      console.log(data);
       resolve(data);
     } catch (error) {
       reject(error);
@@ -321,7 +314,6 @@ export async function getTableFromTableland(table){
 
 
       const data = await response.json();
-      console.log(data);
       resolve(data);
     } catch (error) {
       reject(error);
@@ -334,7 +326,7 @@ export async function getNFTDetail(tokenID, categories) {
     const url = 'https://testnets.tableland.network/api/v1/query';
     const params = new URLSearchParams({
       statement: `SELECT json_object(
-              'tokenID', file_main_80001_6097.tokenID,
+              'tokenID', ${DB_main}.tokenID,
               'dbName', dbName,
               'dataFormatCID', dataFormatCID,
               'description', description,
@@ -348,9 +340,9 @@ export async function getNFTDetail(tokenID, categories) {
                 )
               )
             )
-          FROM file_main_80001_6097 JOIN file_attribute_80001_6098
-              ON file_main_80001_6097.tokenID = file_attribute_80001_6098.tokenID
-          WHERE file_main_80001_6097.tokenID = ${tokenID}
+          FROM ${DB_main} JOIN ${DB_attribute}
+              ON ${DB_main}.tokenID = ${DB_attribute}.tokenID
+          WHERE ${DB_main}.tokenID = ${tokenID}
           
           
           `,
@@ -367,7 +359,7 @@ export async function getNFTDetail(tokenID, categories) {
 
 
       const data = await response.json();
-      console.log(data);
+
       resolve(data);
     } catch (error) {
       reject(error);
@@ -379,7 +371,7 @@ export async function getAllCategories() {
   return new Promise(async (resolve, reject) => {
     const url = 'https://testnets.tableland.network/api/v1/query';
     const params = new URLSearchParams({
-      statement: `SELECT DISTINCT file_attribute_80001_6098.value FROM file_attribute_80001_6098 WHERE file_attribute_80001_6098.trait_type = 'category'`
+      statement: `SELECT DISTINCT ${DB_attribute}.value FROM ${DB_attribute} WHERE ${DB_attribute}.trait_type = 'category'`
     });
 
     try {
@@ -401,7 +393,6 @@ export async function getAllCategories() {
         }
       });
 
-      console.log(newData);
       resolve(newData);
     } catch (error) {
       reject(error);
@@ -414,7 +405,7 @@ export async function getAllContributionData(creator) {
   return new Promise(async (resolve, reject) => {
     const url = 'https://testnets.tableland.network/api/v1/query';
     const params = new URLSearchParams({
-      statement: `SELECT * FROM data_contribution_80001_6096 JOIN file_main_80001_6097 ON file_main_80001_6097.tokenID = data_contribution_80001_6096.tokenID WHERE creator = '${creator}'`,
+      statement: `SELECT * FROM ${data_contribution} JOIN ${DB_main} ON ${data_contribution}.tokenID = ${DB_main}.tokenID  WHERE creator = '${creator}'`,
     });
 
     try {
@@ -430,6 +421,52 @@ export async function getAllContributionData(creator) {
     }
   });
 }
+
+export async function countContributions(creator) {
+  return new Promise(async (resolve, reject) => {
+    const url = 'https://testnets.tableland.network/api/v1/query';
+    const params = new URLSearchParams({
+      statement: `SELECT COUNT(*)  FROM ${data_contribution} WHERE creator = '${creator}'`,
+      unwrap: true, extract: true, format: "objects"
+      
+    });
+
+    try {
+      const response = await fetch(`${url}?${params.toString()}`, {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+      const data = await response.json();
+      resolve(data);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+export async function countTokenContribution(tokenID) {
+  return new Promise(async (resolve, reject) => {
+    const url = 'https://testnets.tableland.network/api/v1/query';
+    const params = new URLSearchParams({
+      statement: `SELECT COUNT(*) FROM ${data_contribution} WHERE tokenID = '${tokenID}'`,
+      unwrap: true, extract: true, format: "objects"
+    });
+
+    try {
+      const response = await fetch(`${url}?${params.toString()}`, {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+      const data = await response.json();
+      resolve(data);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 
 
 export {

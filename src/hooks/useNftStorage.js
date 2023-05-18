@@ -30,10 +30,8 @@ export async function readFromCID(cid){
     return new Promise((resolve, reject) => {
         readTextAsJson(blob, (error, jsonData) => {
             if (error) {
-                console.error(error);
                 resolve(null)
             } else {
-                console.log(jsonData);
                 resolve(jsonData)
             }
         });
