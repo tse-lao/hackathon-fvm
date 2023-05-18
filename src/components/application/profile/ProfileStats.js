@@ -28,7 +28,7 @@ export default function ProfileStats({ address }) {
       newStats.push(
         {
           name: 'Contributions',
-          current: data.result,
+          current: data,
 
         });
 

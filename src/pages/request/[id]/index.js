@@ -37,6 +37,7 @@ export default function GetRequestDetails() {
       
       const result = await fetch(`/api/tableland/token?${DB_main}.tokenID=${id}`);
       const data = await result.json();
+      console.log(data)
       setData(data)
       
       const result2 = await fetch(`/api/tableland/contributions/count?tokenID=${id}`);
@@ -144,7 +145,7 @@ export default function GetRequestDetails() {
                 onClick={mintNFT}
                 className="inline-flex items-center justify-center flex-col rounded-md bg-cf-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cf-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
               >
-                <div><span>{totalContributions}/{data.result.minRows}</span></div>
+                <div><span>{totalContributions}/{data.result.requiredRows}</span></div>
                 <div>Start Minting</div>
               </button>
 
