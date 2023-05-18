@@ -1,4 +1,6 @@
 import crossChainBacalhauJobsAbi from './BacahlauJobs.abi.json'
+import crossChainTablelandDealRewarderAbi from './CrossChainTablelandDealRewarder.abi.json'
+import crossChainTablelandStorageAbi from './CrossChainTablelandStorage.abi.json'
 import DBAbi from './DB_NFT.abi.json'
 import TWFactoryAbi from './ThirdWebFactory.abi.json'
 import {
@@ -12,8 +14,6 @@ import {
   splitImplementation,
 } from './contractAddress'
 import crossChainTablelandDealClientAbi from './crossChainTablelandDealClient.abi.json'
-import crossChainTablelandDealRewarderAbi from './crossChainTablelandDealRewarder.abi.json'
-import crossChainTablelandStorageAbi from './crossChainTablelandStorage.abi.json'
 import helperAbi from './helper.abi.json'
 import splitterAbi from './splitter.abi.json'
 import {
