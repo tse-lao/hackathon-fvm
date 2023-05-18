@@ -133,7 +133,7 @@ export async function retrieveMergeCID(tokenID, creator) {
   const getToken = await createJWTToken();
   const apiKey = await getLighthouse(creator);
 
-  const url = "http://localhost:4000"
+  const url = process.env.API_ENDPOINT;
 
   const query = `
     query Query($tokenId: String, $jwtToken: String, $creator: String, $apiKey: String) {

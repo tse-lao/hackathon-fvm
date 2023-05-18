@@ -5,7 +5,7 @@ export default function RequestElement({ index, request }) {
   return (
     <Link
       key={index}
-      href={`/request/${request.dbName}/${request.tokenID}`}
+      href={`/request/${request.tokenID}`}
     >
       <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
         <div className="flex flex-row justify-between mt-2 items-center">

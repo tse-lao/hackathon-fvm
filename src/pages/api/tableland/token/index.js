@@ -30,8 +30,18 @@ export default async (req, res) => {
       });
       
       if(result.length == 0) { res.status(200).json({result: "No results found"});}
-      const priceItem = ethers.utils.formatEther((result.attributes.find(attr => attr.trait_type === 'price').value));
-      const categories = result.attributes.find(attr => attr.trait_type === 'category').value;    
-      res.status(200).json({result: result, price: priceItem, categories: categories});
+      const priceAttribute = result.attributes.find(attr => attr.trait_type === 'price');
+      const priceItem = priceAttribute ? ethers.utils.formatEther(priceAttribute.value) : null;
+
+      const creator = result.attributes.find(attr => attr.trait_type === 'creator').value;
+
+      let categories = [];
+      for(let i = 0; i < result.attributes.length; i++) {
+        if(result.attributes[i].trait_type === 'category') {
+          categories.push(result.attributes[i].value);
+        }
+      }
+         
+      res.status(200).json({result: result, price: priceItem, categories: categories, creator: creator});
   }
   

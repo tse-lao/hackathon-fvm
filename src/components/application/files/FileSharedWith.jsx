@@ -201,13 +201,14 @@ export default function FileSharedWith({ cid }) {
                             </li>
                         ))}
                     </ul>
+                    <button onClick={e => applyAccessConditions()}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+    >Apply Access Conditions</button>
                 </div>
 
             )}
             
-            <button onClick={e => applyAccessConditions()}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-            >Apply Access Conditions</button>
+           
 
 
 

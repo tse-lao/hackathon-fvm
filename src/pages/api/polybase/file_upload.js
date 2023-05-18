@@ -93,7 +93,7 @@ async function uploadRecord(record) {
                 record.name,
                 record.cid,
                 record.metadata,
-                [""],
+                ["no_category"],
                 record.type,
                 addedAt,
                 record.carRecord.userName,

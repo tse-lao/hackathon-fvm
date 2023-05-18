@@ -1,6 +1,5 @@
 import { getLighthouse } from '@/lib/createLighthouseApi';
 import lighthouse from '@lighthouse-web3/sdk';
-import Link from 'next/link';
 import { useEffect, useState } from "react";
 import UploadModal from "../../UploadModal";
 import LoadingSpinner from '../elements/LoadingSpinner';
@@ -80,16 +79,9 @@ export default function FileList({ address }) {
                 
 
             </div>
-            <Link href="/files/car">
-                <span
-                className="block rounded-md text-indigo-600 px-3 py-2 text-center text-sm font-semibold text-whitehover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-                Go to CAR Files
-                </span>
-                </Link>
-            <div className="mt-4 sm:flex sm:items-center">
+
                 {isModalOpen && <UploadModal onClose={closeModal} />}
-            </div>
+
           
             <div className="mt-8 flow-root">
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

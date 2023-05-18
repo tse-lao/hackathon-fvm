@@ -22,6 +22,7 @@ export default function TokenID() {
   const [detail, setDetail] = useState({});
   const [price, setPrice] = useState(0);
   const [owned, setOwner] = useState(false);
+  const [showDataformat, setShowDataformat] = useState(false);
   const { mint } = useContract();
 
   useEffect(() => {
@@ -114,6 +115,14 @@ export default function TokenID() {
                Pay {price} MTC
              </button>
            )}
+           
+           <button
+           type='button'
+           onClick={() => setShowDataformat(!showDataformat)}
+           className="flex w-full items-center justify-center rounded-md border border-cf-600  px-8 py-3 text-base font-medium text-cf-500 hover:bg-cf-100 focus:outline-none focus:ring-2 focus:ring-cf-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+           >
+            Show format
+           </button>
            </div>
 
            <div className="mt-10 border-t border-gray-200 pt-10">
@@ -136,7 +145,7 @@ export default function TokenID() {
          </div>
           <div className="lg:col-span-4 lg:row-end-1">
             <div className="aspect-h-3 aspect-w-4 overflow-hidden rounded-lg bg-gray-100">
-              {detail.dataFormatCID && <DataFormatPreview cid={detail.dataFormatCID} />}
+              {detail.dataFormatCID && showDataformat && <DataFormatPreview cid={detail.dataFormatCID} />}
             </div>
           </div>
           <div className="mx-auto mt-16 w-full max-w-2xl lg:col-span-4 lg:mt-0 lg:max-w-none">

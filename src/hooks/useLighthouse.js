@@ -22,21 +22,23 @@ export async function signAuthMessage() {
 }
 
 
-export async function shareFile(cid, creator) {
+export async function shareFile(cid, creator, address) {
 
   // Then get auth message and sign
   // Note: the owner of the file should sign the message.
-  const { publicKey, signedMessage } = await signAuthMessage();
+  localStorage.getItem(`lighthouse-jwt-${address}`);
+  
+  const jwt = await createJWTToken();
 
   const publicVerifier = "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"
 
   const publicKeyUserB = [creator, publicVerifier];
 
   const res = await lighthouse.shareFile(
-    publicKey,
+    address,
     publicKeyUserB,
     cid,
-    signedMessage
+    jwt
   );
 
   console.log(res)
@@ -89,15 +91,19 @@ export async function grantSmartAccess(cid, tokenID, minRows) {
   return response;
 }
 
-export async function createJWTToken(publicKey, signedMessage) {
+export async function createJWTToken(address) {
   
-  if(!publicKey || !signedMessage) {
-    const { signedMessage, publicKey } = await signAuthMessage();
-    const response = await getJWT(publicKey, signedMessage);
-
-    return response.JWT;
+  const jwt = localStorage.getItem(`light-jwt-${address}`);
+  
+  if(jwt) { 
+    return jwt;
   }
+  
+    const { signedMessage, publicKey } = await signAuthMessage();
+
   const response = await getJWT(publicKey, signedMessage);
+  
+  localStorage.setItem(`light-jwt-${address}`, response.JWT);
 
   return response.JWT;
 }
