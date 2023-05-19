@@ -1,11 +1,10 @@
 // Decrypt file nodejs
+import lighthouse from "@lighthouse-web3/sdk";
 import { Polybase } from '@polybase/client';
 import { ethPersonalSign } from "@polybase/eth";
 import CID from 'cids';
 import { ethers } from 'ethers';
 import { v4 as uuidv4 } from "uuid";
-
-import { getUploads } from "@/hooks/useLighthouse";
 
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 async function signInPolybase() {
@@ -47,8 +46,11 @@ export default async function handler(req, res) {
     let carRecords = null;
 
     try {
-        const result = await getUploads(accessToken);
-        carRecords = result;
+
+        const result = await lighthouse.viewCarFiles(1, accessToken)
+        
+        
+        carRecords = result.data;
         console.log(result)
     } catch (error) {
         console.log(error)

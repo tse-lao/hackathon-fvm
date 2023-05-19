@@ -1,5 +1,5 @@
 
-import { createJWTToken, getUploads, uploadCarFile } from '@/hooks/useLighthouse';
+import { createJWTToken, uploadCarFile } from '@/hooks/useLighthouse';
 import { getLighthouse, uploadMetaData } from '@/lib/createLighthouseApi';
 import { getMetadataFromFile } from '@/lib/dataHelper';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
@@ -116,9 +116,7 @@ export default function UploadModal({ onClose }) {
         setLoading(true)
         let api = await getLighthouse(address);
         const jwt = await createJWTToken(address);
-        
-        console.log(api)
-        console.log(jwt)
+
 
         let list = [];
         for (let i = 0; i < files.length; i++) {
@@ -140,8 +138,6 @@ export default function UploadModal({ onClose }) {
                     jwt
                 );
 
-                
-                console.log(encryptedResult.data.Hash);
                 
                 cid = encryptedResult.data.Hash;
                 // window.location.reload();
@@ -183,14 +179,6 @@ export default function UploadModal({ onClose }) {
         //here we somehow need to create a new file from the encrypted file and upload it. 
         const uploadCar = await uploadCarFile(dataDepo, progressCallback, authToken.data.access_token);
         
-        const carfiles = await getUploads(authToken.data.access_token);
-        let findCid = list[0].cid;
-        let carRecord = carfiles.find(carRecord => carRecord.fileName == list[0].cid);
-
-
-        console.log(carRecord);
-        
-        console.log(uploadCar)
          const response = await fetch('/api/polybase/file_upload', {
             method: 'POST',
             headers: {
@@ -203,7 +191,6 @@ export default function UploadModal({ onClose }) {
           console.log(result)
         
           setLoading(false)
-          window.location.reload();
     }
     
 
@@ -219,11 +206,12 @@ const removeSelect = (index) => {
 
 return (
     <ModalLayout onClose={onClose} title="Upload Files">
-
+    {loading ? <LoadingSpinner msg="Uploading files.. " />: (
+        <div>
         <div className="py-4 sm:gap-4 sm:py-5">
-
+       
             <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {loading ? <LoadingSpinner msg="Uploading files.. " />: (
+               
                     
                 
                 <ul role="list" className="divide-y divide-gray-200 rounded-md border border-gray-800 max-h-[400px] overflow-auto">
@@ -267,7 +255,7 @@ return (
 
 
                 </ul>
-                )}
+            
             </dd>
 
 
@@ -282,8 +270,11 @@ return (
             >
                 Upload [{files.length}] files
             </button>
+            </div>
+            </div>
+            )}
 
-        </div>
+        
     </ModalLayout>
 )
 }
