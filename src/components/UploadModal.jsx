@@ -74,15 +74,15 @@ export default function UploadModal({ onClose }) {
 
             let metadata = "";
 
-            if (mockEvent.target.files[0].type === "application/json") {
+            if (mockEvent.target.files[i].type == "application/json") {
 
                 readJSONFromFileInput(mockEvent.target, async (error, jsonData) => {
                     if (error) {
                         console.error(error);
                     } else {
-
                         const format = analyzeJSONStructure(jsonData);
                         const cid = await uploadMetadata(JSON.stringify(format));
+                        console.log(cid);   
                         metadata = cid;
                     }
                 });
@@ -125,7 +125,7 @@ export default function UploadModal({ onClose }) {
     const uploadFileEncrypted = async () => {
         setLoading(true)
         let api = await getLighthouse(address);
-        const jwt = await createJWTToken();
+        const jwt = await createJWTToken(address);
         
         console.log(api)
         console.log(jwt)

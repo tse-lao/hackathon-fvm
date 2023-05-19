@@ -16,7 +16,6 @@ export default function FileList({ address }) {
 
     useEffect(() => {
         
-        
         const getFiles = async () => {
             setLoading(true)
             const uploads = await lighthouse.getUploads(address);
