@@ -84,7 +84,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       
       
     }
-    toast.success("Thank you for your contribution, now lets enjoy the rewards together!")
+    
     setStatus("active")
 
   }

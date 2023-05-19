@@ -27,9 +27,11 @@ export async function shareFile(cid, creator, address) {
 
   // Then get auth message and sign
   // Note: the owner of the file should sign the message.
-  localStorage.getItem(`lighthouse-jwt-${address}`);
+  let jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
   
-  const jwt = await createJWTToken();
+  if(jwt) {
+    jwt = await createJWTToken(address);
+  }
 
   const publicVerifier = "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"
 

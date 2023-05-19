@@ -98,8 +98,12 @@ export default function UploadModal({ onClose }) {
         await MatchRecord(list, authToken.data.access_token)
           
         setLoading(false)
+        onClose()
 
     }
+    
+    
+    
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -172,10 +176,13 @@ export default function UploadModal({ onClose }) {
         //here we somehow need to create a new file from the encrypted file and upload it. 
         await uploadCarFile(dataDepo, progressCallback, authToken.data.access_token);
         
+        await sleep(1000);
          await MatchRecord(list, authToken.data.access_token)
       
             
           setLoading(false)
+          
+          onClose();
     }
     
 
