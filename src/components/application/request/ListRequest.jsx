@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import LoadingIcon from "../elements/loading/LoadingIcon";
 import Filters from "../overlay/Filters";
 import RequestElement from "./RequestElement";
 
@@ -9,17 +10,19 @@ export default function ListRequest() {
     useEffect(() => {
 
         const getData = async() => {
+          setLoading(true)
           const result = await fetch(`/api/tableland/token/all?request=false`);
           const data = await result.json()
-            console.log(data)
           setData(data.result)
+          
+          setLoading(false)
         }
         
         getData();
     }, [])
     
       
-    
+    if(loading) return <LoadingIcon />
     return (
       <div className="flex flex-col">      
       <Filters name="Data Requests"/>

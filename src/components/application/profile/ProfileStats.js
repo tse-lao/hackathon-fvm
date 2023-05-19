@@ -22,7 +22,7 @@ export default function ProfileStats({ address }) {
           total: formatBytes(balance.data.dataLimit)
         })
 
-      const res = await fetch(`/api/tableland/contributions/count?creator=${address}`);
+      const res = await fetch(`/api/tableland/contributions/count?creator=${address.toLowerCase()}`);
       const data = await res.json();
       console.log(data.result)
 

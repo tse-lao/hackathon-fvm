@@ -26,7 +26,7 @@ export default function Contributions({creator}) {
     
     if(loading) return (<LoadingSpinner msg="Loading Contributions" />);
   return (
-    <div className="flex flex-row flex-wrap gap-4 mt-8">
+    <div className="grid md:grid-cols-2 flex-wrap gap-4 mt-8">
         {data.length > 0 ? data.map((item, index) => (
             <ContributionItem key={index} contribution={item} />
         )) : (
