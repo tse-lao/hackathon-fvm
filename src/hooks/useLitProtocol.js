@@ -133,7 +133,7 @@ export async function retrieveMergeCID(tokenID, creator) {
   const getToken = await createJWTToken(creator);
   const apiKey = await getLighthouse(creator);
 
-  const url = process.env.API_ENDPOINT || "http://localhost:4000";
+  const url = "https://apollo-server-gateway.herokuapp.com/";
 
   const query = `
     query Query($tokenId: String, $jwtToken: String, $creator: String, $apiKey: String) {

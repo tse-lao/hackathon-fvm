@@ -114,7 +114,7 @@ export default function GenerateDataset({ tokenId, onClose }) {
                         </span>
                     ) :
                         splitterContract && 
-                            loading ?<LoadingIcon /> : (
+                            loading ?<LoadingIcon  height={64} /> : (
                             <div className='flex flex-col gap-2'>
                                 <span className='text-sm text-gray-600'>
                                     We will be merging the CID's of the contributors in order to create a new CID that will be used to mint the NFT.
@@ -134,7 +134,7 @@ export default function GenerateDataset({ tokenId, onClose }) {
                     </h2>
                     {mergedCID && splitterContract && (
                         <div className='flex flex-col gap-2'>
-                        { loading &&  <LoadingIcon height={64}/> }
+                        { loading &&  <LoadingIcon  height={64} /> }
                             <span>
                                 Now we have everything prepared for the minting of the NFT, please set a price for the NFT and starting preparing the dataset for distribution
                             </span>
