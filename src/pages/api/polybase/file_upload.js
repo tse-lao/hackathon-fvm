@@ -92,6 +92,14 @@ async function uploadRecord(record) {
 
         const cidHexRaw = new CID(record.carRecord.pieceCid).toString('base16').substring(1)
         const cidHex = "0x00" + cidHexRaw
+        
+        if(!record.carRecord && !record.carRecord.userName && !record.carRecord.id && !record.carRecord.pieceCid && !record.carRecord.payloadCid){
+            reject("Invalid Car Record")
+        }
+        
+        if(record.name == null && record.cid == null && record.metadata == null && record.type == null){
+            reject("Invalid Record")
+        }
 
         try {
             // constructor(id: string,name:string,  cid: string, metadata:string, categories: string[], type: string,  addedAt: string, owner: string, carId: string, carPieceCid: string, carPayload: string, cidHex: string){
