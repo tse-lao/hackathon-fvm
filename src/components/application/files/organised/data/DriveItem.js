@@ -17,8 +17,8 @@ export default function DriveItem({ file }) {
 
   return (
     <>
-    <div className='flex flex-col'>
-      <div className="flex justify-between items-center p-4 bg-white border rounded-md shadow-sm cursor-pointer hover:bg-gray-50" key={file.id}>
+    <div className='flex flex-col mb-2 p-4 bg-white border rounded-md shadow-sm  hover:bg-gray-50'>
+      <div className="flex justify-between items-centercursor-pointer" key={file.id}>
       <div className="flex items-center space-x-4">
         <div className="p-2 bg-gray-200 rounded-full">
           {file.type === null ? (
@@ -35,6 +35,7 @@ export default function DriveItem({ file }) {
       </div>
       <div>
           <button
+          className='px-4 py-2 text-sm font-medium text-indigo-600 rounded-md z-index-5'
           onClick={handleClick}
           >
           Show more
@@ -53,8 +54,9 @@ export default function DriveItem({ file }) {
             <DetailItem label="Car ID" value={file.carId} />
             <DetailItem label="CID" value={file.cid} />
             <DetailItem label="Metadata" value={file.metadata} />
-          
           </div>
+          
+          
         </div>
       )}
       </div>

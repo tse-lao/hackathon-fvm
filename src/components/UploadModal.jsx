@@ -1,7 +1,7 @@
 
 import { createJWTToken, getUploads, uploadCarFile } from '@/hooks/useLighthouse';
 import { getLighthouse, uploadMetaData } from '@/lib/createLighthouseApi';
-import { analyzeJSONStructure, getMetadataCID, readJSONFromFileInput } from '@/lib/dataHelper';
+import { getMetadataFromFile } from '@/lib/dataHelper';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
 import lighthouse from '@lighthouse-web3/sdk';
 import { useState } from 'react';
@@ -75,17 +75,7 @@ export default function UploadModal({ onClose }) {
             let metadata = "";
 
             if (mockEvent.target.files[i].type == "application/json") {
-
-                readJSONFromFileInput(mockEvent.target, async (error, jsonData) => {
-                    if (error) {
-                        console.error(error);
-                    } else {
-                        const format = analyzeJSONStructure(jsonData);
-                        const cid = await uploadMetadata(JSON.stringify(format));
-                        console.log(cid);   
-                        metadata = cid;
-                    }
-                });
+                metadata = await getMetadataFromFile(mockEvent.target);
             }
 
 
@@ -160,17 +150,7 @@ export default function UploadModal({ onClose }) {
             } catch (e) {   toast.error(e.message)}
 
             if (mockEvent.target.files[0].type === "application/json") {
-                readJSONFromFileInput(mockEvent.target, async (error, jsonData) => {
-                    if (error) {
-                        console.error(error);
-                    } else {
-
-                        const format = analyzeJSONStructure(jsonData);
-
-                        const result = await getMetadataCID(JSON.stringify(format));
-                        metadata = result;
-                    }
-                });
+                metadata = await getMetadataFromFile(mockEvent.target);
             }
             const file = {
                 name: mockEvent.target.files[0].name,
@@ -224,9 +204,6 @@ export default function UploadModal({ onClose }) {
         
           setLoading(false)
           window.location.reload();
-
-        /* getMetadataFromFile(carFile);
-        console.log(carFile); */
     }
     
 

@@ -190,9 +190,12 @@ export function readJSONFromFileInput(fileInput, callback) {
     }
   });
 
+
   // Read the file as text using the reader
   reader.readAsText(file);
 }
+
+
 
 export function readFSStream(file) {
   return new Promise((resolve, reject) => {
@@ -216,6 +219,7 @@ export function readFSStream(file) {
 }
 
 export async function getMetadataFromFile(file) {
+  const readfile = file.files[0];
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -224,6 +228,7 @@ export async function getMetadataFromFile(file) {
         const json = JSON.parse(reader.result);
         const metadata = analyzeJSONStructure(json);
         const result = await getMetadataCID(metadata);
+        
         resolve(result);
       } catch (error) {
         toast.error(error);
@@ -235,7 +240,7 @@ export async function getMetadataFromFile(file) {
       reject(new Error('Error reading file'));
     });
 
-    reader.readAsText(file);
+    reader.readAsText(readfile);
   });
 }
 
