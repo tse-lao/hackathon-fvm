@@ -31,7 +31,7 @@ export default async (req, res) => {
               )
             FROM ${DB_main} JOIN ${DB_attribute}
                 ON ${DB_main}.tokenID = ${DB_attribute}.tokenID
-                ${req.query.request ? ` WHERE ${DB_main}.piece_cid != 'piece_cid'` : ''}  
+                ${!req.query.request ? ` WHERE ${DB_main}.piece_cid != 'piece_cid'` : ''}  
             GROUP BY ${DB_main}.tokenID`,
         extract: true, format: "objects", unwrap: false
         });
