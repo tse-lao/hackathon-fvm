@@ -2826,7 +2826,7 @@ blockstore-core@^3.0.0:
     it-take "^2.0.0"
     multiformats "^11.0.0"
 
-bls-eth-wasm@^1.0.4, bls-eth-wasm@^1.0.5:
+bls-eth-wasm@^1.0.4, bls-eth-wasm@^1.0.5, bls-eth-wasm@^1.0.6:
   version "1.0.6"
   resolved "https://registry.npmjs.org/bls-eth-wasm/-/bls-eth-wasm-1.0.6.tgz"
   integrity sha512-XDXNaxd6CGHLLprfhbr2Yb1ctylIalDvfO28Tepk+Fa/cTEYqNAJq51hdV55PY34u9R1UX/f4RHQJAj/CPG3NA==
