@@ -228,14 +228,8 @@ function downloadBlob(blob, fileName) {
   }, 1000); // Delay in milliseconds (adjust as needed)
 }
 export async function countRows(cid, jwt, address){
-  // Here you continue the function in the backend
-  // ... Run your backend function and assign the result to `result` variable
-  // Return the result
-  const {cid, jwt, address }= req.query;
-  
-  //we decrypt the file and then count it 
-  
-  console.log(cid, jwt, address)
+
+
 
   const keyObject = await lighthouse.fetchEncryptionKey(
       cid,
