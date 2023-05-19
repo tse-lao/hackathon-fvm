@@ -44,7 +44,6 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       return;
     };
 
-    
 
     for (let i = 0; i < selectedOptions.length; i++) {
       setCoutner(i+1)
@@ -61,7 +60,6 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       
       const jwt = await createJWTToken(address);
       const count = await countRows(cid, jwt, address);
-
       
       if(count < minRows){
         toast.error("Error: This CID does not contain enough rows to be used for training the model");
@@ -75,9 +73,8 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       setStatus(RECORD_CONTRIBUTION)
       try {
         submitData(tokenID, selectedOptions[i], count.toString(), getData.v, getData.r, getData.s);
-        toast.success("Access granted!")
-        //also want toa dd to db            
-      } catch (e) {
+        toast.success("Access granted!")          
+      }catch (e) {
         console.log(e)
         toast.error(e.message)
       }

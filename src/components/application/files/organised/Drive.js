@@ -7,7 +7,7 @@ import DriveItem from "./data/DriveItem";
 export default function Drive({address}) {
   const polybase = usePolybase();
   const { data, error, loading } =
-    useCollection(polybase.collection("File").where("owner", "==", address.toLowerCase()));
+    useCollection(polybase.collection("File").where("owner", "==", address.toLowerCase()).sort("addedAt", "desc"));
     
     useEffect(() => {
         console.log(address);
@@ -18,9 +18,6 @@ export default function Drive({address}) {
   if(error) return <p>Error: {error.message}</p>
     
   return (
-
-    <div>
-
         <div className="mt-8 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -40,6 +37,6 @@ export default function Drive({address}) {
             </div>
         </div>
     </div>
-    </div>
+
   );
 }

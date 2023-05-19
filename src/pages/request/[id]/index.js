@@ -203,8 +203,8 @@ export default function GetRequestDetails() {
               </section>
 
 
-            {/* Comments*/}
-            <section aria-labelledby="notes-title">
+            <section aria-labelledby="contributions">
+              <h2 className="font-bold text-lg text-gray-600 mb-2"> {totalContributions +1 }  Contributions </h2>
               <div className="bg-white shadow sm:overflow-hidden sm:rounded-lg">
                 <div className="divide-y divide-gray-200">
                   <div className="p-0">
