@@ -5,7 +5,6 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
 import { Logo } from './Logo'
-import Avatar from './application/elements/Avatar'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -111,16 +110,6 @@ export default function Navigation({ active }) {
                       border="none"
                       
                     />
-                  </div>
-                  <div>
-                  
-                    <Menu.Button className="flex rounded-full bg-white">
-                      <span className="sr-only">Open user menu</span>
-                      <div className="h-8 w-8 rounded-full">
-                        {mounted && <Avatar size={6} className="rounded-full" address={address} />}
-                      </div>
-                    </Menu.Button>
-
                   </div>
                 </Menu>
 

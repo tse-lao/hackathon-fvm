@@ -1,5 +1,6 @@
 import Avatar from '@/components/application/elements/Avatar'
 import Tabs from '@/components/application/elements/Tabs'
+import LoadingIcon from '@/components/application/elements/loading/LoadingIcon'
 import Contributions from '@/components/application/profile/Contributions'
 import ProfileDataSets from '@/components/application/profile/ProfileDataSets'
 import ProfileStats from '@/components/application/profile/ProfileStats'
@@ -27,31 +28,30 @@ export default function Profile() {
     const mounted = useIsMounted()
 
   useEffect(() => {
-    if (address) {
+    if (address && mounted) {
       setLoading(false)
     }
-  }, [address])
-    const setSelected = (tab) => {
+  }, [address, mounted])
+  
+  
+  const setSelected = (tab) => {
         setSelect(tab)
         mounted && setLoading(false)
     }
     
     
   if(address === undefined) { return <Layout active="Dashboard"><div className="text-center">Please connect your wallet</div></Layout>}
-  if(loading) { return <div>Loading...</div> }
+  if(loading) { return <LoadingIcon /> }
     
   return (
     <Layout active="Dashboard">
-    
         <ProfileStats address={address} />
         <div className='bg-white rounded-sm flex items-center py-6 px-12 mt-12'>
-            <div className='mr-12'>
-              {address && <Avatar size="16" creator={address} />}
-            </div>
-
+            {address && <Avatar height={64} className='mr-12' creator={address} />}
+              
             <div>
             <span className='text-sm text-gray-600 mt-2 uppercase'>Welcome</span>
-            <h1 className='text-lg font-bold leading-7 text-gray-700'>{address}</h1>
+            <h1 className='text-lg font-bold leading-7 text-gray-700'>{address && address}</h1>
             </div>
             
         </div>

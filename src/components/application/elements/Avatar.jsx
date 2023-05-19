@@ -1,4 +1,4 @@
-"use client"
+
 import Blockies from 'react-blockies';
 export default function Avatar({height, size, creator}) {
 

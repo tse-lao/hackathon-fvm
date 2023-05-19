@@ -1,3 +1,4 @@
+"use client"
 import { formatBytes } from '@/lib/helpers';
 import lighthouse from '@lighthouse-web3/sdk';
 import { ethers } from 'ethers';
@@ -44,9 +45,9 @@ export default function ProfileStats({ address }) {
       //get current ETH balance
       setStats(newStats)
     }
-    if (address) {
+    
       getBalance()
-    }
+    
   }, [address])
 
 

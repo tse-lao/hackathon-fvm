@@ -58,10 +58,11 @@ export default function ViewFile() {
                 readContent(status.data.mimeType, file);
             }
             
-            console.log(data.data[0].data.carPayload)
-            const deal = await fetch(`/api/tableland/request?cid=${data.data[0].data.carPayload}`)
-            const dealData = await deal.json();
-            console.log(dealData)
+            if(data != null){
+                const deal = await fetch(`/api/tableland/request?cid=${data.data[0].data.carPayload}`)
+                const dealData = await deal.json();
+                console.log(dealData);       
+            }
         }
 
         if (cid) { getFile(); setLoading(false) }
@@ -211,7 +212,6 @@ export default function ViewFile() {
 
                         {/* Sidebar */}
                         <div className="w-120 p-4 w-[350px] bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">
-                        <pre>{data && JSON.stringify(data.data[0].data, null, 2)}</pre>
                             <FileDetailInformation detail={fileInfo} className="mt-4 mb-4" cid={cid} address={address} />
                             <FileSharedWith detail={fileInfo} />
                         </div>

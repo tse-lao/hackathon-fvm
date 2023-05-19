@@ -188,7 +188,7 @@ export default function GetRequestDetails() {
                       <div className="sm:col-span-2">
                         <dt className="text-sm font-medium text-gray-500">Metadata Format</dt>
                         <dd className="mt-1 text-sm text-gray-900 overflow-scroll">
-                            <Link href={`/metadata/${data.result.metadataFormatCID}`} className="hover:text-cf-600">
+                            <Link href={`/metadata/${data.result.dataFormatCID}`} className="hover:text-cf-600">
                               {data.result.dataFormatCID}
                             </Link>
                         </dd>
@@ -218,9 +218,8 @@ export default function GetRequestDetails() {
 
           <section aria-labelledby="timeline-title" className="lg:col-span-1 lg:col-start-3">
             <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-
               {showGrant ? (
-                <GrantAccess tokenID={data.result.tokenID} setShowGrant={setShowGrant} address={address} creator={data.creator} minRows={data.result.minimumRowsOnSubmission} />
+                <GrantAccess tokenID={data.result.tokenID} setShowGrant={setShowGrant} address={address} creator={data.creator} minRows={data.result.minimumRowsOnSubmission} metadataCID={data.result.dataFormatCID} />
               ) : (
                 <div>
                   <h2 id="timeline-title" className="text-lg font-medium text-gray-900">
