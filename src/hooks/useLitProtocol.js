@@ -87,9 +87,9 @@ export async function recoverAddress(dataCID) {
 }
 
 export async function validateInput(tokenID, cid, rows) {
-  const url = "http://localhost:4000"
 
-  const pUrl = "https://apollo-server-gateway.herokuapp.com/"
+
+  const url = "https://apollo-server-gateway.herokuapp.com/"
 
   const query = `
     query VerifyCID($tokenId: String!, $cid: String!, $rows: Int!) {

@@ -187,7 +187,7 @@ export default function GetRequestDetails() {
                       </div>
                       <div className="sm:col-span-2">
                         <dt className="text-sm font-medium text-gray-500">Metadata Format</dt>
-                        <dd className="mt-1 text-sm text-gray-900 overflow-scroll">
+                        <dd className="mt-1 text-sm text-gray-900 truncate">
                             <Link href={`/metadata/${data.result.dataFormatCID}`} className="hover:text-cf-600">
                               {data.result.dataFormatCID}
                             </Link>
