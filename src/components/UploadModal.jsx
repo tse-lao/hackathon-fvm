@@ -1,4 +1,5 @@
 
+import MatchRecord from '@/hooks/useBlockchain';
 import { createJWTToken, uploadCarFile } from '@/hooks/useLighthouse';
 import { getLighthouse, uploadMetaData } from '@/lib/createLighthouseApi';
 import { getMetadataFromFile } from '@/lib/dataHelper';
@@ -179,17 +180,11 @@ export default function UploadModal({ onClose }) {
         //here we somehow need to create a new file from the encrypted file and upload it. 
         const uploadCar = await uploadCarFile(dataDepo, progressCallback, authToken.data.access_token);
         
-         const response = await fetch('/api/polybase/file_upload', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ list, accessToken: authToken.data.access_token }),
-          }); 
+         const response = await MatchRecord(list, authToken.data.access_token)
       
-          const result = await response.json();
           console.log(result)
-        
+            
+          onClose();
           setLoading(false)
     }
     
