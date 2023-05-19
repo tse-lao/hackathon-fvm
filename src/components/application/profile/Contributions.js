@@ -11,7 +11,7 @@ export default function Contributions({creator}) {
 
         const getData = async () => {
             console.log(creator)
-            const result = await fetch(`/api/tableland/contributions?creator=${creator}`)
+            const result = await fetch(`/api/tableland/contributions?creator=${creator.toLowerCase()}`)
             const data = await result.json()
             console.log(data);
             

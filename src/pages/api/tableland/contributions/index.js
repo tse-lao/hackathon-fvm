@@ -5,7 +5,7 @@ export default async (req, res) => {
     var whereStatement = ""
     for(var key in req.query) {
         if(whereStatement == "") {
-            whereStatement = `WHERE ${key} = '${req.query[key].toLowerCase()}' `
+            whereStatement = `WHERE ${key} = '${req.query[key]}' `
         }
         else {
             whereStatement = whereStatement + ` AND ${key} = '${req.query[key]}' `
