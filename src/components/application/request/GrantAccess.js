@@ -60,9 +60,8 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       setStatus(COUNTING_ROWS);
       
       const jwt = await createJWTToken(address);
-      const res = await countRows(cid, jwt, address);
-      const count = await res.json();
-      console.log(count)
+      const count = await countRows(cid, jwt, address);
+
       
       if(count < minRows){
         toast.error("Error: This CID does not contain enough rows to be used for training the model");

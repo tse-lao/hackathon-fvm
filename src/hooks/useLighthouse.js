@@ -1,4 +1,5 @@
 import { DB_NFT_address } from '@/constants/contractAddress';
+import { readBlobAsJson } from '@/lib/dataHelper';
 import { getCurrentDateAsString } from '@/lib/helpers';
 import { getJWT } from '@lighthouse-web3/kavach';
 import lighthouse from '@lighthouse-web3/sdk';
@@ -228,9 +229,6 @@ function downloadBlob(blob, fileName) {
   }, 1000); // Delay in milliseconds (adjust as needed)
 }
 export async function countRows(cid, jwt, address){
-
-
-
   const keyObject = await lighthouse.fetchEncryptionKey(
       cid,
       address,
@@ -238,10 +236,7 @@ export async function countRows(cid, jwt, address){
     );
 
   const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
-  console.log(decrypted);
-  let decoder = new TextDecoder('utf8');
-  let jsonString = decoder.decode(decrypted);
-  let jsonData = JSON.parse(jsonString);
+  const jsonData = await readBlobAsJson(decrypted);
   
   let count = jsonData.length;
   console.log(count)
