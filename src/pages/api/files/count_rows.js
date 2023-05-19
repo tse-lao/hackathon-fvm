@@ -8,6 +8,8 @@ export default async (req, res) => {
     const {cid, jwt, address }= req.query;
     
     //we decrypt the file and then count it 
+    
+    console.log(cid, jwt, address)
 
     const keyObject = await lighthouse.fetchEncryptionKey(
         cid,

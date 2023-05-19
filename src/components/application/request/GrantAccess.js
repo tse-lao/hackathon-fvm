@@ -1,5 +1,5 @@
 import { useContract } from "@/hooks/useContract";
-import { createJWTToken, shareFile } from "@/hooks/useLighthouse";
+import { countRows, createJWTToken, shareFile } from "@/hooks/useLighthouse";
 import { validateInput } from "@/hooks/useLitProtocol";
 import { useDocument, usePolybase } from "@polybase/react";
 import { useState } from "react";
@@ -60,7 +60,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       setStatus(COUNTING_ROWS);
       
       const jwt = await createJWTToken(address);
-      const res = await fetch(`/api/files/count_rows?cid=${cid}&jwt=${jwt}&address=${address}`);
+      const res = await countRows(cid, jwt, address);
       const count = await res.json();
       console.log(count)
       
