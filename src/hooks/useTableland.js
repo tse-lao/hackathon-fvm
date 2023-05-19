@@ -106,7 +106,7 @@ const getRequestData = (tokenID) => {
 
 
 const getContributionSplit = (tokenID) => {
-  const url = "http://localhost:4000"
+  const url = process.env.API_ENDPOINT || "http://localhost:4000";
   const query = `
         query GetContributors($tokenId: String) {
           getContributors(tokenID: $tokenId) {

@@ -2,6 +2,7 @@ import Contributions from "@/components/application/data/Contributions";
 import LoadingSpinner from "@/components/application/elements/LoadingSpinner";
 import GrantAccess from "@/components/application/request/GrantAccess";
 import DataFormatPreview from "@/components/marketplace/DataFormatPreview";
+import GenerateDataset from "@/components/marketplace/GenerateDataset";
 import { DB_main } from '@/constants';
 import { useContract } from "@/hooks/useContract";
 import { getSignature, retrieveMergeCID } from "@/hooks/useLitProtocol";
@@ -15,10 +16,6 @@ import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
 export default function GetRequestDetails() {
   const router = useRouter();
   const { id } = router.query;
@@ -26,7 +23,7 @@ export default function GetRequestDetails() {
   const { address } = useAccount();
   const [data, setData] = useState(null);
   const [showGrant, setShowGrant] = useState(true);
-  const [creator, setCreator] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalContributions, setTotalContributions] = useState(0);
 
   const { CreateSpitter, createDB_NFT } = useContract();
@@ -43,21 +40,18 @@ export default function GetRequestDetails() {
       const result2 = await fetch(`/api/tableland/contributions/count?tokenID=${id}`);
       const data2 = await result2.json();
       setTotalContributions(data2)
+      setLoading(false)
       
 
     }
-    if (id) { getData(); setLoading(false) };
+    if (id) { getData();};
   }, [id])
 
 
   const mintNFT = async () => {
-
-
-    //
-
+    
+    //Getting splitter and create the spliitter contract.
     const contributors = await getContributionSplit(tokenId);
-
-
     try {
       const hash = await CreateSpitter(address, contributors.contributors, contributors.percentage);
       console.log(hash);
@@ -127,12 +121,14 @@ export default function GetRequestDetails() {
     {data && (
       <main className="py-10">
         {/* Page header */}
+        {isModalOpen && <GenerateDataset tokenId={id} onClose={() => setIsModalOpen(false)}/>}
+        
       
         <div className="mx-auto max-w-3xl px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
           <div className="flex items-center space-x-5">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{data.result.dbName}</h1>
-              <Link href={`/profile/${creator}`} className="text-sm font-medium text-gray-500 hover:text-cf-500">
+              <Link href={`/profile/${data.creator}`} className="text-sm font-medium text-gray-500 hover:text-cf-500">
                 {data.creator && (data.creator)}
               </Link>
             </div>
@@ -142,11 +138,11 @@ export default function GetRequestDetails() {
             {data.creator && address && data.creator.toLowerCase() == address.toLowerCase() && (
               <button
                 type="button"
-                onClick={mintNFT}
+                onClick={() => setIsModalOpen(!isModalOpen)}
                 className="inline-flex items-center justify-center flex-col rounded-md bg-cf-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cf-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-              >
-                <div><span>{totalContributions}/{data.result.requiredRows}</span></div>
-                <div>Start Minting</div>
+                disabled={totalContributions < data.result.requiredRows}
+                >
+                <div className="text-sm"><span className="foint-md">{totalContributions}/{data.result.requiredRows}</span> Prepare DB</div>
               </button>
 
             )}
