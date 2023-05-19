@@ -65,6 +65,8 @@ const wagmiClient = createClient({
 
 
 
+
+
 export default function App({ Component, pageProps }) {
   return (
     <PolybaseProvider polybase={db}>

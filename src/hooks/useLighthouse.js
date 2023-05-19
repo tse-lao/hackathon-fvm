@@ -93,7 +93,7 @@ export async function grantSmartAccess(cid, tokenID, minRows) {
 
 export async function createJWTToken(address) {
   
-  const jwt = localStorage.getItem(`light-jwt-${address}`);
+  const jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
   
   if(jwt) { 
     return jwt;
@@ -103,7 +103,7 @@ export async function createJWTToken(address) {
 
   const response = await getJWT(publicKey, signedMessage);
   
-  localStorage.setItem(`light-jwt-${address}`, response.JWT);
+  localStorage.setItem(`lighthouse-jwt-${address}`, response.JWT);
 
   return response.JWT;
 }

@@ -214,13 +214,11 @@ const changeStatus = (status) => {
 const removeSelect = (index) => {
     const newFiles = files.filter((_, i) => i !== index);
     setFiles(newFiles);
-    toast.success("File removed" + index);
-
 }
 
 
 return (
-    <ModalLayout onClose={onClose}>
+    <ModalLayout onClose={onClose} title="Upload Files">
 
         <div className="py-4 sm:gap-4 sm:py-5">
 
@@ -228,11 +226,28 @@ return (
                 {loading ? <LoadingSpinner msg="Uploading files.. " />: (
                     
                 
-                <ul role="list" className="divide-y divide-gray-200 rounded-md border border-gray-200">
-                    
-                    <li className="flex items-center justify-between py-3 pl-3 pr-4 text-sm bg-white dark:bg-gray">
+                <ul role="list" className="divide-y divide-gray-200 rounded-md border border-gray-800 max-h-[400px] overflow-auto">
+                {files.map((file, index) => (
+                    <li key={file.name} className="flex items-center justify-between py-3 pl-3 pr-4 text-sm bg-white dark:bg-gray">
+                        <div className="flex w-0 flex-1 items-center">
+                            <PaperClipIcon className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                            <span className="ml-2 w-0 flex-1 truncate">{file.name}</span>
+                        </div>
+                        <div className="ml-4 flex flex-shrink-0 space-x-4">
+                            <button
+                                type="button"
+                                onClick={e => { removeSelect(index) }}
 
-                        <span className="ml-2 w-0 flex-1 truncate">
+                                className="rounded-md bg-white font-medium text-indigo-600 hover:text-red-500 "
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    </li>
+                ))}
+                    <li className="flex items-center justify-between py-2 pl-2 pr-4 text-sm bg-white dark:bg-gray hover:bg-cf-200">
+
+                        <span className="ml-2 w-0 flex-1 truncate ">
                             <input
                                 type="file"
                                 id="image"
@@ -248,24 +263,7 @@ return (
                     </li>
 
 
-                    {files.map((file, index) => (
-                        <li key={file.name} className="flex items-center justify-between py-3 pl-3 pr-4 text-sm bg-white dark:bg-gray">
-                            <div className="flex w-0 flex-1 items-center">
-                                <PaperClipIcon className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-                                <span className="ml-2 w-0 flex-1 truncate">{file.name}</span>
-                            </div>
-                            <div className="ml-4 flex flex-shrink-0 space-x-4">
-                                <button
-                                    type="button"
-                                    onClick={e => { removeSelect(index) }}
-
-                                    className="rounded-md bg-white font-medium text-indigo-600 hover:text-red-500 "
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        </li>
-                    ))}
+                    
 
 
                 </ul>
@@ -279,19 +277,12 @@ return (
         <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-4">
             <button
                 type="button"
-                className="mt-3 inline-flex w-full justify-center rounded-md bg-cf-500 text-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-cf-600 hover:bg-cf-300 sm:mt-0 sm:w-auto"
+                className=" mt-3 inline-flex w-full justify-center rounded-md bg-cf-500 text-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-cf-600 hover:bg-cf-300 sm:mt-0 sm:w-auto"
                 onClick={startUpload}
             >
-                Upload
+                Upload [{files.length}] files
             </button>
 
-            <button
-                type="button"
-                className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-400 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                onClick={onClose}
-            >
-                Cancel
-            </button>
         </div>
     </ModalLayout>
 )
