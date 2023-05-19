@@ -210,7 +210,7 @@ export async function mintNFTDB (tokenID, txHash,  creator, mintPrice) {
 
 export async function getSignature(message){
   
-  const url = "http://localhost:4000"
+  const url = "https://apollo-server-gateway.herokuapp.com/"
   
   const query = `
   query SignMessage($message: String) {
