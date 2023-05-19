@@ -1,6 +1,5 @@
 import Link from "next/link";
-import StackedLabels from "../elements/StackedLabels";
-
+import Category from "../elements/Category";
 export default function RequestElement({ index, request }) {
   return (
     <Link
@@ -13,9 +12,11 @@ export default function RequestElement({ index, request }) {
             <h3 className="text-xl font-semibold mb-2 group-hover:text-indigo-500">{request.dbName}</h3>
           </div>
           <div className="px-6 pt-4 pb-2 ">
+
         
-            {request.attributes && (
-              <StackedLabels labels={request.attributes} />
+            {request.attributes && 
+              request.attributes.map((item, index) => 
+              <Category key={index} category={item.value} />
             )}
           </div>
         </div>

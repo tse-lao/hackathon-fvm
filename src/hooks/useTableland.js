@@ -1,6 +1,5 @@
 import { DB_attribute, DB_main, data_contribution } from '../constants/tableland';
 
-//const url = "http://localhost:4000";
 
 const fetchTokenRequest = (tokenID) => {
   return new Promise(async (resolve, reject) => {
@@ -106,7 +105,7 @@ const getRequestData = (tokenID) => {
 
 
 const getContributionSplit = (tokenID) => {
-  const url = process.env.API_ENDPOINT || "http://localhost:4000";
+  const url = "https://apollo-server-gateway.herokuapp.com/"
   const query = `
         query GetContributors($tokenId: String) {
           getContributors(tokenID: $tokenId) {
