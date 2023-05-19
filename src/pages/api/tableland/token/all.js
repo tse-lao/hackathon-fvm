@@ -55,16 +55,6 @@ export default async (req, res) => {
                     result[i].attributes.splice(j, 1)
                     j--
                 }
-                if(result[i].attributes[j].trait_type == "creator"){
-                    result[i].creator = result[i].attributes[j].value
-                    result[i].attributes.splice(j, 1)
-                    j--
-                }
-                if(result[i].attributes[j].trait_type == "mintPrice"){
-                    result[i].mintPrice = result[i].attributes[j].value
-                    result[i].attributes.splice(j, 1)
-                    j--
-                }
                 
             }
                 

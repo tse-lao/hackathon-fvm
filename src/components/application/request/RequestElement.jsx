@@ -15,8 +15,8 @@ export default function RequestElement({ index, request }) {
 
         
             {request.attributes && 
-              request.attributes.map((item, index) => 
-              <Category key={index} category={item.value} />
+              request.categories.map((item, index) => 
+              <Category key={index} category={item} />
             )}
           </div>
         </div>
