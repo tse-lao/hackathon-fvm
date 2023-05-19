@@ -23,12 +23,12 @@ export async function getNfts(address) {
 }
 
 // Decrypt file nodejs
-import lighthouse from "@lighthouse-web3/sdk"
 import { Polybase } from '@polybase/client'
 import { ethPersonalSign } from "@polybase/eth"
 import CID from 'cids'
 import { ethers } from 'ethers'
 import { v4 as uuidv4 } from "uuid"
+import { getUploads } from "./useLighthouse"
 
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 async function signInPolybase() {
@@ -57,19 +57,28 @@ async function signInPolybase() {
 export default async function MatchRecord(list, accessToken) {
 
 
-    let carRecords = null;
+    let carRecords = [];
 
     try {
 
-        const result = await lighthouse.viewCarFiles(1, accessToken)
-        
-        
-        carRecords = result.data;
-        console.log(result)
+        //loop over all of it 
+
+        let page = 1
+        while(page < 4){
+            const result = await getUploads(accessToken, page)
+            if(result.length == 0){
+                break;
+            }
+            carRecords = [...carRecords, ...result]
+            page++
+        }
+
     } catch (error) {
         console.log(error)
         return  { message: 'Error collection car Files.' };
     }
+    
+    console.log(carRecords)
 
     try {
         let results = [];
@@ -103,9 +112,11 @@ async function uploadRecord(record) {
 
         const newId = uuidv4();
         const addedAt = new Date().toISOString();
-
+        console.log(record.carRecord)
         const cidHexRaw = new CID(record.carRecord.pieceCid).toString('base16').substring(1)
         const cidHex = "0x00" + cidHexRaw
+        console.log(cidHex)
+        
         
         if(!record.carRecord && !record.carRecord.userName && !record.carRecord.id && !record.carRecord.pieceCid && !record.carRecord.payloadCid){
             reject("Invalid Car Record")
@@ -129,6 +140,9 @@ async function uploadRecord(record) {
                 record.carRecord.id,
                 record.carRecord.pieceCid,
                 record.carRecord.payloadCid,
+                record.carRecord.pieceSize, 
+                record.carRecord.carSize,
+                record.carRecord.fileSize,
                 cidHex
             ])
 

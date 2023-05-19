@@ -162,12 +162,12 @@ export async function uploadCarFile(
     console.log(`Something Went Wrong : ${error}`, "error");
   }
 };
-export async function getUploads(accessToken) {
+export async function getUploads(accessToken, page) {
   return new Promise(async (resolve, reject) => {
     try {
 
       const sec = "https://data-depot.lighthouse.storage/api"
-      const endpoint = `${sec}/data/get_user_uploads?pageNo=1`
+      const endpoint = `${sec}/data/get_user_uploads?pageNo=${page}`
 
 
       let check = await fetch(endpoint, {
@@ -179,7 +179,6 @@ export async function getUploads(accessToken) {
 
 
       const result = await check.json()
-      console.log(result)
       resolve(result)
 
 

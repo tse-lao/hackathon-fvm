@@ -89,26 +89,13 @@ export default function UploadModal({ onClose }) {
             };
 
             list.push(file);
-
-
         }
-        console.log(list);
-        const uploadCar = await uploadCarFile(files, progressCallback, authToken.data.access_token)
+        
+        await uploadCarFile(files, progressCallback, authToken.data.access_token)
 
-        const response = await fetch('/api/polybase/file_upload', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ list, accessToken: authToken.data.access_token  }),
-          });
-      
-          const result = await response.json();
-          console.log(result)
+        await MatchRecord(list, authToken.data.access_token)
           
-          setLoading(false)
-        console.log(uploadCar)
-        window.location.reload();
+        setLoading(false)
 
     }
 
@@ -178,13 +165,11 @@ export default function UploadModal({ onClose }) {
         console.log(authToken.data.access_token)
         
         //here we somehow need to create a new file from the encrypted file and upload it. 
-        const uploadCar = await uploadCarFile(dataDepo, progressCallback, authToken.data.access_token);
+        await uploadCarFile(dataDepo, progressCallback, authToken.data.access_token);
         
-         const response = await MatchRecord(list, authToken.data.access_token)
+         await MatchRecord(list, authToken.data.access_token)
       
-          console.log(result)
             
-          onClose();
           setLoading(false)
     }
     
