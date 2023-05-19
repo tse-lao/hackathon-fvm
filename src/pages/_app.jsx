@@ -73,7 +73,7 @@ export default function App({ Component, pageProps }) {
     <AuthProvider auth={auth} polybase={db}>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains}>
-
+          
           <Component {...pageProps} />
           <ToastContainer />
         </RainbowKitProvider>
