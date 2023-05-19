@@ -38,7 +38,7 @@ export default function DriveItem({ file }) {
 
         </div>
         {showModal && (
-          <div onClick={() => setShowModal(false)}>
+          <div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <DetailItem label="Owner" value={file.owner} />
               <DetailItem label="Piece CID" value={file.carPieceCid} />

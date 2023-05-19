@@ -157,7 +157,8 @@ export async function getMetadataFromFile(file) {
       try {
         const json = JSON.parse(reader.result);
         const metadata = analyzeJSONStructure(json);
-        const result = await getMetadataCID(metadata);
+        console.log(metadata)
+        const result = await getMetadataCID(JSON.stringify(metadata));
         
         resolve(result);
       } catch (error) {

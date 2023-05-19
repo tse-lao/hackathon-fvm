@@ -1,5 +1,4 @@
 import AttributeTable from '@/components/application/data/AttributeTable';
-import LoadingIcon from '@/components/application/elements/loading/LoadingIcon';
 import DataFormatPreview from '@/components/marketplace/DataFormatPreview';
 import ProductDetailTab from '@/components/marketplace/ProductDetailTab';
 import { DB_main } from '@/constants';
@@ -68,14 +67,13 @@ export default function TokenID() {
     }
   }
 
-  if (loading) return ( <LoadingIcon height={64} msg="Loading..." /> )
+ 
 
   return (
-
     <Layout title="Market" active="Market">
-      <div className="mx-auto px-4 py-6 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+      <div className="mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         {/* Product */}
-        <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
+        <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-5 xl:gap-x-16">
           {/* Product image */}
            {/* Product details */}
            <div className="bg-white p-6 mx-auto mt-14 max-w-2xl sm:mt-16 lg:col-span-3 lg:row-span-2 lg:row-end-2 lg:mt-0 lg:max-w-none">
@@ -148,8 +146,8 @@ export default function TokenID() {
               {detail.dataFormatCID && showDataformat && <DataFormatPreview cid={detail.dataFormatCID} />}
             </div>
           </div>
-          <div className="mx-auto mt-16 w-full max-w-2xl lg:col-span-4 lg:mt-0 lg:max-w-none">
-            <ProductDetailTab />
+          <div className="mx-auto w-full max-w-2xl lg:col-span-4 lg:mt-0 lg:max-w-none">
+            <ProductDetailTab tokenID={id} />
           </div>
         </div>
       </div>

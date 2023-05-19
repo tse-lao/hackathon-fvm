@@ -238,10 +238,6 @@ export async function countRows(cid, jwt, address){
   const jsonData = await readBlobAsJson(decrypted);
   
   let count = jsonData.length;
-  console.log(count)
-  
-  
-  
   
   return count;
 }

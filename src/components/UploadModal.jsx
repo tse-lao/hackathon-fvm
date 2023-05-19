@@ -93,10 +93,15 @@ export default function UploadModal({ onClose }) {
         
         await uploadCarFile(files, progressCallback, authToken.data.access_token)
 
+        await sleep(1000);
+        //time
         await MatchRecord(list, authToken.data.access_token)
           
         setLoading(false)
 
+    }
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 

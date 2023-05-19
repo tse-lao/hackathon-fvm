@@ -96,7 +96,7 @@ const reviews = {
     // More FAQs...
   ]
 
-export default function ProductDetailTab() {
+export default function ProductDetailTab({tokenID}) {
   return (
     <Tab.Group as="div">
     <div className="border-b border-gray-200">
@@ -135,27 +135,24 @@ export default function ProductDetailTab() {
             )
           }
         >
-          License
+          Token Holders
         </Tab>
       </Tab.List>
     </div>
     <Tab.Panels as={Fragment} >
       <Tab.Panel className="-mb-10 bg-white rounded-lg mt-5 max-h-[500px] overflow-auto" >
         <h3 className="sr-only">Contributors</h3>
-
-        <Contributions tokenID="1" />
+        <Contributions tokenID={tokenID} />
       </Tab.Panel>  
-      <Tab.Panel className="pt-10">
+    <Tab.Panel className="pt-10">
       <h3 className="sr-only">Computation Overview</h3>
-
-      <div
-        className="prose prose-sm max-w-none text-gray-500">
-        </div>
+      <div className="prose prose-sm max-w-none text-gray-500">
+        Search for added CID to Job IDS
+      </div>
     </Tab.Panel>
       <Tab.Panel className="pt-10">
-        <h3 className="sr-only">License</h3>
-
-
+        <h3 className="sr-only">Token Holders</h3>
+        
       </Tab.Panel>
     </Tab.Panels>
   </Tab.Group>

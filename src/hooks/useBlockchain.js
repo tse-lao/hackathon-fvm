@@ -51,9 +51,6 @@ async function signInPolybase() {
     // console.log(db);
     return db;
 }
-
-
-
 export default async function MatchRecord(list, accessToken) {
 
 
@@ -101,8 +98,6 @@ export default async function MatchRecord(list, accessToken) {
     }
 
 }
-
-
 async function uploadRecord(record) {
     // logic to upload record to database
     // this is just an example, replace with your own logic
