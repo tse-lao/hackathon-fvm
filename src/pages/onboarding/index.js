@@ -52,6 +52,8 @@ console.log(auth)
     
     localStorage.setItem(`lighthouse-${address}`, response.data.apiKey)
 
+    setApi(response.data.apiKey)
+    setJwt(jwt)
     /* { data: { apiKey: '7d8f3d18.eda91521aa294773a8201d2a7d241a2c' } } */
  }
  

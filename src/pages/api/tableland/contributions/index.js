@@ -5,12 +5,14 @@ export default async (req, res) => {
     var whereStatement = ""
     for(var key in req.query) {
         if(whereStatement == "") {
-            whereStatement = `WHERE ${key} = '${req.query[key]}' `
+            whereStatement = `WHERE ${key} = '${req.query[key].toLowerCase()}' `
         }
         else {
             whereStatement = whereStatement + ` AND ${key} = '${req.query[key]}' `
         } 
     }
+    
+    console.log(whereStatement)
     
     const result = await new Promise(async (resolve, reject) => {
         const url = 'https://testnets.tableland.network/api/v1/query';

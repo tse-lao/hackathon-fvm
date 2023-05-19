@@ -24,11 +24,12 @@ export default function ProfileDataSets({ creator }) {
         {data.length > 0 && data.map((item, index) => (
           <Link key={index} href={`/market/${item.tokenId}`}>
           <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-            <div className="flex flex-col gap-8 items-center">
+            <div className="flex flex-col gap-4 items-center">
+            <span className='text-cf-600 text-sm'>{item.contract.address} </span>
               <span>{item.tokenType} | {item.tokenId} / {item.contract.totalSupply}</span>
-              <span className='text-cf-600 text-sm'>{item.contract.address} </span>
+            
               <div className="ml-4">
-                <time datetime="">{item.timeLastUpdated}</time>
+                <time className='text-gray-500 text-sm'>{item.timeLastUpdated}</time>
               </div>
             </div>
           </div>

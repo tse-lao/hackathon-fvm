@@ -10,8 +10,11 @@ export default function Contributions({creator}) {
     useEffect(() => {
 
         const getData = async () => {
+            console.log(creator)
             const result = await fetch(`/api/tableland/contributions?creator=${creator}`)
             const data = await result.json()
+            console.log(data);
+            
             setData(data.result)
             setLoading(false)
         }

@@ -192,12 +192,13 @@ export async function getUploads(accessToken, page) {
 }
 
 export async function downloadNFT(cid, address, tokenId) {
-  const { signedMessage, publicKey } = await signAuthMessage(address);
+  
+  const jwt = await createJWTToken(address);
 
   const keyObject = await lighthouse.fetchEncryptionKey(
     cid,
-    publicKey,
-    signedMessage
+    address,
+    jwt
   );
 
   const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
@@ -205,6 +206,8 @@ export async function downloadNFT(cid, address, tokenId) {
   const date = getCurrentDateAsString();
 
   const fileName = `token-${tokenId}-${date}.json`;
+  
+  console.log(fileName)
 
   downloadBlob(decrypted, fileName);
 }
@@ -229,6 +232,7 @@ function downloadBlob(blob, fileName) {
     document.body.removeChild(link);
   }, 1000); // Delay in milliseconds (adjust as needed)
 }
+
 export async function countRows(cid, jwt, address){
   const keyObject = await lighthouse.fetchEncryptionKey(
       cid,
