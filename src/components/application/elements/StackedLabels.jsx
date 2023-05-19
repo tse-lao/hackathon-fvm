@@ -1,5 +1,4 @@
 export default function StackedLabels ({ labels }) {
-    console.log(labels)
     return (
       <div className="relative h-10 w-32">
         {labels.map((label, idx) => (

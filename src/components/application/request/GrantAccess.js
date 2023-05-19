@@ -15,7 +15,7 @@ const COUNTING_ROWS = "We are counting the rows of the dataset, this might take 
 
 export default function GrantAccess({ tokenID, metadataCID, address, creator, minRows }) {
   const polybase = usePolybase();
-  const { data, error, loading } = useDocument(polybase.collection("File").where("metadata", "==", metadataCID).where("owner", "==", address));
+  const { data, error, loading } = useDocument(polybase.collection("File").where("metadata", "==", metadataCID).where("owner", "==", address.toLowerCase()));
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [counter, setCoutner] = useState(0);
   const { submitData } = useContract();
@@ -103,7 +103,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       {status == "active" ? (
         <div>
           <div className="divide-y divide-gray-200 max-h-[400px] overflow-auto outline outline-cf-300 rounded-md ring-cf-200">
-            {data.data ? data.data.map((item, index) => (
+            {data.data.length > 0 ? data.data.map((item, index) => (
               <label key={index} className="flex items-center py-4 px-4 hover:bg-gray-100 transition-colors duration-150 cursor-pointer">
                 <input
                   type="checkbox"
