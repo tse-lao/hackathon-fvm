@@ -9,13 +9,14 @@ interface IDealTablelandStorage is IDealClient {
     // function toUpdate(string memory prefix, uint256 tableID,string memory set, string memory filter)external view returns(string memory);
 
     function dealInsertion(
-        string memory piece_cid,
-        uint64 dealID,
+        string memory label,
+        uint256 dealID,
+        uint256 provider,
         string memory status
     ) external;
 
     function requestInsertion(
-        string memory piece_cid,
+        string memory label,
         string memory location_ref,
         uint64 car_size,
         uint64 piece_size,

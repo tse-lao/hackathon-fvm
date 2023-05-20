@@ -24,9 +24,15 @@ export const useContract = () => {
 
   const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
 
-  const crossChainTablelandStorage = new ethers.Contract(
+  const TablelandStorage = new ethers.Contract(
     crossChainTablelandStorageAddress,
     crossChainTablelandStorageAbi,
+    signer!
+  )
+
+  const TablelandDealClient = new ethers.Contract(
+    crossChainTablelandDealClientAddress,
+    crossChainTablelandDealClientAbi,
     signer!
   )
 
@@ -156,55 +162,89 @@ export const useContract = () => {
     return await tx.wait()
   }
 
+  // --------------------------------------------------- Cross Chain Job and Deals ------------------------------------------------------------------------------------------------------
 
-// --------------------------------------------------- Cross Chain Job and Deals ------------------------------------------------------------------------------------------------------
+  // const executeCrossChainBacalhauJob = async (
+  //   input: string,
+  //   _specStart: String,
+  //   _specEnd: string,
+  //   jobId: string
+  // ) => {
+  //   const tx = await crossChainTablelandStorage.executeCrossChainBacalhauJob(
+  //     'filecoin',
+  //     crossChainBacalhauJobs_address,
+  //     input,
+  //     _specStart,
+  //     _specEnd,
+  //     jobId,
+  //     { value: ethers.utils.parseEther("1.5"), gasLimit: 1000000 }
+  //   )
+  //   return await tx.wait()
+  // }
 
-  const executeCrossChainBacalhauJob = async (
-    input: string,
-    _specStart: String,
-    _specEnd: string,
-    jobId: string
-  ) => {
-    const tx = await crossChainTablelandStorage.executeCrossChainBacalhauJob(
-      'filecoin',
-      crossChainBacalhauJobs_address,
-      input,
-      _specStart,
-      _specEnd,
-      jobId,
-      { value: ethers.utils.parseEther("1.5"), gasLimit: 1000000 }
-    )
-    return await tx.wait()
-  }
-
-  const createCrossChainDealRequest = async (
-    piece_cid: string,
-    label: String,
-    piece_size: number,
-    end_epoch: number,
-    location_ref: string,
-    car_size: number
-  ) => {
-    const tx = await crossChainTablelandStorage.createCrossChainDealRequest(
-      'filecoin',
-      crossChainTablelandDealClientAddress,
-      piece_cid,
-      label,
-      piece_size,
-      end_epoch,
-      location_ref,
-      car_size,
-      { value: ethers.utils.parseEther("1.5"), gasLimit: 1000000 }
-    )
-    return await tx.wait()
-  }
-
-
+  // const createCrossChainDealRequest = async (
+  //   piece_cid: string,
+  //   label: String,
+  //   piece_size: number,
+  //   end_epoch: number,
+  //   location_ref: string,
+  //   car_size: number
+  // ) => {
+  //   const tx = await crossChainTablelandStorage.createCrossChainDealRequest(
+  //     'filecoin',
+  //     crossChainTablelandDealClientAddress,
+  //     piece_cid,
+  //     label,
+  //     piece_size,
+  //     end_epoch,
+  //     location_ref,
+  //     car_size,
+  //     { value: ethers.utils.parseEther("1.5"), gasLimit: 1000000 }
+  //   )
+  //   return await tx.wait()
+  // }
 
   // Fund Bacalhau jobs on hyperspace
   const submitFunds = async (value: number) => {
     const price = ethers.utils.parseEther(value.toString())
     const tx = await tablelandBacalhau.submitFunds({ value: price })
+    return await tx.wait()
+  }
+
+  const callLillypadJob = async (
+    _specStart: string,
+    input: string,
+    _specEnd
+  ) => {
+    const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd)
+    return await tx.wait()
+  }
+
+  // --------------------------------------------------- crossChainTablelandDealClient ------------------------------------------------------------------------------------------------------
+
+  const makeDealProposal = async (
+    locationRef: string,
+    carSize: number,
+    cidHex: string,
+    pieceSize: number,
+    label: string,
+    startEpoch: number
+  ) => {
+    let DealRequestStruct = [
+      cidHex,
+      pieceSize,
+      false,
+      label,
+      startEpoch,
+      1050026,
+      0,
+      0,
+      0,
+      1,
+      [locationRef, carSize, false, false],
+    ]
+    const tx = await TablelandDealClient.makeDealProposal(DealRequestStruct)
+    return await tx.wait()
   }
 
   // --------------------------------------------------------- ThirdWeb CreateSplitter & Interact with a Splitter  -----------------------------------------------------------------------------------------------
@@ -270,6 +310,7 @@ export const useContract = () => {
       signer!
     )
     const tx = await splitterInstance.distribute()
+    return await tx.wait()
   }
 
   return {
@@ -280,7 +321,7 @@ export const useContract = () => {
     mint,
     submitData,
     createDB_NFT,
-    executeCrossChainBacalhauJob,
+    callLillypadJob,
     submitFunds,
     balanceOf,
     hasAccess,
@@ -289,6 +330,6 @@ export const useContract = () => {
     getPayee,
     getPayeeShares,
     distributeShares,
-    createCrossChainDealRequest
+    makeDealProposal,
   }
 }

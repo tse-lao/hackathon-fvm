@@ -25,15 +25,15 @@ contract dealTablelandStorage is IDealClient, Ownable {
     using AccountCBOR for *;
     using MarketCBOR for *;
 
-    string private _baseURIString;
+    // string private _baseURIString;
 
     string private constant REQUEST_TABLE_PREFIX = 'request';
     string private constant REQUEST_SCHEMA =
-        'piece_cid text, location_ref text, car_size text, piece_size text, storage_price_per_epoch text, timestampt text, creator text';
+        'label text, location_ref text, car_size text, piece_size text, storage_price_per_epoch text, timestampt text, creator text';
 
     string private constant DEAL_TABLE_PREFIX = 'deal';
     string private constant DEAL_SCHEMA =
-        'piece_cid text, dealID text, status text';
+        'label text, dealID text, provder text, status text';
 
     uint256 storage_price_per_epoch;
 
@@ -45,7 +45,7 @@ contract dealTablelandStorage is IDealClient, Ownable {
 
     // 0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
     constructor() {
-        _baseURIString = 'https://testnets.tableland.network/api/v1/query?statement=';
+        // _baseURIString = 'https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement=';
 
         tablelandContract = TablelandDeployments.get();
 
@@ -117,7 +117,7 @@ contract dealTablelandStorage is IDealClient, Ownable {
 
 
     function requestInsertion(
-        string memory piece_cid,
+        string memory label,
         string memory location_ref,
         uint64 car_size,
         uint64 piece_size,
@@ -129,9 +129,9 @@ contract dealTablelandStorage is IDealClient, Ownable {
             SQLHelpers.toInsert(
                 REQUEST_TABLE_PREFIX,
                 tableIDs[0],
-                'piece_cid, location_ref, car_size, piece_size, storage_price_per_epoch, timestampt, creator',
+                'label, location_ref, car_size, piece_size, storage_price_per_epoch, timestampt, creator',
                 string.concat(
-                    SQLHelpers.quote(piece_cid),
+                    SQLHelpers.quote(label),
                     ',',
                     SQLHelpers.quote(location_ref),
                     ',',
@@ -150,8 +150,9 @@ contract dealTablelandStorage is IDealClient, Ownable {
     }
 
     function dealInsertion(
-        string memory piece_cid,
-        uint64 dealID,
+        string memory label,
+        uint256 dealID,
+        uint256 provider,
         string memory status
     ) public onlyOwner{
         mutate(
@@ -159,11 +160,13 @@ contract dealTablelandStorage is IDealClient, Ownable {
             SQLHelpers.toInsert(
                 DEAL_TABLE_PREFIX,
                 tableIDs[1],
-                'piece_cid, dealID, status',
+                'label, dealID, provider, status',
                 string.concat(
-                    SQLHelpers.quote(piece_cid),
+                    SQLHelpers.quote(label),
                     ',',
                     SQLHelpers.quote(Strings.toString(dealID)),
+                    ',',
+                    SQLHelpers.quote(Strings.toString(provider)),
                     ',',
                     SQLHelpers.quote(status)
                 )

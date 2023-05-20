@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-import {AxelarExecutable} from '@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol';
-import {IAxelarGateway} from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol';
-import {IAxelarGasService} from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 import '@tableland/evm/contracts/utils/SQLHelpers.sol';
@@ -13,11 +10,8 @@ import '@openzeppelin/contracts/token/ERC1155/IERC1155.sol';
 /// @author Nick Lionis (github handle : nijoe1 )
 /// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
 /// All the data inside the tables are pointing on an IPFS CID.
-contract TablelandStorage is AxelarExecutable, Ownable {
+contract TablelandStorage is  Ownable {
     ITablelandTables private tablelandContract;
-
-    // address contractManager;
-
     string main;
     string attribute;
     string contribution;
@@ -29,13 +23,12 @@ contract TablelandStorage is AxelarExecutable, Ownable {
     string[] public tables;
     uint256[] private tableIDs;
 
-    IAxelarGasService public immutable gasService;
     IERC1155 public DB_NFT;
     string private _baseURIString;
 
     string private constant MAIN_TABLE_PREFIX = 'file_main';
     string private constant MAIN_SCHEMA =
-        'tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text, requiredRows text, piece_cid text';
+        'tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text, requiredRows text, label text';
 
     string private constant ATTRIBUTE_TABLE_PREFIX = 'file_attribute';
     string private constant ATTRIBUTE_SCHEMA =
@@ -49,10 +42,8 @@ contract TablelandStorage is AxelarExecutable, Ownable {
 
     // "0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6"
     constructor(
-        address gateway_,
-        address gasReceiver_
-    ) AxelarExecutable(gateway_) {
-        gasService = IAxelarGasService(gasReceiver_);
+
+    ){
         tablelandContract = TablelandDeployments.get();
 
         createStatements.push(
@@ -77,7 +68,7 @@ contract TablelandStorage is AxelarExecutable, Ownable {
             tables[2],
             tableIDs[2]
         );
-        _baseURIString = 'https://testnets.tableland.network/api/v1/query?statement=';
+        _baseURIString = 'https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement=';
     }
 
     function setContract(IERC1155 nft) public onlyOwner {
@@ -100,16 +91,6 @@ contract TablelandStorage is AxelarExecutable, Ownable {
         attributeID = attributeId;
     }
 
-    // modifier onlyDBNFT() {
-    //     if (!(contractManager == address(0))) {
-    //         revert();
-    //     }
-    //     _;
-    // }
-
-    // function setContractManager(address manager) public onlyOwner {
-    //     contractManager = manager;
-    // }
 
     function toUpdate(
         string memory set,
@@ -126,13 +107,13 @@ contract TablelandStorage is AxelarExecutable, Ownable {
         string memory dbCID,
         uint256 minimumRowsOnSubmission,
         uint256 requiredRows,
-        string memory piece_cid
+        string memory label
     ) public onlyOwner{
         
              mutate(mainID, SQLHelpers.toInsert(
                 MAIN_TABLE_PREFIX,
                 mainID,
-                'tokenID, dataFormatCID, dbName, description, dbCID, minimumRowsOnSubmission, requiredRows, piece_cid',
+                'tokenID, dataFormatCID, dbName, description, dbCID, minimumRowsOnSubmission, requiredRows, label',
                 string.concat(
                     SQLHelpers.quote(Strings.toString(tokenid)),
                     ',',
@@ -148,7 +129,7 @@ contract TablelandStorage is AxelarExecutable, Ownable {
                     ',',
                     SQLHelpers.quote(Strings.toString(requiredRows)),
                     ',',
-                    SQLHelpers.quote(piece_cid)
+                    SQLHelpers.quote(label)
                 )
             ));
     }
@@ -236,79 +217,7 @@ contract TablelandStorage is AxelarExecutable, Ownable {
         _baseURIString = baseURI;
     }
 
-    function executeCrossChainBacalhauJob(
-        string calldata destinationChain,
-        string calldata destinationAddress,
-        string memory input,
-        string memory _specStart,
-        string memory _specEnd,
-        string memory jobId
-    ) public payable {
-        bytes memory payload = abi.encode(_specStart,input,_specEnd, jobId, msg.sender);
-        if (msg.value > 0) {
-            gasService.payNativeGasForContractCall{value: msg.value}(
-                address(this),
-                destinationChain,
-                destinationAddress,
-                payload,
-                msg.sender
-            );
-        }
-        gateway.callContract(destinationChain, destinationAddress, payload);
-    }
 
-    function createCrossChainBounty(
-        string calldata destinationChain,
-        string calldata destinationAddress,
-        string memory piece_cid,
-        bytes memory piece_cid_bytes,
-        string memory location_ref,
-        uint256 bountyReward,
-        int64 minAcceptedDealDuration,
-        uint256 size
-    ) public payable {
-        bytes memory payload = abi.encode(
-            piece_cid,
-            piece_cid_bytes,
-            location_ref,
-            bountyReward,
-            minAcceptedDealDuration,
-            size
-        );
-        if (msg.value > 0) {
-            gasService.payNativeGasForContractCall{value: msg.value}(
-                address(this),
-                destinationChain,
-                destinationAddress,
-                payload,
-                msg.sender
-            );
-        }
-        gateway.callContract(destinationChain, destinationAddress, payload);
-    }
-
-    function createCrossChainDealRequest(
-        string calldata destinationChain,
-        string calldata destinationAddress,
-        bytes memory piece_cid,
-        string memory label,
-        uint64 piece_size,
-        int64 end_epoch,
-        string memory location_ref,
-        uint64 car_size
-    ) public payable {
-        bytes memory payload = abi.encode(piece_cid, label, piece_size, end_epoch, msg.sender,location_ref,car_size);
-        if (msg.value > 0) {
-            gasService.payNativeGasForContractCall{value: msg.value}(
-                address(this),
-                destinationChain,
-                destinationAddress,
-                payload,
-                msg.sender
-            );
-        }
-        gateway.callContract(destinationChain, destinationAddress, payload);
-    }
 
     // Returns the address that signed a given string message
     function verifyString(

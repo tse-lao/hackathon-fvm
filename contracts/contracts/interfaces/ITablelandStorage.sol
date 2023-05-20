@@ -13,7 +13,7 @@ interface ITablelandStorage {
         string memory metadataCID,
         uint256 minimumRowsOnSubmission,
         uint256 requiredRows,
-        string memory piece_cid
+        string memory label
     ) external ;
 
     function insertAttributeStatement(

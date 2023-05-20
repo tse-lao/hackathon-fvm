@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
-import {AxelarExecutable} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
-import {IAxelarGateway} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol";
-import {IAxelarGasService} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
 import {MarketAPI} from "@zondax/filecoin-solidity/contracts/v0.8/MarketAPI.sol";
 import {CommonTypes} from "@zondax/filecoin-solidity/contracts/v0.8/types/CommonTypes.sol";
 import {MarketTypes} from "@zondax/filecoin-solidity/contracts/v0.8/types/MarketTypes.sol";
@@ -12,9 +9,9 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./interfaces/IDealTablelandStorage.sol";
 import "./interfaces/IDealClient.sol";
 
-contract crossChainTablelandDealClient is AxelarExecutable, IDealClient {
+contract tablelandDealClient is IDealClient {
+    
     IDealTablelandStorage dealClientTablelandStorage;
-    IAxelarGasService public immutable gasService;
 
     using EnumerableSet for EnumerableSet.UintSet;
 
@@ -34,47 +31,12 @@ contract crossChainTablelandDealClient is AxelarExecutable, IDealClient {
 
     mapping(address => uint) public userFunds;
 
-    uint256 storage_price_per_epoch = 0;
-
     constructor(
-        address gateway_,
-        address gasReceiver_,
         IDealTablelandStorage dealTablelandView
-    ) AxelarExecutable(gateway_) {
-        gasService = IAxelarGasService(gasReceiver_);
+    ) {
         dealClientTablelandStorage = dealTablelandView;
     }
-
-    // Handles calls created by setAndSend. Updates this contract's value
-    function _execute(bytes calldata payload_) internal {
-        bytes memory piece_cid;
-        string memory label;
-        uint64 piece_size;
-        int64 end_epoch;
-        address sender;
-        string memory location_ref;
-        uint64 car_size;
-        (piece_cid, label, piece_size, end_epoch, sender, location_ref, car_size) = abi.decode(
-            payload_,
-            (bytes, string, uint64, int64, address, string, uint64)
-        );
-        ExtraParamsV1 memory extraParams = ExtraParamsV1(location_ref, car_size, false, false);
-
-        DealRequest memory deal = DealRequest(
-            piece_cid,
-            piece_size,
-            false,
-            label,
-            int64(uint64((block.number + 500))),
-            end_epoch,
-            storage_price_per_epoch,
-            0,
-            0,
-            1,
-            extraParams
-        );
-        makeDealProposal(deal);
-    }
+   
 
     // After a proposal deal is materialized we offer more deal replications
     function makeDealProposal(DealRequest memory deal) public returns (bytes32) {
@@ -99,7 +61,6 @@ contract crossChainTablelandDealClient is AxelarExecutable, IDealClient {
             0,
             Status.RequestSubmitted
         );
-
         request[id] = deal;
         dealClientTablelandStorage.requestInsertion(
             deal.label,
@@ -111,7 +72,7 @@ contract crossChainTablelandDealClient is AxelarExecutable, IDealClient {
         );
 
         // writes the proposal metadata to the event log
-        emit DealProposalCreate(id, deal.piece_size, deal.verified_deal, storage_price_per_epoch);
+        emit DealProposalCreate(id, deal.piece_size, deal.verified_deal, 0);
 
         return id;
     }
@@ -202,18 +163,24 @@ contract crossChainTablelandDealClient is AxelarExecutable, IDealClient {
         );
 
         uint256 DEAL_ID = uint256(uint64(mdnp.dealId));
+        
+        // get deal client
+        uint64 provider = MarketAPI.getDealProvider(mdnp.dealId);
+
         // dealToProposal[DEAL_ID] = proposal;
 
         pieceproviders[proposal.piece_cid.data][proposal.provider.data] = true;
+
         piecedeals[proposal.piece_cid.data].add(DEAL_ID);
 
         currentPieceRequestInfo[proposal.piece_cid.data].dealid = DEAL_ID;
 
         currentPieceRequestInfo[proposal.piece_cid.data].status = Status.DealPublished;
-
+        string storage payloadCID = request[currentPieceRequestInfo[proposal.piece_cid.data].currentRequestID].label;
         dealClientTablelandStorage.dealInsertion(
-            request[currentPieceRequestInfo[proposal.piece_cid.data].currentRequestID].label,
-            mdnp.dealId,
+            payloadCID,
+            DEAL_ID,
+            uint256(provider),
             "DealPublished"
         );
     }

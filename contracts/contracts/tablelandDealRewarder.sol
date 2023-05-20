@@ -1,25 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {AxelarExecutable} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
-import {IAxelarGateway} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol";
-import {IAxelarGasService} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
-import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@tableland/evm/contracts/utils/SQLHelpers.sol";
 import "@zondax/filecoin-solidity/contracts/v0.8/utils/Actor.sol";
 import "@zondax/filecoin-solidity/contracts/v0.8/MarketAPI.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "./interfaces/IRewardTablelandStorage.sol";
 import "./interfaces/IDealReward.sol";
 
-
-contract crossChainTablelandDealRewarder is IDealReward, AxelarExecutable {
+contract tablelandDealRewarder is IDealReward {
     // Create a orice per GB per epoch variable and take input the piece_size to generate the bountyReward in a generic way
-    IAxelarGasService public immutable gasService;
-
-    ITablelandTables private tablelandContract;
+    IRewardTablelandStorage private RewardTablelandStorage;
 
     address constant CALL_ACTOR_ID = 0xfe00000000000000000000000000000000000005;
     uint64 constant DEFAULT_FLAG = 0x00000000;
@@ -29,51 +22,25 @@ contract crossChainTablelandDealRewarder is IDealReward, AxelarExecutable {
     using EnumerableSet for EnumerableSet.AddressSet;
     using Counters for Counters.Counter;
 
-    uint256 bounty_tableID;
-    string public bounty_tableName;
-    string private constant BOUNTY_TABLE_PREFIX = "bounty";
-    string private constant BOUNTY_SCHEMA =
-        "piece_cid text, location_ref text, reward text, donatedTokens text, size text, minAcceptedDealDuration text";
-
-    uint256 claim_tableID;
-    string public claim_tableName;
-    string private constant CLAIM_TABLE_PREFIX = "claim";
-    string private constant CLAIM_SCHEMA =
-        "piece_cid text, dealID text, client text, provider text, activationEpoch text, dealEndEpoch text";
-
     mapping(bytes => bounty) public pieceToBounty;
 
-    mapping(bytes => string) public pieceInfo;
+    mapping(bytes => string) public piecelabel;
 
     mapping(bytes => mapping(uint64 => bool)) public pieceToSPs;
 
-    constructor(address gateway_, address gasReceiver_) AxelarExecutable(gateway_) {
-        gasService = IAxelarGasService(gasReceiver_);
-
-        tablelandContract = TablelandDeployments.get();
-
-        bounty_tableID = tablelandContract.create(
-            address(this),
-            SQLHelpers.toCreateFromSchema(BOUNTY_SCHEMA, BOUNTY_TABLE_PREFIX)
-        );
-        bounty_tableName = SQLHelpers.toNameFromId(BOUNTY_TABLE_PREFIX, bounty_tableID);
-
-        claim_tableID = tablelandContract.create(
-            address(this),
-            SQLHelpers.toCreateFromSchema(CLAIM_SCHEMA, CLAIM_TABLE_PREFIX)
-        );
-        claim_tableName = SQLHelpers.toNameFromId(CLAIM_TABLE_PREFIX, claim_tableID);
+    constructor(IRewardTablelandStorage rewardTablelandStorage) {
+        RewardTablelandStorage = rewardTablelandStorage;
     }
 
     /// @dev Creating a Bounty only for accepted proposals
-    /// @param piece_cid: cid of the bounty
+    /// @param label: cid of the bounty
     /// @param piece_cid_bytes: reward for each client or storageProvider that will make a deal for that piece_cid
     /// @param location_ref: size of the file
     /// @param bountyReward: size of the file
     /// @param minAcceptedDealDuration: size of the file
     /// @param size: size of the file
     function createBounty(
-        string memory piece_cid,
+        string memory label,
         bytes memory piece_cid_bytes,
         string memory location_ref,
         uint256 bountyReward,
@@ -91,13 +58,16 @@ contract crossChainTablelandDealRewarder is IDealReward, AxelarExecutable {
         });
 
         // bytes memory bountyID = stringToBytes(piece_cid);
-        pieceInfo[piece_cid_bytes] = piece_cid;
+        piecelabel[piece_cid_bytes] = label;
 
         pieceToBounty[piece_cid_bytes] = newBounty;
 
-        mutate(
-            bounty_tableID,
-            bountyInsertion(piece_cid, location_ref, bountyReward, size, minAcceptedDealDuration)
+        RewardTablelandStorage.bountyInsertion(
+            label,
+            location_ref,
+            bountyReward,
+            size,
+            minAcceptedDealDuration
         );
     }
 
@@ -106,16 +76,9 @@ contract crossChainTablelandDealRewarder is IDealReward, AxelarExecutable {
     function fundBounty(bytes memory piece_cid) public payable {
         require(pieceToBounty[piece_cid].created, "bounty does not exists");
         pieceToBounty[piece_cid].donatedTokens += msg.value;
-
-        string memory set = string.concat(
-            "donatedTokens='",
-            Strings.toString(pieceToBounty[piece_cid].donatedTokens),
-            "'"
-        );
-        string memory filter = string.concat("piece_cid=", pieceInfo[piece_cid]);
-        mutate(
-            bounty_tableID,
-            SQLHelpers.toUpdate(BOUNTY_TABLE_PREFIX, bounty_tableID, set, filter)
+        RewardTablelandStorage.updateDonatedTokens(
+            piecelabel[piece_cid],
+            pieceToBounty[piece_cid].donatedTokens
         );
     }
 
@@ -152,27 +115,18 @@ contract crossChainTablelandDealRewarder is IDealReward, AxelarExecutable {
         // piece_cidToDeals[piece_cid].add(uint256(deal_id));
         pieceToBounty[piece_cid].donatedTokens -= pieceToBounty[piece_cid].bountyReward;
 
-        mutate(
-            bounty_tableID,
-            claimInsertion(
-                pieceInfo[piece_cid],
-                deal_id,
-                client,
-                provider,
-                activationEpoch,
-                dealEndEpoch
-            )
+        RewardTablelandStorage.claimInsertion(
+            piecelabel[piece_cid],
+            deal_id,
+            client,
+            provider,
+            activationEpoch,
+            dealEndEpoch
         );
 
-        string memory set = string.concat(
-            "donatedTokens='",
-            Strings.toString(pieceToBounty[piece_cid].donatedTokens),
-            "'"
-        );
-        string memory filter = string.concat("piece_cid=", pieceInfo[piece_cid]);
-        mutate(
-            bounty_tableID,
-            SQLHelpers.toUpdate(BOUNTY_TABLE_PREFIX, bounty_tableID, set, filter)
+        RewardTablelandStorage.updateDonatedTokens(
+            piecelabel[piece_cid],
+            pieceToBounty[piece_cid].donatedTokens
         );
     }
 
@@ -236,92 +190,5 @@ contract crossChainTablelandDealRewarder is IDealReward, AxelarExecutable {
             (int256, uint64, bytes)
         );
         return (success, exit, return_codec, return_value);
-    }
-
-    function claimInsertion(
-        string memory piece_cid,
-        uint64 dealID,
-        uint64 client,
-        uint64 provider,
-        int64 activationEpoch,
-        int64 dealEndEpoch
-    ) internal view returns (string memory) {
-        return
-            SQLHelpers.toInsert(
-                BOUNTY_TABLE_PREFIX,
-                bounty_tableID,
-                "piece_cid, dealID, client, provider, activationEpoch, dealEndEpoch",
-                string.concat(
-                    string(piece_cid),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(dealID)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(client)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(provider)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(uint(int(activationEpoch)))),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(uint(int(dealEndEpoch))))
-                )
-            );
-    }
-
-    function bountyInsertion(
-        string memory piece_cid,
-        string memory location_ref,
-        uint256 bountyreward,
-        uint256 size,
-        int64 minAcceptedDealDuration
-    ) internal view returns (string memory) {
-        return
-            SQLHelpers.toInsert(
-                BOUNTY_TABLE_PREFIX,
-                bounty_tableID,
-                "piece_cid, location_ref, reward, donatedTokens, size, minAcceptedDealDuration",
-                string.concat(
-                    string(piece_cid),
-                    ",",
-                    SQLHelpers.quote(location_ref),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(bountyreward)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(0)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(size)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(uint(int(minAcceptedDealDuration))))
-                )
-            );
-    }
-
-    function mutate(uint256 tableId, string memory statement) internal {
-        tablelandContract.mutate(address(this), tableId, statement);
-    }
-
-    // Other Contracts can use this contract to perform crossChain calls and to create bounties from all the axelar supported chains
-    function _execute(bytes calldata payload_) internal {
-        string memory piece_cid;
-        bytes memory piece_cid_bytes;
-        string memory location_ref;
-        uint256 bountyReward;
-        int64 minAcceptedDealDuration;
-        uint256 size;
-        (
-            piece_cid,
-            piece_cid_bytes,
-            location_ref,
-            bountyReward,
-            minAcceptedDealDuration,
-            size
-        ) = abi.decode(payload_, (string, bytes, string, uint256, int64, uint256));
-        createBounty(
-            piece_cid,
-            piece_cid_bytes,
-            location_ref,
-            bountyReward,
-            minAcceptedDealDuration,
-            size
-        );
     }
 }

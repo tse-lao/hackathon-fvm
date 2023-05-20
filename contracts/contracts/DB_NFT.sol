@@ -40,7 +40,7 @@ contract DB_NFT is ERC1155, Ownable {
 
     mapping(string => EnumerableSet.UintSet) private submittedCIDtoTokens;
 
-    address public PKP;
+    address public SignerAddress;
 
     constructor(ITablelandStorage tablelandStorage) ERC1155("") {
         TablelandStorage = tablelandStorage;
@@ -54,7 +54,6 @@ contract DB_NFT is ERC1155, Ownable {
         uint256 requiredRows,
         uint256 minimumRowsOnSubmission
     ) public {
-
         require(requiredRows > 0);
         tokenID.increment();
         uint256 tokenId = tokenID.current();
@@ -71,7 +70,7 @@ contract DB_NFT is ERC1155, Ownable {
             "CID will get added after the DB is fullfilled and the DB NFT creation",
             minimumRowsOnSubmission,
             requiredRows,
-            "piece_cid"
+            "label"
         );
 
         TablelandStorage.insertAttributeStatement(
@@ -95,12 +94,12 @@ contract DB_NFT is ERC1155, Ownable {
     ) public {
         require(_exists(tokenId));
         require(tokenInfoMap[tokenId].requiredRows > 0, "this is an OpenDB you cannot submit");
-        string memory signMessage = string.concat(
+        string memory signedMessage = string.concat(
             Strings.toString(tokenId),
             dataCID,
             Strings.toString(rows)
         );
-        require(TablelandStorage.verifyString(signMessage, v, r, s, PKP));
+        require(TablelandStorage.verifyString(signedMessage, v, r, s, SignerAddress));
 
         require(tokenInfoMap[tokenId].minimumRowsOnSubmission <= rows, "sumbit more data");
         require(!submittedCIDtoTokens[dataCID].contains(tokenId), "DB already has that CID");
@@ -123,20 +122,20 @@ contract DB_NFT is ERC1155, Ownable {
         string memory dbCID,
         uint256 mintPrice,
         address royaltiesAddress,
-        string memory piece_cid,
+        string memory label,
         uint8 v,
         bytes32 r,
         bytes32 s
     ) public {
         require(_exists(tokenId));
 
-        string memory signMessage = string.concat(
+        string memory signedMessage = string.concat(
             Strings.toString(tokenId),
             dbCID,
             Strings.toString(mintPrice),
             Strings.toHexString(royaltiesAddress)
         );
-        require(TablelandStorage.verifyString(signMessage, v, r, s, PKP));
+        require(TablelandStorage.verifyString(signedMessage, v, r, s, SignerAddress));
 
         require(
             !tokenInfoMap[tokenId].mintable &&
@@ -155,7 +154,7 @@ contract DB_NFT is ERC1155, Ownable {
         );
 
         TablelandStorage.toUpdate(
-            string.concat("piece_cid='", piece_cid, "'"),
+            string.concat("label='", label, "'"),
             string.concat("tokenID=", Strings.toString(tokenId))
         );
 
@@ -168,18 +167,34 @@ contract DB_NFT is ERC1155, Ownable {
         );
     }
 
+    function updateDB_NFT1(uint256 tokenId, string memory dbCID, string memory label) public {
+        require(_exists(tokenId));
+        require(tokenInfoMap[tokenId].requiredRows > 0);
+        require(tokenInfoMap[tokenId].creator == msg.sender);
+        TablelandStorage.toUpdate(
+            string.concat("dbCID='", dbCID, "'"),
+            string.concat("tokenID=", Strings.toString(tokenId))
+        );
+
+        TablelandStorage.toUpdate(
+            string.concat("label='", label, "'"),
+            string.concat("tokenID=", Strings.toString(tokenId))
+        );
+    }
+
     function updateDB_NFT(
         uint256 tokenId,
         string memory dbCID,
-        string memory piece_cid,
+        string memory label,
         uint8 v,
         bytes32 r,
         bytes32 s
     ) public {
         require(_exists(tokenId));
+        require(tokenInfoMap[tokenId].requiredRows > 0);
         require(tokenInfoMap[tokenId].creator == msg.sender);
-        string memory signMessage = string.concat(Strings.toString(tokenId), dbCID);
-        require(TablelandStorage.verifyString(signMessage, v, r, s, PKP));
+        string memory signedMessage = string.concat(Strings.toString(tokenId), dbCID);
+        require(TablelandStorage.verifyString(signedMessage, v, r, s, SignerAddress));
 
         TablelandStorage.toUpdate(
             string.concat("dbCID='", dbCID, "'"),
@@ -187,7 +202,7 @@ contract DB_NFT is ERC1155, Ownable {
         );
 
         TablelandStorage.toUpdate(
-            string.concat("piece_cid='", piece_cid, "'"),
+            string.concat("label='", label, "'"),
             string.concat("tokenID=", Strings.toString(tokenId))
         );
     }
@@ -195,13 +210,14 @@ contract DB_NFT is ERC1155, Ownable {
     // We also need to call this function from the PKP because we need to set a fair royaltiesAddress splitter contract
     function createOpenDataSet(
         string memory dbCID,
-        string memory piece_cid,
+        string memory label,
         string memory dataFormatCID,
         string memory dbName,
         string memory description,
         string[] memory categories
     ) public {
         tokenID.increment();
+        tokenInfoMap[tokenID.current()].requiredRows = 0;
         TablelandStorage.insertMainStatement(
             tokenID.current(),
             dataFormatCID,
@@ -210,7 +226,7 @@ contract DB_NFT is ERC1155, Ownable {
             dbCID,
             0,
             0,
-            piece_cid
+            label
         );
 
         TablelandStorage.insertAttributeStatement(
@@ -242,10 +258,6 @@ contract DB_NFT is ERC1155, Ownable {
         _mint(msg.sender, tokenid, 1, "");
     }
 
-    function onlyPKP(address sender) internal view {
-        require(sender == PKP);
-    }
-
     /// @notice Overriten URI function of the ERC1155 to fit Tableland based NFTs
     /// @dev retrieves the value of the tokenID
     /// @return the tokenURI link for the specific NFT metadata
@@ -269,7 +281,21 @@ contract DB_NFT is ERC1155, Ownable {
         return tokenId <= tokenID.current();
     }
 
-    function assignNewPKP(address newPKP) public onlyOwner {
-        PKP = newPKP;
+    function assignNewSignerAddress(address newSignerAddress) public onlyOwner {
+        SignerAddress = newSignerAddress;
+    }
+
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) internal pure override {
+        require(
+            from == address(0) || to == address(0),
+            "This a Soulbound token. It cannot be transferred. It can only be burned by the token owner."
+        );
     }
 }
