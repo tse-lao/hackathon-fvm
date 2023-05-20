@@ -1,4 +1,5 @@
 import AttributeTable from '@/components/application/data/AttributeTable';
+import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
 import { DownloadButton } from '@/components/application/elements/buttons/DownloadButton';
 import { OpenButton } from '@/components/application/elements/buttons/OpenButton';
 import { PayButton } from '@/components/application/elements/buttons/PayButton';
@@ -70,6 +71,12 @@ export default function TokenID() {
       window.location.reload();
     }
   }
+  
+  const createDeal = async () => {
+    toast.info("Creating Deal...");
+    
+  
+  }
 
 
 
@@ -97,13 +104,15 @@ export default function TokenID() {
             <p className="mt-6 text-gray-500">{detail.description}</p>
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 content-center">
-              {detail.minimumRowsOnSubmission !== 0 && (
+              {detail.minimumRowsOnSubmission != 0 && (
                 owned ? (
                   <DownloadButton onClick={startDownload} />
                 ) : (
                   <PayButton price={price} onClick={mintNFT} />
                 )
               )}
+              
+              {detail.minimumRowsOnSubmission == 0 && <ActionButton text="Coming Soon" onClick={createDeal}/>}
               <OpenButton text={showDataformat ? "Hide Format" : "Show Format"} onClick={() => setShowDataformat(!showDataformat)} />
             </div>
 

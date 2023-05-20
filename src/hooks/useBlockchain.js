@@ -1,6 +1,5 @@
-import { Alchemy, Network } from "alchemy-sdk"
-
 import { DB_NFT_address } from "@/constants"
+import { Alchemy, Network } from "alchemy-sdk"
 
 const config = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
@@ -52,13 +51,8 @@ async function signInPolybase() {
     return db;
 }
 export default async function MatchRecord(list, accessToken, open) {
-
-
     let carRecords = [];
-
     try {
-
-        //loop over all of it 
 
         let page = 1
         while(page < 4){
@@ -77,30 +71,33 @@ export default async function MatchRecord(list, accessToken, open) {
     
     console.log(carRecords)
     let results = [];
-    try {
-        
-
-        for (let record of list) {
-            console.log(record)
-            //find the name of each car Record to add the deatails of the car record. 
-            let name = record.cid
-            if(open){
-                 name = record.name
+    for (let record of list) {
+        try {
+            let name = record.cid;
+            if (open) {
+                name = record.name;
             }
-           
+            
+            console.log(name)
+    
             let carRecord = carRecords.find(carRecord => carRecord.fileName == name);
+        if (carRecord !== undefined) {
             record.carRecord = carRecord;
-
-
+        } else {
+            // Handle the case where no matching car record is found
+            console.error(`No car record found with name: ${name}`);
+            continue;
+}
+       
+    
             let result = await uploadRecord(record);
             results.push(result);
+        } catch (error) {
+            console.error(`Error processing record ${record.cid}: ${error.message}`);
+            results.push({message: `Error processing record ${record.cid}: ${error.message}`});
         }
-
-        return  { message: 'Upload Successful', data: results };
-    } catch (error) {
-        console.error(error);
-        return  { message: 'Internal Server Error' };
     }
+    return results;
 
 }
 async function uploadRecord(record) {

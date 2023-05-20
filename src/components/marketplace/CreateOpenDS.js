@@ -1,12 +1,13 @@
 
 import MatchRecord from '@/hooks/useBlockchain';
 import { useContract } from '@/hooks/useContract';
-import { uploadCarFile } from '@/hooks/useLighthouse';
+import { getDataDepoAuth } from '@/hooks/useLighthouse';
 import { getLighthouse } from '@/lib/createLighthouseApi';
-import { getMetadataFromFile } from '@/lib/dataHelper';
+import { matchAndSetCarFile, uploadAndSetFile, uploadFileWithProgress } from '@/lib/uploadHelpers';
 import lighthouse from '@lighthouse-web3/sdk';
 import { useState } from 'react';
 import TagsInput from 'react-tagsinput';
+import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 import ModalLayout from '../ModalLayout';
 import LoadingSpinner from '../application/elements/LoadingSpinner';
@@ -27,70 +28,62 @@ export default function CreateOpenDS({ tokenId, onClose }) {
 
     const [loading, setLoading] = useState(false);
     const [loadingFile, setLoadingFile] = useState(false);
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState({
+        name: "",
+        type: "",
+        size: "",
+        cid: "",
+        metadata: "",
+
+    });
+    const [carError, setCarError] = useState(false);
+
 
     const uploadFile = async (e) => {
-
         setLoadingFile(true);
         const apiKey = await getLighthouse(address);
-        const authToken = await lighthouse.dataDepotAuth(apiKey);
-
-        const mockEvent = {
-            target: {
-                files: [e.target.files[0]],
-            },
-            persist: () => { },
-        };
-
-        let cid = "";
+        const authToken = await getDataDepoAuth(address);
+        const uploadFile = e.target.files[0];
+        const mockEvent = { target: { files: [uploadFile] }, persist: () => {} };
+    
         try {
-            const output = await lighthouse.upload(e, apiKey, progressCallback);
-            console.log(output)
-            cid = output.data.Hash
+            const dummyFile = await uploadAndSetFile(mockEvent, apiKey, progressCallback);
+            console.log("DUMMY FILE")
+            console.log(dummyFile);
+            setFile(dummyFile);
+            await uploadFileWithProgress(uploadFile, progressCallback, authToken.data.access_token);
+            await sleep(3000);
+            await matchAndSetCarFile(dummyFile, authToken.data.access_token, setLoadingFile, setFile, setCarError);
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+        }
+        setLoadingFile(false);
+    };
+
+    async function matchCarFile(dummy) {
+        const apiKey = await getLighthouse(address);
+        const authToken = await lighthouse.dataDepotAuth(apiKey);
+        setCarError(false)
+        try {
+            const result = await MatchRecord([dummy], authToken.data.access_token, true)
+            console.log(result);
+            
+
+            setFile(
+                {
+                    ...dummy,
+                    ...result.data[0].data
+                }
+            )
         } catch (e) {
             console.log(e)
+            setCarError(true)
+            setLoadingFile(false)
         }
-
-        let metadata = "";
-
-
-
-
-        if (e.target.files[0].type == "application/json") {
-            metadata = await getMetadataFromFile(mockEvent.target);
-        }
-
-
-        const dummyFile = {
-            name: e.target.files[0].name,
-            type: e.target.files[0].type,
-            size: e.target.files[0].size,
-            cid: cid,
-            metadata: metadata,
-        };
-
-        setFile(dummyFile)
-
-        await uploadCarFile(e.target.files[0], progressCallback, authToken.data.access_token)
-
-        await sleep(300);
-        //get car file. 
-        const result = await MatchRecord([dummyFile], authToken.data.access_token, true)
-
-        console.log(result);
-
-        setFile(
-            {
-                ...dummyFile,
-                ...result.data[0].data
-            }
-        )
-
-        console.log(dummyFile)
-
-        setLoadingFile(false)
-
     }
+    
+
 
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -157,7 +150,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
                 </div>
 
                 {loadingFile ? <LoadingSpinner /> :
-                    !file ? (
+                    !file.cid ? (
                         <div>
                             <label htmlFor="upload" className="block text-sm font-medium text-gray-700">
                                 Upload Opendataset
@@ -165,7 +158,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
                             <input
                                 type="file"
                                 name="job" id="job" onChange={uploadFile} required
-                                accept="*"
+                                accept="application/json"
                             />
                         </div>
                     ) : (
@@ -177,8 +170,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
                         </div>
                     )}
 
-                <ActionButton text="Create Open Dataset" onClick={submitOpen} />
-
+                {carError ? <ActionButton text="Find Car" onClick={() => matchCarFile(file)} /> : <ActionButton text="Create Open Dataset" onClick={submitOpen} />}
 
 
 

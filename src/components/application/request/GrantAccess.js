@@ -1,5 +1,5 @@
 import { useContract } from "@/hooks/useContract";
-import { countRows, createJWTToken, shareFile } from "@/hooks/useLighthouse";
+import { countRows, shareFile } from "@/hooks/useLighthouse";
 import { validateInput } from "@/hooks/useLitProtocol";
 import { useDocument, usePolybase } from "@polybase/react";
 import { useState } from "react";
@@ -50,16 +50,13 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       setStatus(PROVIDE_ACCESS)
       const cid = selectedOptions[i];
       const response = await shareFile(cid, creator, address);
-      console.log(response)
 
       if (tokenID < 1 && selectedOptions.length == 1) {
         toast.error("Error: By not providing the rights inputs")
       }
       
       setStatus(COUNTING_ROWS);
-      
-      const jwt = await createJWTToken(address);
-      const count = await countRows(cid, jwt, address);
+      const count = await countRows(cid, address);
       
       if(count < minRows){
         toast.error("Error: This CID does not contain enough rows to be used for training the model");
