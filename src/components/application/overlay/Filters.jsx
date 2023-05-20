@@ -2,37 +2,8 @@ import { getAllCategories } from '@/hooks/useTableland'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon, FunnelIcon } from '@heroicons/react/20/solid'
 import { Fragment, useEffect, useState } from 'react'
-import CustomRange from '../elements/CustomRange'
+import Toggle from '../Toggle'
 
-const filters = {
-  price: [
-    { value: '0', label: '0 - 10', checked: false },
-    { value: '25', label: '10 - 50', checked: false },
-    { value: '50', label: '50 - 75', checked: false },
-    { value: '75', label: '75+', checked: false },
-  ],
-  date: [
-    { value: 'week', label: 'Last Week', checked: false },
-    { value: 'month', label: 'Last Month', checked: false },
-    { value: '3months', label: '3 Month', checked: true },
-    { value: 'year', label: 'Year', checked: false },
-  ],
-  size: [
-    { value: 'xs', label: 'XS', checked: false },
-    { value: 's', label: 'S', checked: true },
-    { value: 'm', label: 'M', checked: false },
-    { value: 'l', label: 'L', checked: false },
-    { value: 'xl', label: 'XL', checked: false },
-    { value: '2xl', label: '2XL', checked: false },
-  ],
-  category: [
-    { value: 'all-new-arrivals', label: 'All New Arrivals', checked: false },
-    { value: 'tees', label: 'Tees', checked: false },
-    { value: 'objects', label: 'Objects', checked: false },
-    { value: 'sweatshirts', label: 'Sweatshirts', checked: false },
-    { value: 'pants-and-shorts', label: 'Pants & Shorts', checked: false },
-  ],
-}
 const sortOptions = [
   { name: 'Most Popular', href: '#', current: true },
   { name: 'Best Rating', href: '#', current: false },
@@ -44,9 +15,25 @@ function classNames(...classes) {
 }
 
 
-export default function Filters({name, selectChange}) {
+export default function Filters({name, selectChange, currentFilters}) {
     const [categories, setCategories] = useState([]);
-    const [priceRange, setPriceRange] = useState({min: 0, max: 100});
+    const [onlyOpen, setOnlyOpen] = useState(false);
+    const [filters, setFilters] = useState(currentFilters);
+    
+
+    const handleOpenChange = (isOpen) => {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        open: isOpen,
+      }));
+    };
+    
+    const handleCategoryChange = (category) => {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        categories: [...prevFilters.categories, category],
+      }));
+    };
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -57,12 +44,8 @@ export default function Filters({name, selectChange}) {
         fetchCategories();
     }, []);
     
-    const handleCheckboxChange = (event) => {
-      if (event.target.checked) {
-        selectChange(event.target.value);
-      } else {
-        selectChange();
-      }
+    const applyFilters = () => {
+        selectChange(filters);
     };
     
     
@@ -89,13 +72,17 @@ export default function Filters({name, selectChange}) {
                   className="mr-2 h-5 w-5 flex-none text-gray-400 group-hover:text-gray-500"
                   aria-hidden="true"
                 />
-                2 Filters
+                {filters.categories.length} Filters
               </Disclosure.Button>
             </div>
             <div className="pl-6">
-              <button type="button" className="text-gray-500">
+            <button type="button" className="text-cf-500 font-bold mr-5" onClick={applyFilters}>
+              Apply Filters
+            </button>
+              <button type="button" className="text-gray-500" onClick={() => setFilters({open: false, categories:[]})}>
                 Clear all
               </button>
+              
             </div>
           </div>
         </div>
@@ -103,28 +90,7 @@ export default function Filters({name, selectChange}) {
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 px-4 text-sm sm:px-6 md:gap-x-6 lg:px-8">
             <div className="grid auto-rows-min grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-6">
               <fieldset>
-                <legend className="block font-medium">Price</legend>
-                <CustomRange min="100" max="1000"/>
-              </fieldset>
-              <fieldset>
-                <legend className="block font-medium">Date</legend>
-                <div className="space-y-6 pt-6 sm:space-y-4 sm:pt-4">
-                  {filters.date.map((option, optionIdx) => (
-                    <div key={option.value} className="flex items-center text-base sm:text-sm">
-                      <input
-                        id={`color-${optionIdx}`}
-                        name="color[]"
-                        defaultValue={option.value}
-                        type="checkbox"
-                        className="h-4 w-4 flex-shrink-0 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        defaultChecked={option.checked}
-                      />
-                      <label htmlFor={`color-${optionIdx}`} className="ml-3 min-w-0 flex-1 text-gray-600">
-                        {option.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
+                <Toggle text="Open Datasets" changeStatus={handleOpenChange}  />
               </fieldset>
             </div>
             <div className="grid auto-rows-min grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-6">
@@ -140,7 +106,7 @@ export default function Filters({name, selectChange}) {
                         type="checkbox"
                         className="h-4 w-4 flex-shrink-0 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                         defaultChecked={option.checked}
-                        onChange={handleCheckboxChange}
+                        onChange={() => handleCategoryChange(option.value)}
                       />
                       <label htmlFor={`category-${optionIdx}`} className="ml-3 min-w-0 flex-1 text-gray-600">
                         {option.label}

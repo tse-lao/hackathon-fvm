@@ -1,3 +1,4 @@
+
 import MatchRecord from '@/hooks/useBlockchain';
 import { useContract } from '@/hooks/useContract';
 import { uploadCarFile } from '@/hooks/useLighthouse';
@@ -9,6 +10,11 @@ import TagsInput from 'react-tagsinput';
 import { useAccount } from 'wagmi';
 import ModalLayout from '../ModalLayout';
 import LoadingSpinner from '../application/elements/LoadingSpinner';
+import { ActionButton } from '../application/elements/buttons/ActionButton';
+import InputField from "../application/elements/input/InputField";
+import TextArea from '../application/elements/input/TextArea';
+
+
 export default function CreateOpenDS({ tokenId, onClose }) {
     const { address } = useAccount();
     const { createOpenDataSet } = useContract();
@@ -28,7 +34,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
         setLoadingFile(true);
         const apiKey = await getLighthouse(address);
         const authToken = await lighthouse.dataDepotAuth(apiKey);
-        
+
         const mockEvent = {
             target: {
                 files: [e.target.files[0]],
@@ -46,9 +52,9 @@ export default function CreateOpenDS({ tokenId, onClose }) {
         }
 
         let metadata = "";
-        
 
-        
+
+
 
         if (e.target.files[0].type == "application/json") {
             metadata = await getMetadataFromFile(mockEvent.target);
@@ -62,140 +68,123 @@ export default function CreateOpenDS({ tokenId, onClose }) {
             cid: cid,
             metadata: metadata,
         };
-        
+
         setFile(dummyFile)
 
         await uploadCarFile(e.target.files[0], progressCallback, authToken.data.access_token)
-        
+
         await sleep(300);
         //get car file. 
         const result = await MatchRecord([dummyFile], authToken.data.access_token, true)
-        
+
         console.log(result);
-        
+
         setFile(
             {
                 ...dummyFile,
                 ...result.data[0].data
             }
         )
-        
+
         console.log(dummyFile)
 
         setLoadingFile(false)
 
-}
+    }
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-const progressCallback = (progressData) => {
-    let percentageDone =
-        100 - (progressData.total / progressData.uploaded).toFixed(2);
-    console.log(percentageDone);
-};
+    const progressCallback = (progressData) => {
+        let percentageDone =
+            100 - (progressData.total / progressData.uploaded).toFixed(2);
+        console.log(percentageDone);
+    };
 
 
-const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-};
-const handleTagChange = (tags) => {
-    setFormData({ ...formData, categories: tags });
-};
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+    const handleTagChange = (tags) => {
+        setFormData({ ...formData, categories: tags });
+    };
 
-const submitOpen = async () => {
-    setLoading(true)
-console.log(file);
-    const contract = await createOpenDataSet(
-        file.cid,
-        file.carRecord.pieceCid,
-        file.metadata,
-        formData.name,
-        formData.description,
-        formData.categories,
-    )
+    const submitOpen = async () => {
+        setLoading(true)
+        console.log(file);
+        const contract = await createOpenDataSet(
+            file.cid,
+            file.carRecord.pieceCid,
+            file.metadata,
+            formData.name,
+            formData.description,
+            formData.categories,
+        )
 
-    console.log(contract);
-    setLoading(false)
-}
+        console.log(contract);
+        setLoading(false)
+    }
 
-if(loading) {
-    return <LoadingSpinner />
-}
-return (
-    <ModalLayout title="Create Open Dataset" onClose={onClose}>
-        <div className="space-y-4 w-full">
-            <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    Name
-                </label>
-                <input
-                    type="text"
+    if (loading) {
+        return <LoadingSpinner />
+    }
+    return (
+        <ModalLayout title="Create Open Dataset" onClose={onClose}>
+            <div className="space-y-4 w-full">
+                <InputField
+                    label="Name"
                     name="name"
-                    id="name"
+                    type="text"
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
-            </div>
-            <div>
-                <label htmlFor="requestData" className="block text-sm font-medium text-gray-700">
-                    Description
-                </label>
-                <textarea
+                <TextArea
+                    label="Description"
                     name="description"
-                    id="description"
-                    rows="3"
+                    rows={3}
                     value={formData.description}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                ></textarea>
+                />
+                <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                        Category
+                    </label>
+                    <TagsInput value={formData.categories} onChange={handleTagChange} />
+                </div>
+
+                {loadingFile ? <LoadingSpinner /> :
+                    !file ? (
+                        <div>
+                            <label htmlFor="upload" className="block text-sm font-medium text-gray-700">
+                                Upload Opendataset
+                            </label>
+                            <input
+                                type="file"
+                                name="job" id="job" onChange={uploadFile} required
+                                accept="*"
+                            />
+                        </div>
+                    ) : (
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                Your open dataset
+                            </label>
+                            <span className="text-sm">{file.cid} || {file.pieceCid} || {file.metadata}</span>
+                        </div>
+                    )}
+
+                <ActionButton text="Create Open Dataset" onClick={submitOpen} />
+
+
+
+
+
             </div>
-            <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Category
-                </label>
-                <TagsInput value={formData.categories} onChange={handleTagChange} />
-            </div>
 
-            {loadingFile ? <LoadingSpinner /> :
-                !file ? (
-                    <div>
-                        <label htmlFor="upload" className="block text-sm font-medium text-gray-700">
-                            Upload Opendataset
-                        </label>
-                        <input
-                            type="file"
-                            name="job" id="job" onChange={uploadFile} required
-                            accept="*"
-                        />
-                    </div>
-                ) : (
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Your open dataset
-                        </label>
-                        <span className="text-sm">{file.cid} || {file.pieceCid} || {file.metadata}</span>
-                    </div>
-                )}
-
-            <button
-            onClick={submitOpen}
-                type="button"
-                className="bg-indigo-500 hover:bg-indigo-700 self-end text-white font-bold py-2 px-4 rounded-full"
-            >
-                Create Dataset
-            </button>
-
-
-
-
-        </div>
-
-    </ModalLayout>
-)
+        </ModalLayout>
+    )
 }

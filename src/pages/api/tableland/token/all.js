@@ -2,17 +2,8 @@ import { DB_attribute, DB_main } from "@/constants";
 
 
 export default async (req, res) => {    
-    var whereStatement = ""
-    for(var key in req.query) {
-        if(whereStatement == "") {
-            whereStatement = `WHERE ${key} = '${req.query[key]}' `
-        }
-        else {
-            whereStatement = whereStatement + ` AND ${key} = '${req.query[key]}' `
-        }}
-    
-        
-        console.log(req.query.request)
+   
+        console.log(req.query)
     const result = await new Promise(async (resolve, reject) => {
         const url = 'https://testnets.tableland.network/api/v1/query';
         const params = new URLSearchParams({
@@ -31,8 +22,8 @@ export default async (req, res) => {
                 )
               )
             FROM ${DB_main} JOIN ${DB_attribute}
-                ON ${DB_main}.tokenID = ${DB_attribute}.tokenID
-                ${req.query.request == 'trues' ? ` WHERE ${DB_main}.piece_cid != 'piece_cid'` : ''}  
+                ON ${DB_main}.tokenID = ${DB_attribute}.tokenID  
+                ${req.query.where}
             GROUP BY ${DB_main}.tokenID`,
         extract: true, format: "objects", unwrap: false
         });
