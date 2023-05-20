@@ -3,6 +3,7 @@ import { ActionButton } from '@/components/application/elements/buttons/ActionBu
 import { DownloadButton } from '@/components/application/elements/buttons/DownloadButton';
 import { OpenButton } from '@/components/application/elements/buttons/OpenButton';
 import { PayButton } from '@/components/application/elements/buttons/PayButton';
+import CreateDeal from '@/components/marketplace/CreateDeal';
 import DataFormatPreview from '@/components/marketplace/DataFormatPreview';
 import ProductDetailTab from '@/components/marketplace/ProductDetailTab';
 import { DB_main } from '@/constants';
@@ -24,6 +25,7 @@ export default function TokenID() {
   const [detail, setDetail] = useState({});
   const [price, setPrice] = useState(0);
   const [owned, setOwner] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [showDataformat, setShowDataformat] = useState(false);
   const { mint } = useContract();
 
@@ -85,7 +87,6 @@ export default function TokenID() {
       <div className="mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-5 xl:gap-x-16">
           <div className="bg-white p-6 mx-auto mt-14 max-w-2xl sm:mt-16 lg:col-span-3 lg:row-span-2 lg:row-end-2 lg:mt-0 lg:max-w-none">
-
             <div className="flex flex-col-reverse">
               <div className="mt-4">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
@@ -112,7 +113,7 @@ export default function TokenID() {
                 )
               )}
               
-              {detail.minimumRowsOnSubmission == 0 && <ActionButton text="Coming Soon" onClick={createDeal}/>}
+              {detail.minimumRowsOnSubmission == 0 && <ActionButton text="Coming Soon" onClick={() => setModalOpen(!modalOpen)}/>}
               <OpenButton text={showDataformat ? "Hide Format" : "Show Format"} onClick={() => setShowDataformat(!showDataformat)} />
             </div>
 
@@ -134,7 +135,7 @@ export default function TokenID() {
           </div>
         </div>
       </div>
-
+      {modalOpen &&<CreateDeal cid={detail.dbCID} onClose={() => setModalOpen(false)} />}
 
     </Layout>
   )

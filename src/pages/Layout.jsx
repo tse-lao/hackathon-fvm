@@ -13,7 +13,7 @@ export default function Layout({children, active}) {
 
     if(address){
       if(!api || !jwt){
-        window.location.href = '/onboarding'
+        window.location.href = '/profile/onboarding'
       }
     }
   }, [address])

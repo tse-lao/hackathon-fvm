@@ -78,16 +78,6 @@ export default function Navigation({ active }) {
                     Requests
                   </a>
                   <a
-                    href="/connections"
-                    className={classNames(
-                      "Connections" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                    )}
-                  >
-                    API
-                  </a>
-                  <a
                     href="/jobs"
                     className={classNames(
                       "Jobs" == active
