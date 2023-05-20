@@ -8,7 +8,7 @@ import DataFormatPreview from '@/components/marketplace/DataFormatPreview';
 import ProductDetailTab from '@/components/marketplace/ProductDetailTab';
 import { DB_main } from '@/constants';
 import { useContract } from '@/hooks/useContract';
-import { downloadNFT } from '@/hooks/useLighthouse';
+import { downloadCid } from '@/hooks/useLighthouse';
 import Layout from '@/pages/Layout';
 import { ethers } from 'ethers';
 import { useRouter } from 'next/router';
@@ -37,7 +37,7 @@ export default function TokenID() {
 
   const startDownload = async () => {
     try{
-      await downloadNFT(detail.dbCID, address, id);
+      await downloadCid(detail.dbCID, address, id);
       toast.success("Succesfully downloaded enjoy!");
     }catch(e){
       toast.error("Error Downloading NFT");

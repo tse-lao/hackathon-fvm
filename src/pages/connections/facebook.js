@@ -1,4 +1,4 @@
-import { createJWTToken } from "@/hooks/useLighthouse";
+import { readJWT } from "@/hooks/useLighthouse";
 import { getLighthouse } from "@/lib/createLighthouseApi";
 import { getMetadataFromFile } from "@/lib/dataHelper";
 import lighthouse from "@lighthouse-web3/sdk";
@@ -70,7 +70,7 @@ export default function FacebookDetails() {
     };
 
     async function processUploadedFiles(uploadedFiles) {
-        const jsonToken = await createJWTToken();
+        const jsonToken = await readJWT(address);
         const api = await getLighthouse(address);
 
 

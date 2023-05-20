@@ -3,7 +3,6 @@ import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
 import CreateDeal from '@/components/marketplace/CreateDeal';
-import { useContract } from '@/hooks/useContract';
 import { signAuthMessage } from '@/lib/createLighthouseApi';
 import readBlobAsJson, { readTextAsJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
@@ -39,7 +38,6 @@ export default function ViewFile() {
     const [fileURL, setFileURL] = useState(null);
     const [loading, setLoading] = useState(true);
     const polybase = usePolybase(); 
-    const {createCrossChainDealRequest}= useContract();
     const [createCarDeal, setCreateCarDeal] = useState(false);
 
     const { data } = useDocument(polybase.collection("File").where("cid", "==", cid));
@@ -52,10 +50,7 @@ export default function ViewFile() {
             setFileInfo(status.data);
 
             if (!status.data.encryption) {
-                //TODO: Read the content of the CID and display it.
                 const file = cid.toString();
-                //read the content of this file 
-                cid
                 readContent(status.data.mimeType, file);
             }
             

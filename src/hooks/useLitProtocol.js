@@ -1,68 +1,9 @@
 import { getLighthouse } from "@/lib/createLighthouseApi";
-import * as LitJsSdk from "@lit-protocol/lit-node-client";
 import { ethers } from 'ethers';
 import { toast } from "react-toastify";
 import { useContract } from "./useContract";
-import { createJWTToken } from "./useLighthouse";
+import { readJWT } from "./useLighthouse";
 const PUBLIC_KEY = "0x04808e24bb109fac42882de0203d77f2ad60ffdbf7ff339d77036f71b35095198aa8cb2705030b4b1a206b066cb0bebd18b45353a79f150eebd6b1e986e97f5d32"
-export async function litJsSdkLoaded() {
-  const client = new LitJsSdk.LitNodeClient({ litNetwork: "serrano" });
-
-  await client.connect();
-  window.litNodeClient = client;
-}
-
-//QmfYdvmY4cifjzis7zWq4UmhVYKJq5J3AiyEVBFRCwx1TB => validate
-//cid => accept
-//rows => accept
-//pkp singing  => valide
-
-// Use the CreateSpitter function from useContract
-
-export async function runLitProtocol(dataCID) {
-  // you need an AuthSig to auth with the nodes
-  // this will get it from metamask or any browser wallet
-  const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "mumbai" });
-
-  console.log(authSig)
-  await litJsSdkLoaded();
-
-  const litCID = "QmanxAzq5LrkJdGWR1V8SWN8kpGVJawqnV9YoyMnMg9R9w";
-
-  //string to 8uint array 
-  const array = dataCID.split('').map((char) => char.charCodeAt(0));
-  const encoder = new ethers.utils.AbiCoder();
-
-
-  const signingMessage = encoder.encode(["string"], [dataCID])
-
-  //turn back 
-  console.log(array);
-  const string = String.fromCharCode(...array);
-
-  console.log(string == dataCID);
-
-  console.log("string", string);
-  const results = await litNodeClient.executeJs({
-    ipfsId: litCID,
-    authSig,
-    jsParams: {
-      cid: dataCID,
-      publicKey: PUBLIC_KEY,
-      sigName: "sig1",
-      toSign: array,
-    },
-  });
-  console.log("results", results);
-  const { signatures, response } = results;
-  console.log("response", response);
-  console.log(signatures);
-
-
-  return signatures
-
-}
-
 
 export async function recoverAddress(dataCID) {
   const str = dataCID;
@@ -130,7 +71,7 @@ export async function validateInput(tokenID, cid, rows) {
 }
 
 export async function retrieveMergeCID(tokenID, creator) {
-  const getToken = await createJWTToken(creator);
+  const getToken = await readJWT(creator);
   const apiKey = await getLighthouse(creator);
 
   const url = "https://apollo-server-gateway.herokuapp.com/";

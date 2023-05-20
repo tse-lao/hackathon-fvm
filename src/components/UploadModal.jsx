@@ -1,6 +1,6 @@
 
 import MatchRecord from '@/hooks/useBlockchain';
-import { uploadCarFile, useJWT } from '@/hooks/useLighthouse';
+import { readJWT, uploadCarFile } from '@/hooks/useLighthouse';
 import { getLighthouse, uploadMetaData } from '@/lib/createLighthouseApi';
 import { getMetadataFromFile } from '@/lib/dataHelper';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
@@ -112,7 +112,7 @@ export default function UploadModal({ onClose }) {
     const uploadFileEncrypted = async () => {
         setLoading(true)
         let api = await getLighthouse(address);
-        const jwt = await useJWT(address);
+        const jwt = await readJWT(address);
 
 
         let list = [];

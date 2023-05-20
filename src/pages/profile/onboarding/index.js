@@ -1,4 +1,4 @@
-import { createJWTToken } from '@/hooks/useLighthouse'
+import { readJWT } from '@/hooks/useLighthouse'
 import lighthouse from '@lighthouse-web3/sdk'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { ethers } from 'ethers'
@@ -32,8 +32,9 @@ export default function Index() {
     console.log(result)
 
     // 2. Create JWT Token with user's address.
-    const jwt = await createJWTToken(address)
+    const jwt = await readJWT(address)
     console.log(jwt)
+    localStorage.setItem(`lighthouse-jwt-${address}`, jwt)
   }
   
   const getApiKey = async () => {
