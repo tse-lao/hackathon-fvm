@@ -29,8 +29,6 @@ export default function ListRequest() {
                 query += ')';
             }
 
-
-
             const marketplace = await fetch(`/api/tableland/token/all?where=${query}`);
             const data = await marketplace.json();
             setData(data.result)
@@ -60,8 +58,6 @@ export default function ListRequest() {
                     {data.length > 0 ? data.map((request, index) => (
                         <RequestElement index={index} request={request} key={index} />
                     )) : (<p>No data found!</p>)}
-
-
                 </div>
             </main>
         </div>

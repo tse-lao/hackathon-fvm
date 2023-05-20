@@ -310,13 +310,8 @@ export const useContract = () => {
       provider
     )
     const tx = await splitterInstance.distribute()
-<<<<<<< HEAD
-    return await tx.wait()
-=======
-    
     return tx
->>>>>>> ca15b758a16598c5aa2764843655b2605305691b
-  }
+    }
   
   const getBalance = async (address:string) => {
     const balance = await provider.getBalance(address);

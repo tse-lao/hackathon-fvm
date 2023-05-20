@@ -1,6 +1,6 @@
 
 import MatchRecord from '@/hooks/useBlockchain';
-import { createJWTToken, uploadCarFile } from '@/hooks/useLighthouse';
+import { uploadCarFile, useJWT } from '@/hooks/useLighthouse';
 import { getLighthouse, uploadMetaData } from '@/lib/createLighthouseApi';
 import { getMetadataFromFile } from '@/lib/dataHelper';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
@@ -112,7 +112,7 @@ export default function UploadModal({ onClose }) {
     const uploadFileEncrypted = async () => {
         setLoading(true)
         let api = await getLighthouse(address);
-        const jwt = await createJWTToken(address);
+        const jwt = await useJWT(address);
 
 
         let list = [];
@@ -173,7 +173,6 @@ export default function UploadModal({ onClose }) {
         const authToken = await lighthouse.dataDepotAuth(api);
         console.log(authToken.data.access_token)
         
-        //here we somehow need to create a new file from the encrypted file and upload it. 
         await uploadCarFile(dataDepo, progressCallback, authToken.data.access_token);
         
         await sleep(1000);
