@@ -27,7 +27,7 @@ export default function CreateDeal({ cid, onClose }) {
         const cidHex = record.cidHex;
         const label = record.carPayload;
         const piece_size = record.pieceSize;
-        const start_epoch = blocknumber + 5500;
+        const start_epoch = blocknumber + 5000;
         
         //TODO get current epoch. 
         
