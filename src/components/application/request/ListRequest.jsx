@@ -11,7 +11,7 @@ export default function ListRequest() {
 
         const getData = async() => {
           setLoading(true)
-          const result = await fetch(`/api/tableland/token/all?request=false`);
+          const result = await fetch(`/api/tableland/token/all?request=${false}`);
           const data = await result.json()
           setData(data.result)
           

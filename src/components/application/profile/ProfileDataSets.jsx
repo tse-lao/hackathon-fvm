@@ -58,8 +58,8 @@ export default function ProfileDataSets({ creator }) {
         <div className="flex flex-col gap-4 items-center ">No data !</div></div>
         )}
 
-        {created && (owned.length > 0 ? owned.map((item, index) => (
-          <Link key={index} href={`/market/${item.tokenID}`}>
+        {created && (owned.length > 0 ? owned.map((item, index) => 
+          <Link key={index} href={item.piece_cid == 'piece_cid' ? `/market/${item.tokenID}`: `/request/${item.tokenID}` }>
             <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
               <div className="flex flex-col gap-4 items-center">
                 <h2 className='text-lg text-gray-600'>{item.dbName}</h2>
@@ -68,7 +68,7 @@ export default function ProfileDataSets({ creator }) {
               </div>
             </div>
           </Link>
-        )) :  
+        ) :  
         <div className=" col-span-2 overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
         <div className="flex flex-col gap-4 items-center ">No data !</div></div>
         )}

@@ -55,9 +55,9 @@ export default function GenerateDataset({ tokenId, onClose }) {
         const toSign = tokenId.concat("", mergedCID).concat("", price).concat("", splitterContract);
         const sign = await getSignature(toSign);
 
-
         try {
             await createDB_NFT(tokenId, mergedCID, mintPrice, splitterContract, sign.v, sign.r, sign.s)
+            window.location.realod()
         }
         catch (e) {
             console.log(e)
@@ -65,6 +65,7 @@ export default function GenerateDataset({ tokenId, onClose }) {
         //console.log(result);s
         setLoading(false);
         onClose();
+        
 
     }
     return (

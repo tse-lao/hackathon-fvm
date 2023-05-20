@@ -12,6 +12,7 @@ export default async (req, res) => {
         }}
     
         
+        console.log(req.query.request)
     const result = await new Promise(async (resolve, reject) => {
         const url = 'https://testnets.tableland.network/api/v1/query';
         const params = new URLSearchParams({
@@ -31,7 +32,7 @@ export default async (req, res) => {
               )
             FROM ${DB_main} JOIN ${DB_attribute}
                 ON ${DB_main}.tokenID = ${DB_attribute}.tokenID
-                ${!req.query.request ? ` WHERE ${DB_main}.piece_cid != 'piece_cid'` : ''}  
+                ${req.query.request == 'true' ? ` WHERE ${DB_main}.piece_cid != 'piece_cid'` : ''}  
             GROUP BY ${DB_main}.tokenID`,
         extract: true, format: "objects", unwrap: false
         });

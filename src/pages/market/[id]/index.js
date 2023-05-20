@@ -130,16 +130,6 @@ export default function TokenID() {
                 }
              </div>
            </div>
-
-           <div className="mt-10 border-t border-gray-200 pt-10">
-             <h3 className="text-sm font-medium text-gray-900">License</h3>
-             <p className="mt-4 text-sm text-gray-500">
-               Standard licensing information <br />
-               <a href="#" className="font-medium text-cf-600 hover:text-cf-500">
-                 Read full license
-               </a>
-             </p>
-           </div>
          </div>
           <div className="lg:col-span-4 lg:row-end-1">
             <div className="aspect-h-3 aspect-w-4 overflow-hidden rounded-lg bg-gray-100">

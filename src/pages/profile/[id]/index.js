@@ -30,8 +30,8 @@ export default function Profile() {
   return (
     <Layout title="Profile">
     
-    <ProfileStats address={id} />
-        <div className='bg-white rounded-sm flex items-center py-6 px-12'>
+      <ProfileStats address={id} />
+        <div className='bg-white rounded-sm flex items-center py-6 px-12 mt-6'>
             <Avatar creator={id} height="100" width="100" />
             <div>
             <span className='text-sm text-gray-600 mt-2 uppercase'>You are viewing</span>
@@ -41,9 +41,8 @@ export default function Profile() {
         </div>
         <Tabs tabs={tabs} selected={setSelected} active={select} />
         <div className='flex mt-12'>
-          {select === "Contributions" &&     <Contributions creator={id} />}
-          {select === "DataSets" &&     <ProfileDataSets creator={id} />}
-
+          {select === "Contributions" && <Contributions creator={id} />}
+          {select === "DataSets" && <ProfileDataSets creator={id} />}
         </div>
     </Layout>
   )

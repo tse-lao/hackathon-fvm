@@ -7,36 +7,34 @@ import {
   TWFactoryAddress,
   crossChainBacalhauJobsAbi,
   crossChainBacalhauJobs_address,
+  crossChainTablelandDealClientAddress,
+  crossChainTablelandStorageAbi,
+  crossChainTablelandStorageAddress,
   helper,
   helperAbi,
   splitImplementation,
-  splitterAbi,
-  crossChainTablelandDealRewarderAbi,
-  crossChainTablelandDealClientAbi,
-  crossChainTablelandStorageAbi,
-  crossChainTablelandDealClientAddress,
-  crossChainTablelandDealRewarderAddress,
-  crossChainTablelandStorageAddress,
+  splitterAbi
 } from '../constants'
 
 export const useContract = () => {
   const { data: signer } = useSigner()
 
-  const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
+  const provider = new ethers.providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com	")
+  const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, provider)
 
   const crossChainTablelandStorage = new ethers.Contract(
     crossChainTablelandStorageAddress,
     crossChainTablelandStorageAbi,
-    signer!
+    provider
   )
 
   const tablelandBacalhau = new ethers.Contract(
     crossChainBacalhauJobs_address,
     crossChainBacalhauJobsAbi,
-    signer!
+    provider
   )
-  const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, signer!)
-  const helperContract = new ethers.Contract(helper, helperAbi, signer!)
+  const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, provider)
+  const helperContract = new ethers.Contract(helper, helperAbi, provider)
 
   // --------------------------------------------------------- DB_NFT_CONTRACT INTERACTIONS -----------------------------------------------------------------------------------------------
   const getCurrentTokenId = async () => {
@@ -240,7 +238,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer!
+      provider
     )
     return await splitterInstance.payeeCount()
   }
@@ -249,7 +247,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer!
+      provider
     )
     return await splitterInstance.payee(index)
   }
@@ -258,7 +256,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer!
+      provider
     )
     return await splitterInstance.shares(address)
   }
@@ -267,14 +265,25 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer!
+      provider
     )
     const tx = await splitterInstance.distribute()
+    
+    return tx
   }
+  
+  const getBalance = async (address:string) => {
+    const balance = await provider.getBalance(address);
+
+    return ethers.utils.formatEther(balance);
+  };
+  
+  
 
   return {
     getCurrentTokenId,
     createOpenDataSet,
+    getBalance, 
     updateDB_NFT,
     RequestDB,
     mint,
