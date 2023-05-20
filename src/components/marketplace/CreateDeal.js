@@ -57,7 +57,7 @@ export default function CreateDeal({ cid, onClose }) {
             <div className="flex flex-col w-full h-full py-6 gap-4">
                 {makingDeal && <LoadingSpinner />}
                 {errorMessage && <div className="text-red-500">{errorMessage}</div>}
-                {blocknumber}
+                
                 <div className='flex flex-col'>
                     <label className="font-bold">CID</label>
                     <span>{data.data[0].data.cidHex}</span>
@@ -81,6 +81,10 @@ export default function CreateDeal({ cid, onClose }) {
                 <div className='flex flex-col'>
                     <label className="font-bold">Size</label>
                     <span>{data.data[0].data.carId}</span>
+                </div>
+                <div className='flex flex-col'>
+                <label className="font-bold">Current Block</label>
+                <span>{blocknumber}</span>
                 </div>
                 {chain.id == HYPERSPACE_ID ? <ActionButton onClick={makeProposal} text="Make Deal" /> : 
                 <OpenButton text="Change to HyperSpace"
