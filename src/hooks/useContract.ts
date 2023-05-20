@@ -215,7 +215,7 @@ export const useContract = () => {
   const callLillypadJob = async (
     _specStart: string,
     input: string,
-    _specEnd
+    _specEnd: string
   ) => {
     const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd)
     return await tx.wait()
