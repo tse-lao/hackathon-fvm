@@ -7,6 +7,7 @@ import {
   TWFactoryAddress,
   crossChainBacalhauJobsAbi,
   crossChainBacalhauJobs_address,
+  crossChainTablelandDealClientAbi,
   crossChainTablelandDealClientAddress,
   crossChainTablelandStorageAbi,
   crossChainTablelandStorageAddress,
@@ -310,8 +311,10 @@ export const useContract = () => {
       provider
     )
     const tx = await splitterInstance.distribute()
-    return tx
-    }
+
+    
+    return await tx.wait()
+  }
   
   const getBalance = async (address:string) => {
     const balance = await provider.getBalance(address);
