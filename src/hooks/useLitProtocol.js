@@ -87,9 +87,9 @@ export async function recoverAddress(dataCID) {
 }
 
 export async function validateInput(tokenID, cid, rows) {
-  const url = "http://localhost:4000"
 
-  const pUrl = "https://apollo-server-gateway.herokuapp.com/"
+
+  const url = "https://apollo-server-gateway.herokuapp.com/"
 
   const query = `
     query VerifyCID($tokenId: String!, $cid: String!, $rows: Int!) {
@@ -130,10 +130,10 @@ export async function validateInput(tokenID, cid, rows) {
 }
 
 export async function retrieveMergeCID(tokenID, creator) {
-  const getToken = await createJWTToken();
+  const getToken = await createJWTToken(creator);
   const apiKey = await getLighthouse(creator);
 
-  const url = "http://localhost:4000"
+  const url = "https://apollo-server-gateway.herokuapp.com/";
 
   const query = `
     query Query($tokenId: String, $jwtToken: String, $creator: String, $apiKey: String) {
@@ -210,7 +210,7 @@ export async function mintNFTDB (tokenID, txHash,  creator, mintPrice) {
 
 export async function getSignature(message){
   
-  const url = "http://localhost:4000"
+  const url = "https://apollo-server-gateway.herokuapp.com/"
   
   const query = `
   query SignMessage($message: String) {

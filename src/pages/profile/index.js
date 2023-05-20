@@ -33,19 +33,15 @@ export default function Profile() {
     <ProfileStats address={address} />
         <div className='bg-white rounded-sm flex items-center py-6 px-12'>
             <Avatar creator={address} height="100" width="100" />
-            <div>
+          <div>
             <span className='text-sm text-gray-600 mt-2 uppercase'>Welcome</span>
             <h1 className='text-lg font-bold leading-7 text-gray-700'>{address}</h1>
-            </div>
-            
+          </div>      
         </div>
        
-        <div className='flex '>
+
         <div className='flex-grow'>
           <Tabs tabs={tabs} />
-          
-        </div>
-        
         </div>
     </Layout>
   )

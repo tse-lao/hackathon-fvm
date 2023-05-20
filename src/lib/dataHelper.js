@@ -2,38 +2,36 @@
 import Papa from 'papaparse';
 
 import { NFTStorage } from 'nft.storage';
-import { Configuration, OpenAIApi } from "openai";
 import { toast } from 'react-toastify';
 
-const configuration = new Configuration({
-  apiKey: "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",
-});
-const openai = new OpenAIApi(configuration);
-
-
-export default
-  function readBlobAsJson(blob, callback) {
+export async function readBlobAsJson(blob) {
+  return new Promise((resolve, reject) => {
   const reader = new FileReader();
 
+
+  reader.addEventListener('error', () => {
+    reject(new Error('Error reading file'));
+  });
   // Define the onload event handler
-  reader.onload = function (event) {
+  reader.addEventListener('load', async () => {
     try {
       const json = JSON.parse(event.target.result);
-      callback(null, json);
+      resolve(json);
     } catch (error) {
-      callback(error);
+      reject(error);
     }
-  };
+  });
 
   // Define the onerror event handler
   reader.onerror = function () {
-    callback(reader.error);
+    reject(reader.error);
   };
 
   // Read the Blob as a text string
   reader.readAsText(blob);
 
   return reader;
+  })
 }
 
 export function readTextAsJson(blob, callback) {
@@ -126,51 +124,6 @@ export function analyzeJSONStructure(json) {
   return analyzeNode(json);
 }
 
-async function checkOpenAI() {
-  if (!configuration.apiKey) {
-    res.status(500).json({
-      error: {
-        message: "OpenAI API key not configured, please follow instructions in README.md",
-      }
-    });
-    return;
-  }
-
-}
-
-export async function categorizeData(json) {
-
-  checkOpenAI();
-  const jsonData = JSON.stringify(json, null, 2);
-
-  const prompt = `Analyze and categorize the following JSON data:\n\n${jsonData}\n\nAnalysis:`;
-
-
-  try {
-    const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: generatePrompt(prompt),
-      temperature: 0.6,
-    });
-    res.status(200).json({ result: completion.data.choices[0].text });
-  } catch (error) {
-    // Consider adjusting the error handling logic for your use case
-    if (error.response) {
-      console.error(error.response.status, error.response.data);
-      res.status(error.response.status).json(error.response.data);
-    } else {
-      console.error(`Error with OpenAI API request: ${error.message}`);
-      res.status(500).json({
-        error: {
-          message: 'An error occurred during your request.',
-        }
-      });
-    }
-  }
-
-
-  return 'Unable to analyze and categorize the JSON data.';
-}
 
 export function readJSONFromFileInput(fileInput, callback) {
   // Get the first file object from the file input
@@ -190,32 +143,13 @@ export function readJSONFromFileInput(fileInput, callback) {
     }
   });
 
+
   // Read the file as text using the reader
   reader.readAsText(file);
 }
 
-export function readFSStream(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.addEventListener('load', async () => {
-      try {
-        resolve(reader.result);
-      } catch (error) {
-        toast.error(error);
-        reject(error.message);
-      }
-    });
-
-    reader.addEventListener('error', () => {
-      reject(new Error('Error reading file'));
-    });
-
-    reader.readAsText(file);
-  });
-}
-
 export async function getMetadataFromFile(file) {
+  const readfile = file.files[0];
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -223,7 +157,9 @@ export async function getMetadataFromFile(file) {
       try {
         const json = JSON.parse(reader.result);
         const metadata = analyzeJSONStructure(json);
-        const result = await getMetadataCID(metadata);
+        console.log(metadata)
+        const result = await getMetadataCID(JSON.stringify(metadata));
+        
         resolve(result);
       } catch (error) {
         toast.error(error);
@@ -235,7 +171,7 @@ export async function getMetadataFromFile(file) {
       reject(new Error('Error reading file'));
     });
 
-    reader.readAsText(file);
+    reader.readAsText(readfile);
   });
 }
 

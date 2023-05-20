@@ -1,4 +1,3 @@
-import { getAllContributionData } from "@/hooks/useTableland";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../elements/LoadingSpinner";
 import ContributionItem from "./ContributionItem";
@@ -11,18 +10,23 @@ export default function Contributions({creator}) {
     useEffect(() => {
 
         const getData = async () => {
-            const response = await getAllContributionData(creator);
-            console.log(response)
-            setData(response)
+            console.log(creator)
+            const result = await fetch(`/api/tableland/contributions?creator=${creator.toLowerCase()}`)
+            const data = await result.json()
+            console.log(data);
+            
+            setData(data.result)
             setLoading(false)
         }
-        getData()
+        if(creator != undefined)  getData();
+
+       
 
     }, [creator])
     
     if(loading) return (<LoadingSpinner msg="Loading Contributions" />);
   return (
-    <div className="flex flex-row flex-wrap gap-4 mt-8">
+    <div className="grid md:grid-cols-2 flex-wrap gap-4 mt-8">
         {data.length > 0 ? data.map((item, index) => (
             <ContributionItem key={index} contribution={item} />
         )) : (

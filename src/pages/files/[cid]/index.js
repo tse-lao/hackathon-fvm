@@ -2,11 +2,12 @@
 import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
-import useNftStorage, { readEncryptFile } from '@/hooks/useNftStorage';
+import { useContract } from '@/hooks/useContract';
 import { signAuthMessage } from '@/lib/createLighthouseApi';
-import readBlobAsJson, { analyzeJSONStructure, readTextAsJson } from '@/lib/dataHelper';
+import readBlobAsJson, { readTextAsJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
 import lighthouse from '@lighthouse-web3/sdk';
+import { useDocument, usePolybase } from '@polybase/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -33,23 +34,19 @@ const MIMETYPE_APP_CSV = "application/csv";
 export default function ViewFile() {
     const { cid } = useRouter().query;
     const { address } = useAccount();
-    const { uploadMetadata } = useNftStorage();
-
-    const [record, setRecord] = useState(
-        {
-            cid: "",
-            metadata: "",
-        }
-    );
-
     const [fileInfo, setFileInfo] = useState(fileDefault);
     const [fileURL, setFileURL] = useState(null);
     const [loading, setLoading] = useState(true);
+    const polybase = usePolybase(); 
+    const {createCrossChainDealRequest}= useContract();
+    const [dealStatus, setDealStatus] = useState(null);
+
+    const { data } = useDocument(polybase.collection("File").where("cid", "==", cid));
+    
 
     //get the file info.
     useEffect(() => {
         const getFile = async () => {
-            setRecord({ cid: cid, metadata: "" })
             const status = await lighthouse.getFileInfo(cid)
             setFileInfo(status.data);
 
@@ -60,11 +57,17 @@ export default function ViewFile() {
                 cid
                 readContent(status.data.mimeType, file);
             }
+            
+            if(data != null){
+                const deal = await fetch(`/api/tableland/request?cid=${data.data[0].data.carPayload}`)
+                const dealData = await deal.json();
+                console.log(dealData);       
+            }
         }
 
         if (cid) { getFile(); setLoading(false) }
 
-    }, [cid])
+    }, [cid, data])
 
     /* Decrypt file */
     const decrypt = async () => {
@@ -143,20 +146,25 @@ export default function ViewFile() {
         }, 0);
     }
 
-    async function analyze() {
-        const structure = analyzeJSONStructure(fileURL);
-        const metadata = await uploadMetadata(JSON.stringify(structure));
-        setRecord({
-            cid: cid,
-            metadata: metadata
-        });
-    }
 
-    async function createCar() {
-        //we want to create ht car het 
+    async function createDeal() {
+        //TODO: fix the matic. 
+        let record = data.data[0].data;
         
-        const getCar = await readEncryptFile(cid);
-        console.log(getCar)
+        console.log(data)
+        const piece_cid = record.cidHex;
+        const label = record.carPayload;
+        const piece_size = record.pieceSize;
+        const end_epoch = 1050026;
+        const location_ref = `https://data-depot.lighthouse.storage/api/download/download_car?fileId=${record.carId}.car`;
+        const carSize = record.carSize;
+        
+        console.log(`${piece_cid}:piece_cid, label, ${piece_size} piece_size, ${end_epoch} end_epoch, ${location_ref} location_ref, carSize: ${carSize}`)
+        const result = await createCrossChainDealRequest(piece_cid, label, piece_size, end_epoch, location_ref, carSize);
+        
+        console.log(result);
+        
+        
     }
 
 
@@ -179,16 +187,10 @@ export default function ViewFile() {
                         </div>
                         <div className="space-x-4">
                             <button
-                                onClick={createCar}
+                                onClick={createDeal}
                                 className="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
-                                Create Car
-                            </button>
-                            <button
-                                onClick={analyze}
-                                className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border border-gray-300"
-                            >
-                                Get Metadata
+                                Create Deal
                             </button>
                         </div>
                     </div>
@@ -209,9 +211,9 @@ export default function ViewFile() {
                         </div>
 
                         {/* Sidebar */}
-                        <div className="w-120 p-4 bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">
-                            <FileDetailInformation detail={fileInfo} className="mt-4 mb-4" metadata={record.metadata} cid={cid} address={address} />
-                            <FileSharedWith cid={cid} />
+                        <div className="w-120 p-4 w-[350px] bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">
+                            <FileDetailInformation detail={fileInfo} className="mt-4 mb-4" cid={cid} address={address} />
+                            <FileSharedWith detail={fileInfo} />
                         </div>
                     </div>
                 </div>

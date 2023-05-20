@@ -1,19 +1,27 @@
 
 import Table from "@/components/application/data/Table";
+import {
+    DB_attribute,
+    DB_main,
+    DealClientDeals,
+    DealRequests,
+    computation,
+    data_contribution
+} from '@/constants/tableland';
 import { getTableFromTableland } from "@/hooks/useTableland";
 import { useEffect, useState } from "react";
 import Layout from "../Layout";
-
-export const computation = "computation_3141_15"
-export const data_contribution = "data_contribution_80001_6096 "
-export const DB_main = "file_main_80001_6097"
-export const DB_attribute = "file_attribute_80001_6098"
-const databases = [
-    "file_main_80001_6135", 
-    "computation_3141_15", 
-    "data_contribution_80001_6134", 
-    "file_attribute_80001_6136",
-]
+  
+  // Define an array to store the imported values
+  const exportsList = [];
+  
+  // Add the imported values to the array
+  exportsList.push(computation);
+  exportsList.push(data_contribution);
+  exportsList.push(DB_main);
+  exportsList.push(DB_attribute);
+  exportsList.push(DealRequests);
+  exportsList.push(DealClientDeals);
 
 export default function TableLand() {
     const [loading, setLoading] = useState(true);
@@ -45,7 +53,7 @@ export default function TableLand() {
                 
                 <select value={selectedDB} onChange={changeDB}>
                 <option value="">Select...</option>
-                {databases.map(item => <option value={item}>{item}</option>)}
+                {exportsList.map(item => <option value={item}>{item}</option>)}
 
               </select>
                 

@@ -1,6 +1,5 @@
 import { formatBytes, formatDate } from "@/lib/helpers";
 import { useAccount } from "wagmi";
-import FileStatus from "./FileStatus";
 
 
 export default function FileDetailInformation({detail, metadata, cid}) {
@@ -53,12 +52,6 @@ export default function FileDetailInformation({detail, metadata, cid}) {
     <div className="flex justify-between py-3 text-sm font-medium">
       <dt className="text-gray-500">Encryption</dt>
       {detail.encryption ? <dd className="text-cf-500">Yes</dd> : <dd className="text-red-900">No</dd>}
-    </div>
-    <div className="flex justify-between py-3 text-sm font-medium">
-      <dt className="text-gray-500">Metadata</dt>
-      <dd className="text-gray-900">
-        {address && <FileStatus metadata={metadata} cid={cid} address={address}/> }
-        </dd>
     </div>
   </dl>
   )

@@ -19,6 +19,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes changeColor {
+  0% { color: #52b36d; }
+  25% { color: #4faa6d; }
+  50% { color: #406c72; }
+  75% { color: #333776; }
+  100% { color: #302878; }
+}
+
+.loading-icon {
+  animation: changeColor 2s linear infinite;
+}
+
+
 
 #__next {
   min-height: 100%;
@@ -73,6 +86,54 @@
 }
 
 
+.react-tagsinput {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  overflow: hidden;
+  padding-left: 5px;
+  padding-top: 5px;
+  border-radius: 6px;
+}
 
-/*'ml-3 flex-1 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50',
-*/
+.react-tagsinput--focused {
+  border-color: theme('colors.cf.600');
+}
+
+.react-tagsinput-tag {
+  background-color: theme('colors.cf.400');
+  border-radius: 2px;
+  border: 1px solid theme('colors.cf.600');;
+  color: white;
+  display: inline-block;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  margin-right: 5px;
+  padding: 5px;
+}
+
+.react-tagsinput-remove {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.react-tagsinput-tag a::before {
+  content: " ×";
+}
+
+.react-tagsinput-input {
+  background: transparent;
+  border: 0;
+  color: #777;
+ border-radius: 4px;
+  font-size: theme('fontSize.sm');
+  margin-bottom: 6px;
+  margin-top: 1px;
+  outline: none;
+  padding: 5px;
+  width: 100px;
+}
+.react-tagsinput-input:focus {
+  border-color: theme('colors.cf.400');
+  outline: none;
+}
+

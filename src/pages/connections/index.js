@@ -1,39 +1,14 @@
-import Lighthouse from "@/components/connections/Lighthouse";
 import Link from "next/link";
 import { useState } from "react";
 import Layout from "../Layout";
 const connections = [
     {
         id: 1,
-        name: "Facebook",
-        status: "logged_in",
-        category: "social_media",
-    },
-    {
-        id: 2,
-        name: "Google",
-        status: "logged_out",
-        category: "social_media",
-    },
-    {
-        id: 3,
         name: "Strava",
         status: "not_connected",
         category: "health",
     },
-    {
-        id: 4,
-        name: "MyBank",
-        status: "logged_in",
-        category: "banking",
-    },
-    {
-        id: 5,
-        name: "MyOtherBank",
-        status: "logged_in",
-        category: "banking",
-        component: <Lighthouse />,
-    }
+
 ];
 
 

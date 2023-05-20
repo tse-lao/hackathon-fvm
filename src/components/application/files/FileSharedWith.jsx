@@ -11,7 +11,6 @@ export default function FileSharedWith({ cid }) {
     const [errorMessage, setErrorMessage] = useState("")
     const { address } = useAccount();
 
-
     const [accessControl, setAccessControl] = useState({
         conditions: [],
         conditionsSolana: [],
@@ -64,29 +63,10 @@ export default function FileSharedWith({ cid }) {
             setErrorMessage(e)
         }
 
-
-        /*  const newId = uuidv4();
-         const createSharing = await polybase
-         .collection("FileShare")
-         .create([
-             newId, publicShareKey, 
-         ]); */
-
-        //console.log(createSharing);
-
     }
 
 
     const applyAccessConditions = async (e) => {
-
-        const contractAddress = "0x019e5A2Eb07C677E0173CA789d1b8ed4384e59A5"
-        const minCount = 5;
-
-        // Conditions to add
-
-        // owner or contributor to the dataPool / RequestDB
-        // minAmount of contributors. = data anonimity
-        // minRequired = 100 before data is released.
 
         const conditions = [
             {
@@ -193,7 +173,7 @@ export default function FileSharedWith({ cid }) {
                 <div>
                     <h3 className="font-medium text-gray-900">Access Control</h3>
                     <ul role="list" className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                        {accessControl.conditions.map((condition) => (
+                        {false && accessControl.conditions.map((condition) => (
                             <li className="flex items-center justify-between py-3" key={condition.id}>
                                 <div className="flex items-center">
                                     {condition.chain} {condition.method} {condition.value}
@@ -201,13 +181,14 @@ export default function FileSharedWith({ cid }) {
                             </li>
                         ))}
                     </ul>
+                    <button onClick={e => applyAccessConditions()}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+    >Apply Access Conditions</button>
                 </div>
 
             )}
             
-            <button onClick={e => applyAccessConditions()}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-            >Apply Access Conditions</button>
+           
 
 
 

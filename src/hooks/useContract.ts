@@ -7,27 +7,25 @@ import {
   TWFactoryAddress,
   crossChainBacalhauJobsAbi,
   crossChainBacalhauJobs_address,
+  crossChainTablelandDealClientAddress,
+  crossChainTablelandStorageAbi,
+  crossChainTablelandStorageAddress,
   helper,
   helperAbi,
   splitImplementation,
-  splitterAbi,
-  crossChainTablelandDealRewarderAbi,
-  crossChainTablelandDealClientAbi,
-  crossChainTablelandStorageAbi,
-  crossChainTablelandDealClientAddress,
-  crossChainTablelandDealRewarderAddress,
-  crossChainTablelandStorageAddress,
+  splitterAbi
 } from '../constants'
 
 export const useContract = () => {
   const { data: signer } = useSigner()
 
-  const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
+  const provider = new ethers.providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com	")
+  const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer)
 
   const TablelandStorage = new ethers.Contract(
     crossChainTablelandStorageAddress,
     crossChainTablelandStorageAbi,
-    signer!
+    signer
   )
 
   const TablelandDealClient = new ethers.Contract(
@@ -39,10 +37,10 @@ export const useContract = () => {
   const tablelandBacalhau = new ethers.Contract(
     crossChainBacalhauJobs_address,
     crossChainBacalhauJobsAbi,
-    signer!
+    signer
   )
-  const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, signer!)
-  const helperContract = new ethers.Contract(helper, helperAbi, signer!)
+  const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, provider)
+  const helperContract = new ethers.Contract(helper, helperAbi, provider)
 
   // --------------------------------------------------------- DB_NFT_CONTRACT INTERACTIONS -----------------------------------------------------------------------------------------------
   const getCurrentTokenId = async () => {
@@ -74,6 +72,7 @@ export const useContract = () => {
     )
     return await tx.wait()
   }
+  // ================================ CREATING OPEN DATA SET ======================================== //
 
   const createOpenDataSet = async (
     dbCID: string,
@@ -96,6 +95,7 @@ export const useContract = () => {
     return await tx.wait()
   }
 
+  // ================================ SUBMITTING DATA AND NFT CREATION ======================================== //
   const submitData = async (
     tokenId: number,
     dataCID: String,
@@ -280,7 +280,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer!
+      provider
     )
     return await splitterInstance.payeeCount()
   }
@@ -289,7 +289,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer!
+      provider
     )
     return await splitterInstance.payee(index)
   }
@@ -298,7 +298,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer!
+      provider
     )
     return await splitterInstance.shares(address)
   }
@@ -307,15 +307,29 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer!
+      provider
     )
     const tx = await splitterInstance.distribute()
+<<<<<<< HEAD
     return await tx.wait()
+=======
+    
+    return tx
+>>>>>>> ca15b758a16598c5aa2764843655b2605305691b
   }
+  
+  const getBalance = async (address:string) => {
+    const balance = await provider.getBalance(address);
+
+    return ethers.utils.formatEther(balance);
+  };
+  
+  
 
   return {
     getCurrentTokenId,
     createOpenDataSet,
+    getBalance, 
     updateDB_NFT,
     RequestDB,
     mint,

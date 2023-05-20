@@ -40,7 +40,7 @@ export default function AttributeTable({ data }) {
             </div>
             <div className="text-gray-600 flex flex-col gap-2">
                 <span className="font-bold">Splitter</span>
-                <Link className="hover:text-cf-500" href={`https://mumbai.polygonscan.com/address/${splitter}`} target="blank">{splitter}</Link>
+                <Link className="hover:text-cf-500" href={`/splitter/${splitter}`} target="blank">{splitter}</Link>
             </div>
             <div>
                 {categories.map((category, index) => (

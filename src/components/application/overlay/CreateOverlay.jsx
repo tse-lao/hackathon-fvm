@@ -2,43 +2,6 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment, useEffect, useState } from 'react'
 
-const team = [
-    {
-        name: 'Tom Cook',
-        email: 'tom.cook@example.com',
-        href: '#',
-        imageUrl:
-            'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    },
-    {
-        name: 'Whitney Francis',
-        email: 'whitney.francis@example.com',
-        href: '#',
-        imageUrl:
-            'https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    },
-    {
-        name: 'Leonard Krasner',
-        email: 'leonard.krasner@example.com',
-        href: '#',
-        imageUrl:
-            'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    },
-    {
-        name: 'Floyd Miles',
-        email: 'floyd.miles@example.com',
-        href: '#',
-        imageUrl:
-            'https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    },
-    {
-        name: 'Emily Selman',
-        email: 'emily.selman@example.com',
-        href: '#',
-        imageUrl:
-            'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-    },
-]
 
 export default function CreateOverlay({ title, getOpen, changeOpen, children }) {
     const [open, setOpen] = useState(false)
@@ -73,7 +36,7 @@ export default function CreateOverlay({ title, getOpen, changeOpen, children }) 
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
                                     <form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
                                         <div className="h-0 flex-1 overflow-y-auto">
-                                            <div className="bg-indigo-700 px-4 py-6 sm:px-6">
+                                            <div className="bg-cf-700 px-4 py-6 sm:px-6">
                                                 <div className="flex items-center justify-between">
                                                     <Dialog.Title className="text-base font-semibold leading-6 text-white">
                                                         {title}
@@ -81,7 +44,7 @@ export default function CreateOverlay({ title, getOpen, changeOpen, children }) 
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <button
                                                             type="button"
-                                                            className="rounded-md bg-indigo-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                                            className="rounded-md bg-cf-700 text-cf-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                                                             onClick={closeOverlay}
                                                         >
                                                             <span className="sr-only">Close panel</span>
@@ -90,7 +53,7 @@ export default function CreateOverlay({ title, getOpen, changeOpen, children }) 
                                                     </div>
                                                 </div>
                                                 <div className="mt-1">
-                                                    <p className="text-sm text-indigo-300">
+                                                    <p className="text-sm text-cf-300">
                                                        Please fill in the form and click submit.
                                                     </p>
                                                 </div>
@@ -109,7 +72,7 @@ export default function CreateOverlay({ title, getOpen, changeOpen, children }) 
                                             </button>
                                             <button
                                                 type="submit"
-                                                className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                                className="ml-4 inline-flex justify-center rounded-md bg-cf-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cf-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cf-600"
                                             >
                                                 Save
                                             </button>

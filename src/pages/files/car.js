@@ -12,15 +12,13 @@ export default function car() {
     const { address } = useAccount();
     const [carFiles, setCarFiles] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [organised, setOrganised] = useState(true);
-    const [modalOpen, setModalOpen] = useState(false);
 
 
     useEffect(() => {
         const getFiles = async () => {
             const apiKey = await getLighthouse(address);
             const data = await lighthouse.dataDepotAuth(apiKey)
-            const result = await getUploads(data.data.access_token);
+            const result = await getUploads(data.data.access_token, 1);
             console.log(result);
             setCarFiles(result);
             setLoading(false);
@@ -43,7 +41,7 @@ export default function car() {
 
             <div className="sm:flex sm:items-center">
                 <div className="sm:flex-auto">
-                    <h1 className="text-base font-semibold leading-6 text-gray-900">Car Files</h1>
+                    <h1 className="text-base font-semibold leading-6 text-gray-900">Car Files {carFiles.length}</h1>
                     <p className="mt-2 text-sm text-gray-700">
                         Please you can find all the car files, please not that the car files are different from regular files. 
                     </p>

@@ -20,8 +20,8 @@ export default function Toggle({text, status, changeStatus}) {
         checked={enabled}
         onChange={changeToggle}
         className={classNames(
-          enabled ? 'bg-indigo-600' : 'bg-gray-200',
-          'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2'
+          enabled ? 'bg-cf-600' : 'bg-gray-200',
+          'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cf-600 focus:ring-offset-2'
         )}
       >
         <span
@@ -33,8 +33,7 @@ export default function Toggle({text, status, changeStatus}) {
         />
       </Switch>
       <Switch.Label as="span" className="ml-3 text-sm">
-        <span className="font-medium text-gray-900">{text}</span>{' '}
-        <span className="text-gray-500">(Select is on)</span>
+        <span className="font-medium text-gray-900">{text}</span>
       </Switch.Label>
     </Switch.Group>
   )

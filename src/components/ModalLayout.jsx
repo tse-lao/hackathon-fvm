@@ -2,7 +2,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment, useState } from 'react'
 
-export default function ModalLayout({ children }) {
+export default function ModalLayout({ title, children }) {
   const [open, setOpen] = useState(true)
 
   return (
@@ -32,6 +32,7 @@ export default function ModalLayout({ children }) {
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+              <h2 className='text-xl font-bold'>{title}</h2>
               <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
               <button
                 type="button"

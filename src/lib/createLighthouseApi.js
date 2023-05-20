@@ -40,6 +40,7 @@ export async function getLighthouse(address) {
     
     if(!api){
         //redirect to settings page. 
+        getApiKey();
         return false;
     }
     return api;

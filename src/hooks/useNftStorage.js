@@ -16,13 +16,28 @@ const useNftStorage = () => {
     return { uploadMetadata }
 }
 
-//read from cid 
-
 export async function readFromCID(cid){
     const endpoint = `https://nftstorage.link/ipfs/${cid}`
     const token = process.env.NEXT_PUBLIC_NFT_STORAGE_API_KEY 
     
+    let blob = await fetch(endpoint).then(r => r.blob());
+
+    return new Promise((resolve, reject) => {
+        readTextAsJson(blob, (error, jsonData) => {
+            if (error) {
+                resolve(null)
+            } else {
+                resolve(jsonData)
+            }
+        });
+    })
+  ;
     
+}
+
+export async function blobFromCID(cid){
+    const endpoint = `https://nftstorage.link/ipfs/${cid}`
+
     let blob = await fetch(endpoint).then(r => r.blob());
     
     
