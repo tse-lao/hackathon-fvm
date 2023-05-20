@@ -137,7 +137,7 @@ export default function TokenID() {
             </div>
           </div>
           <div className="mx-auto w-full max-w-2xl lg:col-span-4 lg:mt-0 lg:max-w-none">
-            <ProductDetailTab tokenID={id} />
+            <ProductDetailTab tokenID={id} dataFormat={detail.dataFormatCID}/>
           </div>
         </div>
       </div>

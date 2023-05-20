@@ -1,12 +1,12 @@
 import { useCollection, usePolybase } from "@polybase/react";
 import JobItem from "./JobItem";
 
-export default function AllJobs() {
+export default function AllJobs({dataFormat}) {
     //get all collectionsd
     const polybase = usePolybase();
 
     const { data, error, loading } =
-    useCollection(polybase.collection("Jobs"));
+    useCollection(polybase.collection("Jobs").where("dataFormat", "==", dataFormat));
     
 
     
