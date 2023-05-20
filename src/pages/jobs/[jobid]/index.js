@@ -1,5 +1,4 @@
 
-import AllJobs from '@/components/jobs/AllJobs'
 import CreateJob from '@/components/jobs/CreateJob'
 import PerformJob from '@/components/jobs/PerformJob'
 import Layout from '@/pages/Layout'
@@ -36,9 +35,6 @@ export default function Jobs({ children }) {
 
 
             <div className='flex  gap-12 flex-wrap '>
-                <div className='flex-none bg-white py-4 px-8 max-h-full overflow-auto max-w-[360px]'>
-                    <AllJobs />
-                </div>
                 <div className='flex-auto py-4 px-8 bg-white '>
                     <PerformJob jobID={jobid} />
                 </div>

@@ -1,5 +1,3 @@
-import Lighthouse from "@/components/connections/Lighthouse";
-import Polybase from "@/components/connections/Polybase";
 import { useState } from "react";
 import SettingsLayout from "./SettingsLayout";
 
@@ -28,20 +26,6 @@ const connections = [
         status: "logged_in",
         category: "banking",
     },
-    {
-        id: 5,
-        name: "Polybase",
-        status: "logged_in",
-        category: "data",
-        component: <Polybase />,
-    },
-    {
-        id: 6,
-        name: "LightHouse",
-        status: "logged_in",
-        category: "data",
-        component: <Lighthouse />,
-    }
 ];
 
 
