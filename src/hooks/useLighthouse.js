@@ -22,7 +22,7 @@ export async function signAuthMessage() {
 
 export async function shareFile(cid, creator, address) {
 
-  let jwt = await getJWT(address);
+  let jwt = await readJWT(address);
   const publicVerifier = "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"
   const publicKeyUserB = [creator, publicVerifier];
 

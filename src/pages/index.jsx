@@ -16,11 +16,6 @@ const tabs = [
   { name: 'Recommendation', href: '#', current: false },
 ]
 
-const stats = [
-  { id: 1, name: 'Total Contributions', stat: '71,897', change: '122', changeType: 'increase' },
-  { id: 2, name: 'Datasets', stat: '58.16%', change: '5.4%', changeType: 'increase' },
-  { id: 3, name: 'Events', stat: '24.57%', change: '3.2%', changeType: 'decrease' },
-]
 
 export default function Profile() {
   const { address } = useAccount()
@@ -29,7 +24,7 @@ export default function Profile() {
   const mounted = useIsMounted()
 
   useEffect(() => {
-    if (address && mounted) {
+    if (mounted) {
       setLoading(false)
     }
   }, [address, mounted])
@@ -41,7 +36,7 @@ export default function Profile() {
   }
 
 
-  if (loading) { return <LoadingIcon /> }
+  if (loading) { return <LoadingIcon height={64} /> }
 
   return (
 

@@ -8,6 +8,7 @@ import { ActionButton } from '../application/elements/buttons/ActionButton';
 import { OpenButton } from '../application/elements/buttons/OpenButton';
 
 const HYPERSPACE_ID = 3141;
+const POLYGON = 80001;
 export default function CreateDeal({ cid, onClose }) {
     const polybase = usePolybase();
     const { data, loading } = useDocument(polybase.collection("File").where("cid", "==", cid));
@@ -46,6 +47,8 @@ export default function CreateDeal({ cid, onClose }) {
             setErrorMessage(error.message)
             setMakingDeal(false)
         })
+        
+        useNetwork().switchNetwork(POLYGON)
 
 
 

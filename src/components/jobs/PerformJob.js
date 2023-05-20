@@ -26,59 +26,48 @@ export default function PerformJob({ jobID }) {
         console.log(data[0].data);
         return data[0].data;
     }
-    
+
     const startComputing = async () => {
         toast.info("Starting computation...")
     }
 
 
     if (details === null) { return "something" }
-    
-    return (
-        
-        
-        <div className='max-w-[700px]'>
 
-            <div className='flex gap-12'>
-            
+    return (
+
+
+        <div className='max-w-[700px] flex gap-12'>
                 <div className='max-w-[300px] text-md outline bg-gray-100 text-indigo-500 rounded-md'>
                     <DataFormatPreview cid={details.dataFormat} />
                 </div>
                 <div className='flex flex-col gap-3 text-sm overflow-auto w-fit'>
-                <h1 className='text-lg font-bold'>{details.name}</h1>
-                <span>
-                    {details.description} <br />
-                    <time className='text-xs italic text-gray-500'>{details.createdAt}</time>
-                </span>
-                <div className=''>
-                {details.categories && details.categories.map((category) => (
-                    <Category category={category} />
-                ))}
-                </div>
-              
-                
-                <div className='overflow-auto text-xs text-cf-500 hover:text-cf-800'>
-                    <Link href={`/profile/${details.owner}`}>
-                    {details.owner}
-                    </Link>
-                </div>
-                <span className='text-xs'>
-                    {details.jobCid}
-                </span>
-                
-                <button
-                    className='bg-cf-500 hover:bg-cf-700 text-white font-bold py-2 px-4 rounded-full'
-                    onClick={startComputing}
-                >
-                    Start computing
-                </button>
-                
+                    <h1 className='text-lg font-bold'>{details.name}</h1>
+                    <span>
+                        {details.description} <br />
+                        <time className='text-xs italic text-gray-500'>{details.createdAt}</time>
+                    </span>
+                    <div className=''>
+                        {details.categories && details.categories.map((category) => (
+                            <Category category={category} />
+                        ))}
+                    </div>
 
-                </div>
-                
-                
-            </div>
 
+                    <div className='overflow-auto text-xs text-cf-500 hover:text-cf-800'>
+                        <Link href={`/profile/${details.owner}`}>
+                            {details.owner}
+                        </Link>
+                    </div>
+                    <span className='text-xs'> {details.jobCid} </span>
+
+                    <button
+                        className='bg-cf-500 hover:bg-cf-700 text-white font-bold py-2 px-4 rounded-full'
+                        onClick={startComputing}
+                    >
+                        Start computing
+                    </button>
+                </div>
         </div>
 
     )
