@@ -51,7 +51,7 @@ async function signInPolybase() {
     // console.log(db);
     return db;
 }
-export default async function MatchRecord(list, accessToken) {
+export default async function MatchRecord(list, accessToken, open) {
 
 
     let carRecords = [];
@@ -76,13 +76,18 @@ export default async function MatchRecord(list, accessToken) {
     }
     
     console.log(carRecords)
-
+    let results = [];
     try {
-        let results = [];
+        
 
         for (let record of list) {
+            console.log(record)
             //find the name of each car Record to add the deatails of the car record. 
-            let name = record.cid;
+            let name = record.cid
+            if(open){
+                 name = record.name
+            }
+           
             let carRecord = carRecords.find(carRecord => carRecord.fileName == name);
             record.carRecord = carRecord;
 

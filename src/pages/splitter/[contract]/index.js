@@ -76,18 +76,6 @@ export default function Splitterr() {
             <p className="text-md text-cf-700">Shares: {shares[payee]} %</p>
           </div>
         ))}
-        {payees.map(payee => (
-            <div key={payee} className="mt-5">
-              <p className="text-md text-gray-700">{payee}</p>
-              <p className="text-md text-cf-700">Shares: {shares[payee]} %</p>
-            </div>
-          ))}
-          {payees.map(payee => (
-            <div key={payee} className="mt-5">
-              <p className="text-md text-gray-700">{payee}</p>
-              <p className="text-md text-cf-700">Shares: {shares[payee]} %</p>
-            </div>
-          ))}
       
       </div>
     {isPayee && (

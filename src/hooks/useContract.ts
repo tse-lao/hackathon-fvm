@@ -20,18 +20,18 @@ export const useContract = () => {
   const { data: signer } = useSigner()
 
   const provider = new ethers.providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com	")
-  const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, provider)
+  const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer)
 
   const crossChainTablelandStorage = new ethers.Contract(
     crossChainTablelandStorageAddress,
     crossChainTablelandStorageAbi,
-    provider
+    signer
   )
 
   const tablelandBacalhau = new ethers.Contract(
     crossChainBacalhauJobs_address,
     crossChainBacalhauJobsAbi,
-    provider
+    signer
   )
   const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, provider)
   const helperContract = new ethers.Contract(helper, helperAbi, provider)
@@ -66,6 +66,7 @@ export const useContract = () => {
     )
     return await tx.wait()
   }
+  // ================================ CREATING OPEN DATA SET ======================================== //
 
   const createOpenDataSet = async (
     dbCID: string,
@@ -88,6 +89,7 @@ export const useContract = () => {
     return await tx.wait()
   }
 
+  // ================================ SUBMITTING DATA AND NFT CREATION ======================================== //
   const submitData = async (
     tokenId: number,
     dataCID: String,
