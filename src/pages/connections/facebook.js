@@ -188,7 +188,7 @@ export default function FacebookDetails() {
 
                             <h2 className="text-md  mt-5 font-medium mb-2 text-gray-700">Data Collection Methods</h2>
                             <div>
-                                <input type="file" multiple directory="" webkitdirectory="" onChange={handleFileChange} />
+                                <input type="file" multiple  webkitdirectory="" onChange={handleFileChange} />
                                 <button onClick={handleUpload}>Upload</button>
 
 

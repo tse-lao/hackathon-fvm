@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Layout from "../Layout";
 
 
-export default function strava() {
+export default function Strava() {
     const name = "Strava"
     const router = useRouter();
     const [apiConnected, setApiConnected] = useState(false);
@@ -15,28 +15,6 @@ export default function strava() {
     const [activities, setActivities] = useState([]);
     const { token } = router.query;
 
-    // For now, I'll use some dummy data
-    const profile = {
-        name: 'John Doe',
-        handle: '@johndoe',
-        bio: 'Just a regular guy.',
-        location: 'San Francisco, CA',
-        joined: new Date(),
-    };
-
-    const tweets = [
-        {
-            id: 1,
-            text: 'Hello, world!',
-            createdAt: new Date(),
-        },
-        {
-            id: 2,
-            text: 'My second tweet.',
-            createdAt: new Date(),
-        },
-        // ... more tweets
-    ];
 
     useEffect(() => {
         if (token) {

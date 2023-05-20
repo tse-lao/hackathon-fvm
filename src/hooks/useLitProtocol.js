@@ -1,7 +1,6 @@
 import { getLighthouse } from "@/lib/createLighthouseApi";
 import { ethers } from 'ethers';
 import { toast } from "react-toastify";
-import { useContract } from "./useContract";
 import { readJWT } from "./useLighthouse";
 const PUBLIC_KEY = "0x04808e24bb109fac42882de0203d77f2ad60ffdbf7ff339d77036f71b35095198aa8cb2705030b4b1a206b066cb0bebd18b45353a79f150eebd6b1e986e97f5d32"
 
@@ -118,36 +117,6 @@ export async function retrieveMergeCID(tokenID, creator) {
 
 }
 
-export async function mintNFTDB (tokenID, txHash,  creator, mintPrice) {
-  //const mergedCID = await retrieveMergeCID(tokenID, creator);
-  const {createDB_NFT} = useContract();
-  const mergedCID = "QmYnnwvyU6GhbPdHfzTBmrQdDTnYzBiNgSAykC9qnuhK1v";
-  if(mergedCID == null) {
-    toast.error("Error 2: no merged..")
-    return null;
-  }
-  //
-  
-
-  
-  const txContract = "0x94ac8ca31d45204323b3e1ea62d588088daabd88"
-  getSignature();
-  
-  
-  const toSign = tokenID.concat("", mergedCID).concat("", mintPrice).concat("", txContract);
-
-  const sign = await getSignature(toSign);
-  
-  
-
-  const result = await createDB_NFT(tokenID, mergedCID, mintPrice, hardCodedAddress, sign.r, sign.s, sign.v, txContract, creator)
-  console.log(result);
-  //sign the input TODO: needs to be implemented in the backend for 
-  // tokenid, dbCID, mintPrice, address
-  
-  return true;
-  
-}
 
 export async function getSignature(message){
   

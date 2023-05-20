@@ -213,7 +213,7 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                         loadingMeta ? <LoadingSpinner loadingText='uploading metadata' /> :
                         <div>
                             <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">
-                                "Upload to get metadata"
+                                Upload to analyze metadata
                             </label>
                             <input
                                 type="file"
