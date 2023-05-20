@@ -8,6 +8,7 @@ import { useState } from 'react';
 import TagsInput from 'react-tagsinput';
 import { useAccount } from 'wagmi';
 import ModalLayout from '../ModalLayout';
+import LoadingSpinner from '../application/elements/LoadingSpinner';
 export default function CreateOpenDS({ tokenId, onClose }) {
     const { address } = useAccount();
     const { createOpenDataSet } = useContract();
@@ -24,7 +25,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
 
     const uploadFile = async (e) => {
 
-        setLoading(true);
+        setLoadingFile(true);
         const apiKey = await getLighthouse(address);
         const authToken = await lighthouse.dataDepotAuth(apiKey);
         
@@ -66,7 +67,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
 
         await uploadCarFile(e.target.files[0], progressCallback, authToken.data.access_token)
         
-        await sleep(1000);
+        await sleep(300);
         //get car file. 
         const result = await MatchRecord([dummyFile], authToken.data.access_token, true)
         
@@ -75,14 +76,13 @@ export default function CreateOpenDS({ tokenId, onClose }) {
         setFile(
             {
                 ...dummyFile,
-                pieceCid: result.data.data[0].carPieceCid,
-                carPayload: result.data.data[0].carPayload,
+                ...result.data[0].data
             }
         )
         
         console.log(dummyFile)
 
-        setLoading(false)
+        setLoadingFile(false)
 
 }
 
@@ -121,6 +121,9 @@ console.log(file);
     setLoading(false)
 }
 
+if(loading) {
+    return <LoadingSpinner />
+}
 return (
     <ModalLayout title="Create Open Dataset" onClose={onClose}>
         <div className="space-y-4 w-full">

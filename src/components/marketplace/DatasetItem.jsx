@@ -4,6 +4,7 @@ import Category from '../application/elements/Category';
 const DatasetItem = ({ dataset }) => {
 
   const priceAttribute = dataset.attributes.find(attr => attr.trait_type === 'price');
+  const priceItem = priceAttribute ? ethers.utils.formatEther(priceAttribute.value) : null;
 
   return (
     <Link href={`/market/${dataset.tokenID}`} >
@@ -15,7 +16,7 @@ const DatasetItem = ({ dataset }) => {
           </div>
           <div className="px-6 pt-4 pb-2">
             <span className="text-cf-600 font-medium text-md ">
-              {ethers.utils.formatUnits(priceAttribute.value)} <span className="text-gray-700 ">MATIC</span>
+              {priceItem} <span className="text-gray-700 ">MATIC</span>
             </span>
           </div>
         </div>
