@@ -48,22 +48,23 @@ module.exports = async({ deployments }) => {
 
     await db_NFT_Instance.assignNewSignerAddress("0xf129b0D559CFFc195a3C225cdBaDB44c26660B60")
 
-    // await db_NFT_Instance.RequestDB(
-    //     "dataFormatCID",
-    //     "dbName",
-    //     "description", ["test"],
-    //     1,
-    //     1
-    // )
+    await db_NFT_Instance.RequestDB(
+        "dataFormatCID",
+        "dbName",
+        "description", ["test"],
+        1,
+        1
+    )
 
-    // await db_NFT_Instance.createOpenDataSet(
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test", ["test"]
-    // )
+    await db_NFT_Instance.createOpenDataSet(
+        "test",
+        "test",
+        "test",
+        "test",
+        "test", ["test"]
+    )
 
-    // await db_NFT_Instance.updateDB_NFT1(1, "test2", "test3")
+    await db_NFT_Instance.updateDB_NFT1(1, "test2", ["fdsfsdf", "fdsfdsfsdfdfsdf", "sdfsdfsdfdsfsdfsdfdsfdsf", "dsfsfsdfsdfsdfsdf"],
+        "test3")
 
 }

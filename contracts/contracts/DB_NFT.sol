@@ -29,7 +29,6 @@ contract DB_NFT is ERC1155, Ownable {
         uint256 minimumRowsOnSubmission;
         uint256 price;
         bool mintable;
-        EnumerableSet.AddressSet allowedAddresses;
     }
 
     Counters.Counter private tokenID;
@@ -39,6 +38,8 @@ contract DB_NFT is ERC1155, Ownable {
     mapping(uint256 => mapping(address => uint256)) private submissionsNumberByID;
 
     mapping(string => EnumerableSet.UintSet) private submittedCIDtoTokens;
+
+    mapping(string => bool) private signedMessages;
 
     address public SignerAddress;
 
@@ -92,23 +93,23 @@ contract DB_NFT is ERC1155, Ownable {
         bytes32 r,
         bytes32 s
     ) public {
-        require(_exists(tokenId));
-        require(tokenInfoMap[tokenId].requiredRows > 0, "this is an OpenDB you cannot submit");
         string memory signedMessage = string.concat(
             Strings.toString(tokenId),
             dataCID,
             Strings.toString(rows)
         );
+        require(_exists(tokenId));
+        require(tokenInfoMap[tokenId].requiredRows > 0, "this is an OpenDB you cannot submit");
+        require(!signedMessages[signedMessage]);
         require(TablelandStorage.verifyString(signedMessage, v, r, s, SignerAddress));
-
         require(tokenInfoMap[tokenId].minimumRowsOnSubmission <= rows, "sumbit more data");
         require(!submittedCIDtoTokens[dataCID].contains(tokenId), "DB already has that CID");
-        submissionsNumberByID[tokenId][msg.sender] =
-            submissionsNumberByID[tokenId][msg.sender] +
-            rows;
+
+        signedMessages[signedMessage] = true;
+        submissionsNumberByID[tokenId][msg.sender] += rows;
         submittedCIDtoTokens[dataCID].add(tokenId);
         if (tokenInfoMap[tokenId].remainingRows >= rows) {
-            tokenInfoMap[tokenId].remainingRows = tokenInfoMap[tokenId].remainingRows - rows;
+            tokenInfoMap[tokenId].remainingRows -= rows;
         } else {
             tokenInfoMap[tokenId].remainingRows = 0;
         }
@@ -135,6 +136,8 @@ contract DB_NFT is ERC1155, Ownable {
             Strings.toString(mintPrice),
             Strings.toHexString(royaltiesAddress)
         );
+        require(!signedMessages[signedMessage]);
+
         require(TablelandStorage.verifyString(signedMessage, v, r, s, SignerAddress));
 
         require(
@@ -142,6 +145,8 @@ contract DB_NFT is ERC1155, Ownable {
                 tokenInfoMap[tokenId].remainingRows <= 0 &&
                 tokenInfoMap[tokenId].creator == msg.sender
         );
+        signedMessages[signedMessage] = true;
+
         tokenInfoMap[tokenId].mintable = true;
         tokenInfoMap[tokenId].splitterContract = royaltiesAddress;
         tokenInfoMap[tokenId].price = mintPrice;
@@ -194,7 +199,10 @@ contract DB_NFT is ERC1155, Ownable {
         require(tokenInfoMap[tokenId].requiredRows > 0);
         require(tokenInfoMap[tokenId].creator == msg.sender);
         string memory signedMessage = string.concat(Strings.toString(tokenId), dbCID);
+                require(!signedMessages[signedMessage]);
+
         require(TablelandStorage.verifyString(signedMessage, v, r, s, SignerAddress));
+                signedMessages[signedMessage] = true;
 
         TablelandStorage.toUpdate(
             string.concat("dbCID='", dbCID, "'"),
