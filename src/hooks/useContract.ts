@@ -6,8 +6,8 @@ import {
   TWFactoryAbi,
   TWFactoryAddress,
   crossChainBacalhauJobsAbi,
-  crossChainTablelandDealClientAbi,
   crossChainBacalhauJobs_address,
+  crossChainTablelandDealClientAbi,
   crossChainTablelandDealClientAddress,
   crossChainTablelandStorageAbi,
   crossChainTablelandStorageAddress,
@@ -215,7 +215,7 @@ export const useContract = () => {
   const callLillypadJob = async (
     _specStart: string,
     input: string,
-    _specEnd
+    _specEnd: string
   ) => {
     const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd)
     return await tx.wait()
@@ -311,6 +311,7 @@ export const useContract = () => {
       provider
     )
     const tx = await splitterInstance.distribute()
+
     
     return await tx.wait()
   }
