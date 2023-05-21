@@ -1,6 +1,7 @@
 import { useContract } from '@/hooks/useContract';
 import { useDocument, usePolybase } from '@polybase/react';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import { useBlockNumber, useNetwork, useSwitchNetwork } from 'wagmi';
 import ModalLayout from '../ModalLayout';
 import LoadingSpinner from '../application/elements/LoadingSpinner';
@@ -42,6 +43,7 @@ export default function CreateDeal({ cid, onClose }) {
         .then((result) => { 
             console.log(result)
             setMakingDeal(false)
+            toast.success("Deal created!")
         }).catch((error) => {
             console.log(error)
             setErrorMessage(error.message)

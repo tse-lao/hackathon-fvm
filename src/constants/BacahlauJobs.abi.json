@@ -1,379 +1,215 @@
-[{
-        "inputs": [{
-                "internalType": "address",
-                "name": "_bridgeContractAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "gateway_",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "gasReceiver_",
-                "type": "address"
-            }
+ [
+      {
+        "inputs": [
+          {
+            "internalType": "contract LilypadEventsUpgradeable",
+            "name": "_bridgeContractAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IBacalhauTablelandStorage",
+            "name": "bacalhauTablelandStorage",
+            "type": "address"
+          }
         ],
         "stateMutability": "nonpayable",
         "type": "constructor"
-    },
-    {
-        "inputs": [{
-            "internalType": "uint256",
-            "name": "chainid",
-            "type": "uint256"
-        }],
-        "name": "ChainNotSupported",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "InvalidAddress",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "NotApprovedByGateway",
-        "type": "error"
-    },
-    {
+      },
+      {
         "anonymous": false,
-        "inputs": [{
-                "indexed": true,
-                "internalType": "address",
-                "name": "previousOwner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "newOwner",
-                "type": "address"
-            }
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
         ],
         "name": "OwnershipTransferred",
         "type": "event"
-    },
-    {
-        "inputs": [{
-                "internalType": "string",
-                "name": "resultCID",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "jobID",
-                "type": "uint256"
-            }
-        ],
-        "name": "JobResult",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "string",
-                "name": "new_sourceChain",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "new_sourceAddress",
-                "type": "string"
-            }
-        ],
-        "name": "addSourceChains",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "bridgeAddress",
-        "outputs": [{
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "bytes32",
-                "name": "commandId",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "string",
-                "name": "sourceChain",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "sourceAddress",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes",
-                "name": "payload",
-                "type": "bytes"
-            }
-        ],
-        "name": "execute",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "string",
-                "name": "input",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "_specStart",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "_specEnd",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "jobId",
-                "type": "string"
-            },
-            {
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            }
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "input",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_specStart",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_specEnd",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "jobId",
+            "type": "string"
+          }
         ],
         "name": "executeJOB",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "bytes32",
-                "name": "commandId",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "string",
-                "name": "sourceChain",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "sourceAddress",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes",
-                "name": "payload",
-                "type": "bytes"
-            },
-            {
-                "internalType": "string",
-                "name": "tokenSymbol",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "executeWithToken",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "gasService",
-        "outputs": [{
-            "internalType": "contract IAxelarGasService",
-            "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "gateway",
-        "outputs": [{
-            "internalType": "contract IAxelarGateway",
-            "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
+      },
+      {
         "inputs": [],
         "name": "getLilypadFee",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "address",
-                "name": "_from",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_jobId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "string",
-                "name": "_errorMsg",
-                "type": "string"
-            }
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_from",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_jobId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "_errorMsg",
+            "type": "string"
+          }
         ],
         "name": "lilypadCancelled",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
+      },
+      {
         "inputs": [],
         "name": "lilypadFee",
-        "outputs": [{
+        "outputs": [
+          {
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
-        }],
+          }
+        ],
         "stateMutability": "view",
         "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "address",
-                "name": "_from",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_jobId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "enum LilypadResultType",
-                "name": "_resultType",
-                "type": "uint8"
-            },
-            {
-                "internalType": "string",
-                "name": "_result",
-                "type": "string"
-            }
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_from",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_jobId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum LilypadResultType",
+            "name": "_resultType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "_result",
+            "type": "string"
+          }
         ],
         "name": "lilypadFulfilled",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
+      },
+      {
         "inputs": [],
         "name": "owner",
-        "outputs": [{
+        "outputs": [
+          {
             "internalType": "address",
             "name": "",
             "type": "address"
-        }],
+          }
+        ],
         "stateMutability": "view",
         "type": "function"
-    },
-    {
+      },
+      {
         "inputs": [],
         "name": "renounceOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "address",
-            "name": "_newAddress",
-            "type": "address"
-        }],
-        "name": "setBridgeAddress",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
+      },
+      {
+        "inputs": [
+          {
             "internalType": "address",
             "name": "_eventsAddress",
             "type": "address"
-        }],
+          }
+        ],
         "name": "setLPEventsAddress",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
+      },
+      {
         "inputs": [],
         "name": "submitFunds",
         "outputs": [],
         "stateMutability": "payable",
         "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "tableName",
-        "outputs": [{
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
+      },
+      {
+        "inputs": [
+          {
             "internalType": "address",
             "name": "newOwner",
             "type": "address"
-        }],
+          }
+        ],
         "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
-        "inputs": [{
+      },
+      {
+        "inputs": [
+          {
             "internalType": "address",
             "name": "",
             "type": "address"
-        }],
+          }
+        ],
         "name": "userFunds",
-        "outputs": [{
+        "outputs": [
+          {
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
-        }],
+          }
+        ],
         "stateMutability": "view",
         "type": "function"
-    },
-    {
+      },
+      {
         "inputs": [],
         "name": "withdrawFunds",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    }
-]
+      }
+    ]
