@@ -118,7 +118,7 @@ export default function GenerateDataset({ tokenId, onClose }) {
                             loading ?<LoadingIcon  height={64} /> : (
                             <div className='flex flex-col gap-2'>
                                 <span className='text-sm text-gray-600'>
-                                    We will be merging the CID's of the contributors in order to create a new CID that will be used to mint the NFT.
+                                    We will be merging the CID of the contributors in order to create a new CID that will be used to mint the NFT.
                                 </span>
                                 <button
                                     className='bg-cf-500 hover:bg-cf-700 text-white font-bold py-2 px-4 rounded'

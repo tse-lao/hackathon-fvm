@@ -8,7 +8,7 @@ import { useAccount } from 'wagmi';
 import Layout from '../Layout';
 
 
-export default function car() {
+export default function Car() {
     const { address } = useAccount();
     const [carFiles, setCarFiles] = useState([]);
     const [loading, setLoading] = useState(true);

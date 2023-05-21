@@ -1,7 +1,5 @@
 import useNftStorage from "@/hooks/useNftStorage";
-import { getLighthouse } from "@/lib/createLighthouseApi";
 import { analyzeJSONStructure, readJSONFromFileInput } from "@/lib/dataHelper";
-import lighthouse from "@lighthouse-web3/sdk";
 import { usePolybase } from "@polybase/react";
 import { useState } from "react";
 import TagsInput from "react-tagsinput";
@@ -10,6 +8,8 @@ import { toast } from "react-toastify";
 import { v4 as uuidv4 } from 'uuid';
 import { useAccount } from "wagmi";
 import LoadingSpinner from "../application/elements/LoadingSpinner";
+import InputField from "../application/elements/input/InputField";
+import TextArea from "../application/elements/input/TextArea";
 import CreateOverlay from "../application/overlay/CreateOverlay";
 
 
@@ -18,6 +18,8 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
     const [formData, setFormData] = useState({
         name: "",
         description: "",
+        spec_start: "", 
+        spec_end: "",
         categories: [],
         metadata: dataFormat,
     });
@@ -28,39 +30,14 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
 
     const polybase = usePolybase();
     const { uploadMetadata } = useNftStorage();
-    
+
     console.log("METADATa", dataFormat)
 
     const handleTagChange = (tags) => {
         setFormData({ ...formData, categories: tags });
     };
 
-    const uploadJob = async (e) => {
-        setLoadingFile(true);
 
-        const file = e.target.files[0];
-
-        if (!file) {
-            toast.error("No file selected");
-            return;
-        }
-        //upload to ipfs
-        const api = await getLighthouse(address)
-
-        try {
-
-            const cid = await lighthouse.upload(e, api);
-            console.log(cid);
-
-            SetJobCid(cid.data.Hash);
-
-        } catch (e) {
-            console.log(e);
-        }
-
-
-        setLoadingFile(false);
-    }
 
     const uploadMeta = async (e) => {
         setLoadingMeta(true);
@@ -91,28 +68,23 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
         // Process the form data and send it to the server or API endpoint.
         console.log(formData);
 
-        //prepping the data to collect here. 
-
-        if (!jobCid) {
-            toast.error("No job file uploaded");
-            return;
-        }
         if (!metadata) {
             toast.error("No metadata uploaded");
             return;
         }
 
         console.log(formData);
+        
+        
 
-        const result = await createJob(formData.name, formData.description, jobCid, metadata, formData.categories, address);
+        const result = await createJob(formData.name, formData.description, formData.spec_start, formData.spec_end, metadata, formData.categories, address);
 
         console.log(result);
     };
 
-    async function createJob(name, description, jobCid, dataformat, categories, owner) {
+    async function createJob(name, description, spec_start, spec_end, dataformat, categories, owner) {
         const updatedAt = new Date().toISOString();
         const newId = uuidv4();
-
 
         return new Promise(async (resolve, reject) => {
             try {
@@ -120,7 +92,8 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                     newId,
                     name,
                     description,
-                    jobCid,
+                    spec_start,
+                    spec_end,
                     dataformat,
                     categories,
                     updatedAt,
@@ -141,20 +114,38 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
     return (
         <CreateOverlay title="Create Job" onClose={onClose} getOpen={getOpen} changeOpen={changeOpen}>
             <div className="space-y-4">
-                <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                        Name
-                    </label>
-                    <input
-                        type="text"
-                        name="name"
-                        id="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-cf-500 focus:border-cf-500 sm:text-sm"
-                    />
-                </div>
+                <InputField
+                    label="Name"
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                />
+                <TextArea
+                    label="Description"
+                    name="description"
+                    rows={3}
+                    value={formData.description}
+                    onChange={handleChange}
+                    required
+                />
+                <TextArea
+                    label="Spec Start"
+                    name="spec_start"
+                    rows={3}
+                    value={formData.spec_start}
+                    onChange={handleChange}
+                    required
+                />
+                <TextArea
+                    label="Spec End"
+                    name="spec_end"
+                    rows={3}
+                    value={formData.spec_end}
+                    onChange={handleChange}
+                    required
+                />
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                         Category
@@ -162,58 +153,22 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                     <TagsInput value={formData.categories} onChange={handleTagChange} />
                 </div>
 
-                {loadingFile ? <LoadingSpinner loadingText='uploading metadata' /> :
-                    !jobCid ? (
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Upload JOB File (turn into CID)
-                            </label>
-                            <input
-                                type="file"
-                                name="job" id="job" onChange={uploadJob} required
-                                accept="*"
-                            />
-                        </div>
-                    ) : (
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Your Job Cid
-                            </label>
-                            <span className="text-sm">{jobCid}</span>
-                        </div>
-                    )}
 
 
 
-                <div>
-                    <label htmlFor="requestData" className="block text-sm font-medium text-gray-700">
-                        Description
-                    </label>
-                    <textarea
-                        name="description"
-                        id="description"
-                        rows="3"
-                        value={formData.description}
-                        onChange={handleChange}
-                        required
-                        className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-cf-500 focus:border-cf-500 sm:text-sm"
-                    ></textarea>
-                </div>
-                
-                    
                 {metadata ? (
-                        <div className="items-center">
-                         <a href={`https://gateway.ipfs.io/ipfs/${metadata}`}
-                        className="text-cf-600 hover:text-cf-500"
-                          >Preview metadata</a>
+                    <div className="items-center">
+                        <a href={`https://gateway.ipfs.io/ipfs/${metadata}`}
+                            className="text-cf-600 hover:text-cf-500"
+                        >Preview metadata</a>
 
-                        </div>
-                      
-                    ) : (
-                        loadingMeta ? <LoadingSpinner loadingText='uploading metadata' /> :
+                    </div>
+
+                ) : (
+                    loadingMeta ? <LoadingSpinner loadingText='uploading metadata' /> :
                         <div>
                             <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">
-                                "Upload to get metadata"
+                                Upload to analyze metadata
                             </label>
                             <input
                                 type="file"
@@ -221,7 +176,7 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                                 accept="application/json, application/csv"
                             />
                         </div>
-                    )}
+                )}
                 <button
                     type="submit"
                     onClick={handleSubmit}

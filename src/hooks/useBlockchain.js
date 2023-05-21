@@ -73,6 +73,7 @@ export default async function MatchRecord(list, accessToken, open) {
     let results = [];
     for (let record of list) {
         try {
+            console.log(record);
             let name = record.cid;
             if (open) {
                 name = record.name;

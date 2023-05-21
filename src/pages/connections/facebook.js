@@ -1,4 +1,4 @@
-import { createJWTToken } from "@/hooks/useLighthouse";
+import { readJWT } from "@/hooks/useLighthouse";
 import { getLighthouse } from "@/lib/createLighthouseApi";
 import { getMetadataFromFile } from "@/lib/dataHelper";
 import lighthouse from "@lighthouse-web3/sdk";
@@ -70,7 +70,7 @@ export default function FacebookDetails() {
     };
 
     async function processUploadedFiles(uploadedFiles) {
-        const jsonToken = await createJWTToken();
+        const jsonToken = await readJWT(address);
         const api = await getLighthouse(address);
 
 
@@ -188,7 +188,7 @@ export default function FacebookDetails() {
 
                             <h2 className="text-md  mt-5 font-medium mb-2 text-gray-700">Data Collection Methods</h2>
                             <div>
-                                <input type="file" multiple directory="" webkitdirectory="" onChange={handleFileChange} />
+                                <input type="file" multiple  webkitdirectory="" onChange={handleFileChange} />
                                 <button onClick={handleUpload}>Upload</button>
 
 

@@ -14,8 +14,8 @@ export default function JobItem({ details }) {
                     {details.description}
                 </p>
                 <div className='flex flex-row flex-wrap gap-2 mt-4'>
-                    {details.categories && details.categories.map((category) => (
-                        <Category category={category} />
+                    {details.categories && details.categories.map((category, index) => (
+                        <Category key={index} category={category} />
                     ))}
                 </div>
             </Link>

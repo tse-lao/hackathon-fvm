@@ -3,6 +3,7 @@ import { useIsMounted } from '@/hooks/useIsMounted'
 import { Disclosure, Menu } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import Link from 'next/link'
 import { useAccount } from 'wagmi'
 import { Logo } from './Logo'
 
@@ -37,7 +38,7 @@ export default function Navigation({ active }) {
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   {/* Current: "border-cf-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
-                  <a
+                  <Link
                     href="/"
                     className={classNames(
                       "Dashboard" == active
@@ -46,8 +47,8 @@ export default function Navigation({ active }) {
                     )}
                   >
                     Dashboard
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/files"
                     className={classNames(
                       "Files" == active
@@ -56,8 +57,8 @@ export default function Navigation({ active }) {
                     )}
                   >
                     Files
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/market"
                     className={classNames(
                       "Market" == active
@@ -66,8 +67,8 @@ export default function Navigation({ active }) {
                     )}
                   >
                     Datasets
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/request"
                     className={classNames(
                       "Request" == active
@@ -76,18 +77,8 @@ export default function Navigation({ active }) {
                     )}
                   >
                     Requests
-                  </a>
-                  <a
-                    href="/connections"
-                    className={classNames(
-                      "Connections" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                    )}
-                  >
-                    API
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/jobs"
                     className={classNames(
                       "Jobs" == active
@@ -96,7 +87,7 @@ export default function Navigation({ active }) {
                     )}
                   >
                     Jobs
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">

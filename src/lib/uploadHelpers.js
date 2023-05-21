@@ -3,8 +3,6 @@ import { uploadCarFile } from "@/hooks/useLighthouse";
 import lighthouse from "@lighthouse-web3/sdk";
 import { getMetadataFromFile } from "./dataHelper";
 
-
-
 export const uploadAndSetFile = async (file, apiKey, progressCallback) => {
     console.log(file.target.files[0])
     try {

@@ -5,7 +5,7 @@ import {
   SquaresPlusIcon,
   UserCircleIcon
 } from '@heroicons/react/24/outline'
-import Layout from '../Layout'
+import Layout from '../../Layout'
 
 
 const subNavigation = [

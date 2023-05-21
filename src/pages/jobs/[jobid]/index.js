@@ -1,19 +1,40 @@
-
-import AllJobs from '@/components/jobs/AllJobs'
-import CreateJob from '@/components/jobs/CreateJob'
 import PerformJob from '@/components/jobs/PerformJob'
+import { DB_main } from '@/constants'
 import Layout from '@/pages/Layout'
+import { usePolybase } from '@polybase/react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-
-export default function Jobs({ children }) {
+import { useEffect, useState } from 'react'
+export default function Jobs({  }) {
     const [openModal, setOpenModal] = useState(false)
+    const [datasets, setDatasets] = useState([])
+    const [selected, setSelected] = useState([])
     const router = useRouter()
     const { jobid } = router.query
+    const polybase = usePolybase();
+    
 
-
-    const changeOpen = (e) => {
-        setOpenModal(e)
+    useEffect(() => {
+        const fetchData = async () => {
+            const { data } = await polybase.collection('Jobs').where('id', '==', jobid).get()  
+            console.log(data[0].data.dataFormat);
+            const where = `WHERE ${DB_main}.dataFormatCID = '${data[0].data.dataFormat}' AND ${DB_main}.minimumRowsOnSubmission = 0`
+            const result = await fetch(`/api/tableland/token/all?where=${where}`)
+            const datasets = await result.json()
+            console.log(datasets)
+            setDatasets(datasets.result)
+        }
+        
+        if(jobid){
+            fetchData();
+        }
+    }, [jobid])
+    
+    const addSelected = async (dbCID) => {
+        if(selected.includes(dbCID)){
+            setSelected(selected.filter((item) => item !== dbCID))
+        }else{
+            setSelected([...selected, dbCID])
+        }
     }
 
 
@@ -24,23 +45,20 @@ export default function Jobs({ children }) {
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900">
                     Jobs
                 </h1>
-                <button
-                    onClick={() => setOpenModal(true)}
-                    className="bg-indigo-500 hover:bg-indigo-700 self-end text-white font-bold py-2 px-4 rounded-full"
-                >
-                    <CreateJob changeOpen={changeOpen} getOpen={openModal} />
-
-                    Create a JOB
-                </button>
             </div>
 
 
-            <div className='flex  gap-12 flex-wrap '>
-                <div className='flex-none bg-white py-4 px-8 max-h-full overflow-auto max-w-[360px]'>
-                    <AllJobs />
-                </div>
+            <div className='flex flex-col gap-12 flex-wrap '>
                 <div className='flex-auto py-4 px-8 bg-white '>
-                    <PerformJob jobID={jobid} />
+                    <PerformJob key="1" jobID={jobid} />
+                </div>
+                <div className='grid sm:grid-cols-1 md: grid-cols-2 lg:grid-cols-2 gap-4'>
+                    {datasets && datasets.map((dataset, index) => (
+                        <div key={index} className={`grid sm:grid-cols-1 md:grid-cols-1 bg-white items-center px-4 py-4 ${selected.includes(dataset.dbCID) && 'outline'}`} onClick={() => addSelected(dataset.dbCID)} >
+                            <span className='text-sm text-gray-600'>{dataset.dbCID} </span>
+                            <span>  {dataset.dbName}</span>
+                        </div>
+                    ))}
                 </div>
             </div>
         </Layout>

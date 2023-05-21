@@ -50,6 +50,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       setStatus(PROVIDE_ACCESS)
       const cid = selectedOptions[i];
       const response = await shareFile(cid, creator, address);
+      
 
       if (tokenID < 1 && selectedOptions.length == 1) {
         toast.error("Error: By not providing the rights inputs")

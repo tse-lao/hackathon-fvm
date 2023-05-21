@@ -53,7 +53,7 @@ export default function TableLand() {
                 
                 <select value={selectedDB} onChange={changeDB}>
                 <option value="">Select...</option>
-                {exportsList.map(item => <option value={item}>{item}</option>)}
+                {exportsList.map((item, key) => <option key={key} value={item}>{item}</option>)}
 
               </select>
                 

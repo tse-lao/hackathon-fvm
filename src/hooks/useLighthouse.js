@@ -22,7 +22,7 @@ export async function signAuthMessage() {
 
 export async function shareFile(cid, creator, address) {
 
-  let jwt = await getJWT(address);
+  let jwt = await readJWT(address);
   const publicVerifier = "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"
   const publicKeyUserB = [creator, publicVerifier];
 
@@ -70,7 +70,7 @@ export async function grantSmartAccess(cid, tokenID, minRows) {
   return response;
 }
 
-export async function useJWT(address) {
+export async function readJWT(address) {
   
   const jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
   
@@ -154,7 +154,7 @@ export async function getUploads(accessToken, page) {
 }
 
 export async function downloadCid(cid, address, tokenId) {
-  const jwt = await useJWT(address);
+  const jwt = await readJWT(address);
 
   const keyObject = await lighthouse.fetchEncryptionKey(
     cid,
@@ -195,7 +195,7 @@ function downloadBlob(blob, fileName) {
 }
 
 export async function countRows(cid, address){
-  let jwt = await useJWT(address);
+  let jwt = await readJWT(address);
   const keyObject = await lighthouse.fetchEncryptionKey(
       cid,
       address,

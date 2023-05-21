@@ -2,7 +2,7 @@
 import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
-import { useContract } from '@/hooks/useContract';
+import CreateDeal from '@/components/marketplace/CreateDeal';
 import { signAuthMessage } from '@/lib/createLighthouseApi';
 import readBlobAsJson, { readTextAsJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
@@ -38,8 +38,7 @@ export default function ViewFile() {
     const [fileURL, setFileURL] = useState(null);
     const [loading, setLoading] = useState(true);
     const polybase = usePolybase(); 
-    const {createCrossChainDealRequest}= useContract();
-    const [dealStatus, setDealStatus] = useState(null);
+    const [createCarDeal, setCreateCarDeal] = useState(false);
 
     const { data } = useDocument(polybase.collection("File").where("cid", "==", cid));
     
@@ -51,10 +50,7 @@ export default function ViewFile() {
             setFileInfo(status.data);
 
             if (!status.data.encryption) {
-                //TODO: Read the content of the CID and display it.
                 const file = cid.toString();
-                //read the content of this file 
-                cid
                 readContent(status.data.mimeType, file);
             }
             
@@ -147,26 +143,6 @@ export default function ViewFile() {
     }
 
 
-    async function createDeal() {
-        //TODO: fix the matic. 
-        let record = data.data[0].data;
-        
-        console.log(data)
-        const piece_cid = record.cidHex;
-        const label = record.carPayload;
-        const piece_size = record.pieceSize;
-        const end_epoch = 1050026;
-        const location_ref = `https://data-depot.lighthouse.storage/api/download/download_car?fileId=${record.carId}.car`;
-        const carSize = record.carSize;
-        
-        console.log(`${piece_cid}:piece_cid, label, ${piece_size} piece_size, ${end_epoch} end_epoch, ${location_ref} location_ref, carSize: ${carSize}`)
-        const result = await createCrossChainDealRequest(piece_cid, label, piece_size, end_epoch, location_ref, carSize);
-        
-        console.log(result);
-        
-        
-    }
-
 
 
 
@@ -174,6 +150,7 @@ export default function ViewFile() {
     return (
         <Layout>
 
+            {createCarDeal && <CreateDeal cid={cid}  onClose={() => setCreateCarDeal(!createCarDeal)}/>}
             {loading ? <div>Loading...</div> : (
 
                 <div>
@@ -187,7 +164,7 @@ export default function ViewFile() {
                         </div>
                         <div className="space-x-4">
                             <button
-                                onClick={createDeal}
+                                onClick={() => setCreateCarDeal(!createCarDeal)}
                                 className="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                                 Create Deal
