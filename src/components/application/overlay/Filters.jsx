@@ -90,19 +90,16 @@ export default function Filters({name, selectChange, currentFilters}) {
           </div>
         </div>
         <Disclosure.Panel className="border-t border-gray-200 py-10">
-          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 px-4 text-sm sm:px-6 md:gap-x-6 lg:px-8">
-            <div className="grid auto-rows-min grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-6">
-              <fieldset>
-                <legend className="block font-medium">Category</legend>
-                <div className="space-y-6 pt-6 sm:space-y-4 sm:pt-4">
+        <legend className="block font-medium m-6">Category</legend> 
+            <div className="grid  grid-cols-4 gap-y-10 md:grid-cols-4 md:gap-x-6 px-6 py-6">
                   {categories.map((option, optionIdx) => (
-                    <div key={option.value} className="flex items-center text-base sm:text-sm">
+                    <div key={option.value} className="col-span-1 flex items-center text-base sm:text-sm">
                       <input
                         id={`category-${optionIdx}`}
                         name="category[]"
                         defaultValue={option.value}
                         type="checkbox"
-                        className="h-4 w-4 flex-shrink-0 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        className="h-4 w-4 flex-shrink-0 rounded border-gray-300 text-cf-600 focus:ring-cf-500"
                         defaultChecked={option.checked}
                         onChange={() => handleCategoryChange(option.value)}
                       />
@@ -111,10 +108,7 @@ export default function Filters({name, selectChange, currentFilters}) {
                       </label>
                     </div>
                   ))}
-                </div>
-              </fieldset>
             </div>
-          </div>
         </Disclosure.Panel>
         <div className="col-start-1 row-start-1 py-4">
           <div className="mx-auto flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
