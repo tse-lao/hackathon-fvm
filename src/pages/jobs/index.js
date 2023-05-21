@@ -1,14 +1,30 @@
 
+import Toggle from '@/components/application/Toggle'
 import AllJobs from '@/components/jobs/AllJobs'
 import CreateJob from '@/components/jobs/CreateJob'
 import Layout from '@/pages/Layout'
 import { useState } from 'react'
+import { useNetwork, useSwitchNetwork } from 'wagmi'
 
 export default function Jobs({children}) {
     const [openModal, setOpenModal] = useState(false)
+    const [performed, setPerformed] = useState(false)
+    const { chain } = useNetwork()
 
+    const { switchNetwork } = useSwitchNetwork()
+    const HYPERSPACE_ID = 3141;
+    const POLYGON = 80001;
+    
     const changeOpen = (e) => {
+        if(chain.id != HYPERSPACE_ID){
+            switchNetwork?.(POLYGON)
+        }
+        
       setOpenModal(e)
+    }
+    
+    const changeStatus = (e) => {
+        setPerformed(e)
     }
     
   
@@ -27,11 +43,10 @@ export default function Jobs({children}) {
                     Create a JOB
                 </button>
             </div>
-            
-                 
+                <Toggle text="Show performed jobs" changeStatus={changeStatus} />
                 <div className='flex flex-row gap-12 flex-wrap'>
                 <div className='grid grid-cols-2 py-4 px-8 max-h-full overflow-auto gap-2'>                   
-                    <AllJobs />
+                   <AllJobs performed={performed} />
                 </div>
             </div>
         </Layout>

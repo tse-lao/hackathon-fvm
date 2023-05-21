@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useAccount } from 'wagmi'
 import { Logo } from './Logo'
 
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -14,6 +15,7 @@ function classNames(...classes) {
 export default function Navigation({ active }) {
   const { address } = useAccount();
   const mounted = useIsMounted();
+  
 
   return (
     <Disclosure as="nav" className="bg-white shadow">
@@ -47,16 +49,6 @@ export default function Navigation({ active }) {
                     )}
                   >
                     Dashboard
-                  </Link>
-                  <Link
-                    href="/files"
-                    className={classNames(
-                      "Files" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                    )}
-                  >
-                    Files
                   </Link>
                   <Link
                     href="/market"
@@ -101,6 +93,7 @@ export default function Navigation({ active }) {
                       border="none"
                       
                     />
+
                   </div>
                 </Menu>
 

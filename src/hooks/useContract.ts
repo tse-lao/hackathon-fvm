@@ -61,18 +61,32 @@ export const useContract = () => {
     categories: string[],
     requiredRows: number,
     minimumRowsOnSubmission: number
-  ) => {
-    //read dataFormatCID from the contract.
-    const tx = await DB_NFT.RequestDB(
-      dataFormatCID,
-      DBname,
-      description,
-      categories,
-      requiredRows,
-      minimumRowsOnSubmission,
-      { gasLimit: 1000000 }
-    )
-    return tx
+  ): Promise<any> => {
+    try {
+      const tx = await DB_NFT.RequestDB(
+        dataFormatCID,
+        DBname,
+        description,
+        categories,
+        requiredRows,
+        minimumRowsOnSubmission,
+        { gasLimit: 1000000 }
+      )
+  
+      console.log(tx);
+      toast.update("Promise is pending", {
+        render: "Transaction sent, waiting for confirmation.",
+      });
+  
+      const receipt = await tx.wait();
+      console.log(receipt);
+      toast.success("Promise resolved 👌");
+      return receipt;
+    } catch (error) {
+      console.log(error);
+      toast.error("Promise rejected 🤯");
+      throw error; 
+    }
   }
   // ================================ CREATING OPEN DATA SET ======================================== //
 
@@ -235,11 +249,26 @@ export const useContract = () => {
     input: string,
     _specEnd: string, 
     jobId: string
-  ) => {
-    const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd, jobId, {
-      gasLimit: 100000000,
-    })
-    return await tx.wait()
+  ): Promise<any> => {
+    try {
+      const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd, jobId, {
+        gasLimit: 100000000,
+      })
+      console.log(tx);
+      toast.update("Promise is pending", {
+        render: "Transaction sent, waiting for confirmation.",
+      });
+  
+      const receipt = await tx.wait();
+      console.log(receipt);
+      toast.success("Promise resolved 👌");
+      return receipt;
+    } catch (error) {
+      console.log(error);
+      toast.error("Promise rejected 🤯");
+      throw error; 
+    }
+
   }
 
   // --------------------------------------------------- crossChainTablelandDealClient ------------------------------------------------------------------------------------------------------
@@ -324,7 +353,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      provider
+      signer
     )
     return await splitterInstance.payee(index)
   }
@@ -333,7 +362,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      provider
+      signer
     )
     return await splitterInstance.shares(address)
   }
@@ -342,7 +371,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      provider
+      signer!
     )
     try {
       const tx = await splitterInstance.distribute()

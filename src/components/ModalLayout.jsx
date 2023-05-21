@@ -1,13 +1,30 @@
-import { Dialog, Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { Fragment, useState } from 'react'
+import { Dialog, Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Fragment, useState } from 'react';
+import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 export default function ModalLayout({ title, children }) {
   const [open, setOpen] = useState(true)
+  const HYPERSPACE_ID = 3141;
+  const POLYGON = 80001;
+  const {chain} = useNetwork();
+  const {switchNetwork} = useSwitchNetwork();
+
+  const changeOverlay = (e) => {
+    console.log("test changed");
+    setOpen(e)
+    //now we call the check in here. 
+    
+    
+    if (chain?.id != POLYGON ){
+      switchNetwork?.(POLYGON)
+    }
+    
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={setOpen}>
+      <Dialog as="div" className="relative z-10" onClose={changeOverlay}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -37,7 +54,7 @@ export default function ModalLayout({ title, children }) {
               <button
                 type="button"
                 className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                onClick={() => setOpen(false)}
+                onClick={() => changeOverlay(false)}
               >
                 <span className="sr-only">Close</span>
                 <XMarkIcon className="h-6 w-6" aria-hidden="true" />

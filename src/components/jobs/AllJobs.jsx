@@ -1,13 +1,25 @@
 import { useCollection, usePolybase } from "@polybase/react";
+import { useEffect } from "react";
 import JobItem from "./JobItem";
 
-export default function AllJobs({ dataFormat }) {
+export default function AllJobs({ dataFormat, performed }) {
   //get all collectionsd
   const polybase = usePolybase();
 
   const { data, error, loading } =
     useCollection(polybase.collection("Jobs").where("dataFormat", "==", dataFormat));
 
+  useEffect(() => {
+      if(performed){
+        const fetchData = async () => {
+            const result = await fetch(`/api/tableland/computations`);
+            const status = await result.json();
+            console.log(status);
+        }
+        fetchData()
+      }
+  }, [performed])
+    
 
 
   if (loading) { return <p>Loading...</p> }

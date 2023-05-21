@@ -84,15 +84,13 @@ export default function Filters({name, selectChange, currentFilters}) {
               </button>
               
             </div>
+            <div className='pl-6'>
+            <Toggle text="Open Datasets" changeStatus={handleOpenChange}  />
+            </div>
           </div>
         </div>
         <Disclosure.Panel className="border-t border-gray-200 py-10">
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 px-4 text-sm sm:px-6 md:gap-x-6 lg:px-8">
-            <div className="grid auto-rows-min grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-6">
-              <fieldset>
-                <Toggle text="Open Datasets" changeStatus={handleOpenChange}  />
-              </fieldset>
-            </div>
             <div className="grid auto-rows-min grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-6">
               <fieldset>
                 <legend className="block font-medium">Category</legend>

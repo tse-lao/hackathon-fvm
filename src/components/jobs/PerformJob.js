@@ -1,20 +1,25 @@
 import { usePolybase } from '@polybase/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useNetwork, useSwitchNetwork } from 'wagmi';
 import Category from '../application/elements/Category';
+import { OpenButton } from '../application/elements/buttons/OpenButton';
 import DataFormatPreview from '../marketplace/DataFormatPreview';
 import ExecuteJob from './ExecuteJob';
 
 export default function PerformJob({ jobID, input }) {
     const polybase = usePolybase();
     const [details, setDetails] = useState(null)
+    const [showMetadata, setShowMetadata] = useState(false)
     const [openModal, setOpenModal] = useState(false)
-
+    const { chain } = useNetwork()
+    const {switchNetwork} = useSwitchNetwork()
+    const HYPERSPACE_ID = 3141;
+    const POLYGON = 80001;
     useEffect(() => {
 
         const fetchJob = async () => {
             const job = await getJob(jobID);
-            console.log(job)
             setDetails(job);
         }
 
@@ -29,25 +34,32 @@ export default function PerformJob({ jobID, input }) {
         return data[0].data;
     }
 
+    const changeOpen = (e) => {
+        setOpenModal(e)
+        console.log("closing up")
+        console.log(chain.id)
+        
+        if(chain.id != POLYGON){
+            switchNetwork?.(POLYGON)
+        }
+
+    }
 
     if (details === null) { return "something" }
 
     return (
 
 
-        <div className='max-w-[700px] flex gap-12'>
-                <div className='max-w-[300px] text-md outline bg-gray-100 text-indigo-500 rounded-md'>
-                    <DataFormatPreview cid={details.dataFormat} />
-                </div>
-                <div className='flex flex-col gap-3 text-sm overflow-auto w-fit'>
+        <div className='max-w-[700px] flex flex-col gap-3 text-sm overflow-auto w-fit bg-white p-6'>
+
                     <h1 className='text-lg font-bold'>{details.name}</h1>
                     <span>
                         {details.description} <br />
                         <time className='text-xs italic text-gray-500'>{details.createdAt}</time>
                     </span>
                     <div className=''>
-                        {details.categories && details.categories.map((category) => (
-                            <Category category={category} />
+                        {details.categories && details.categories.map((category, index) => (
+                            <Category key={index} category={category} />
                         ))}
                     </div>
 
@@ -68,8 +80,11 @@ export default function PerformJob({ jobID, input }) {
                     >
                         Start computing
                     </button>
-                </div>
-                {openModal && <ExecuteJob data={details} input={input}/> }
+                    
+                    <OpenButton text="Show Metadata" onClick={() => setShowMetadata(!showMetadata)}  />
+                    
+                    {showMetadata && <DataFormatPreview cid={details.dataFormat} />}
+                {openModal && <ExecuteJob data={details} input={input} openModal={openModal} changeOpen={changeOpen}/> }
                 
         </div>
 

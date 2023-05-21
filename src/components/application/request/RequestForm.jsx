@@ -6,6 +6,7 @@ import TagsInput from "react-tagsinput";
 import 'react-tagsinput/react-tagsinput.css';
 import { toast } from "react-toastify";
 import LoadingSpinner from "../elements/LoadingSpinner";
+import { ActionButton } from "../elements/buttons/ActionButton";
 import CreateOverlay from "../overlay/CreateOverlay";
 
 
@@ -20,6 +21,7 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
   });
   const [loadingFile, setLoadingFile] = useState(false);
   const [metadata, setMetadata] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { RequestDB } = useContract();
   const { uploadMetadata } = useNftStorage();
 
@@ -61,6 +63,8 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     // Process the form data and send it to the server or API endpoint.
     console.log(formData);
 
@@ -75,36 +79,27 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
     }
     
 
-    try {
-      const tx = await RequestDB(
-        metadata,
-        formData.name,
-        formData.description,
-        formData.categories,
-        formData.requiredRows,
-        formData.minRows
-      );
-      console.log(tx);
-      toast.info("Transaction sent, waiting for confirmation.");
     
       // Listen for transaction confirmation
  
-      toast.promise(
-        tx,
+      toast.promise(RequestDB(
+          metadata,
+          formData.name,
+          formData.description,
+          formData.categories,
+          formData.requiredRows,
+          formData.minRows
+        ),
         {
-          pending: 'Promise is pending',
-          success: 'Promise resolved 👌',
-          error: 'Promise rejected 🤯'
+          pending: `Request started for ${formData.name} 🚀`,
+          success: `Request ${formData.name} confirmed 🎉`,
+          error: `Something went wrong..`,
         }
-    )
-    const receipt = await tx.wait();
-      console.log(receipt);
-      toast.success("Transaction confirmed.");
-      changeOpen(false)
-    } catch (e) {
-      console.log(e);
-      toast.error("Something went wrong, please try again later.");
-    }
+    ).then(() => {
+        changeOpen(false)
+        window.location.reload()
+    })
+    
   }
 
 
@@ -200,15 +195,9 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
             />
           </div>
 
-
         )}
-      <button
-        type="submit"
-        onClick={handleSubmit}
-        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        Submit
-      </button>
+        
+        <ActionButton  onClick={handleSubmit} loading={loading} text="Submit" />
     </div>
 </CreateOverlay>
   );

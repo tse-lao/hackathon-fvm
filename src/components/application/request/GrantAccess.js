@@ -70,10 +70,14 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       setStatus(RECORD_CONTRIBUTION)
       
       toast.promise(submitData(tokenID, selectedOptions[i], count.toString(), getData.v, getData.r, getData.s), {
-        pending: "Promise is pending",
-        success: "Promise resolved 👌",
-        error: "Promise rejected 🤯",
-      });
+        pending: "Waiting for transaction to confirm 🕐",
+        success: "Successfully contributing to the dataset. Thank you for your support.  👌",
+        error: "Something went wrong, please try again.. 🤯",
+      }).then(
+        (val) => {
+          window.location.reload();
+        }
+      )
      
     }
     setStatus("active")

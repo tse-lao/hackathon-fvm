@@ -2,9 +2,12 @@
 import { formatBytes } from '@/lib/helpers';
 import lighthouse from '@lighthouse-web3/sdk';
 import { ethers } from 'ethers';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 
 export default function ProfileStats({ address }) {
+  const {address: ownAddress} = useAccount()
   const [stats, setStats] = useState([
     { name: 'Data Used', current: 'loading...', total: 'loading...' },
     { name: 'Contributions', current: 'loading...' },
@@ -60,6 +63,7 @@ export default function ProfileStats({ address }) {
           <div key={index} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
             <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
             <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.current}  {item.total && <span className="text-sm font-md text-gray-500">/ {item.total}</span>}</dd>
+            {index == 0 && address == ownAddress && <Link href="/files"><dd className="mt-1  font-semibold tracking-tight text-cf-600">Show Files</dd></Link>}
           </div>
         ))}
       </dl>

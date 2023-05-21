@@ -1,4 +1,5 @@
 
+import LoadingSpinner from '@/components/application/elements/LoadingSpinner';
 import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
@@ -142,19 +143,18 @@ export default function ViewFile() {
         }, 0);
     }
 
-
-
-
-
+    const closedDeal = () => {
+        setCreateCarDeal(false);
+        //check if what network the user is onn.. 
+        
+    }
 
     return (
         <Layout>
 
-            {createCarDeal && <CreateDeal cid={cid}  onClose={() => setCreateCarDeal(!createCarDeal)}/>}
-            {loading ? <div>Loading...</div> : (
-
+            {createCarDeal && <CreateDeal cid={cid}  onClose={closedDeal}/>}
+            {loading ? <LoadingSpinner height={64} /> : (
                 <div>
-
                     <div className="flex justify-between sm:flex sm:items-center mb-6">
                         <div>
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{fileInfo.fileName}</h1>

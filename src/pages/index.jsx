@@ -1,4 +1,3 @@
-import Avatar from '@/components/application/elements/Avatar'
 import Tabs from '@/components/application/elements/Tabs'
 import LoadingIcon from '@/components/application/elements/loading/LoadingIcon'
 import Contributions from '@/components/application/profile/Contributions'
@@ -42,24 +41,16 @@ export default function Profile() {
 
     <Layout active="Dashboard">
       <ProfileStats address={address} />
-      <div className='bg-white rounded-sm flex items-center py-6 px-12 mt-12'>
-        <div className='mr-12'>
-          {mounted && <Avatar height={64} className='mr-12' creator={address} />}
+
+      <div className='mt-12'>
+        <Tabs tabs={tabs} selected={setSelected} active={select} />
+        <div className='flex mt-12'>
+          {select === "Contributions" && <Contributions creator={address} />}
+          {select === "DataSets" && <ProfileDataSets creator={address} />}
+          {select === "Recommendation" && <Recommendations address={address} />}
         </div>
-
-
-        <div>
-          <span className='text-sm text-gray-600 mt-2 uppercase'>Welcome</span>
-          <h1 className='text-lg font-bold leading-7 text-gray-700'>{address && address}</h1>
-        </div>
-
       </div>
-      <Tabs tabs={tabs} selected={setSelected} active={select} />
-      <div className='flex mt-12'>
-        {select === "Contributions" && <Contributions creator={address} />}
-        {select === "DataSets" && <ProfileDataSets creator={address} />}
-        {select === "Recommendation" && <Recommendations address={address} />}
-      </div>
+    
     </Layout>
 
 

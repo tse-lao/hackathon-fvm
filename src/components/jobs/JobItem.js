@@ -2,7 +2,6 @@ import Link from 'next/link'
 import Category from '../application/elements/Category'
 
 export default function JobItem({ details }) {
-    console.log(details)
     return (
 
         <div className='px-2 py-6 outline-top hover:bg-gray-100 bg-white'>

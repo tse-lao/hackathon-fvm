@@ -113,7 +113,7 @@ export default function TokenID() {
                 )
               )}
               
-              {detail.minimumRowsOnSubmission == 0 && <ActionButton text="Coming Soon" onClick={() => setModalOpen(!modalOpen)}/>}
+              <ActionButton text="Deals" onClick={() => setModalOpen(!modalOpen)}/>
               <OpenButton text={showDataformat ? "Hide Format" : "Show Format"} onClick={() => setShowDataformat(!showDataformat)} />
             </div>
 
