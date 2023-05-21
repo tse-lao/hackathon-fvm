@@ -17,7 +17,7 @@ export default async (req, res) => {
     const result = await new Promise(async (resolve, reject) => {
         const url = 'https://testnets.tableland.network/api/v1/query';
         const params = new URLSearchParams({
-          statement: `SELECT COUNT(*)  FROM ${data_contribution} ${whereStatement}`,
+          statement: `SELECT COUNT(*)  FROM ${data_contribution} ${whereStatement} `,
           unwrap: true, extract: true, format: "objects"
           
         });

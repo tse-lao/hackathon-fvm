@@ -21,6 +21,11 @@ export async function getNfts(address) {
     return nftsData
 }
 
+export async function getTokenHolder(tokenId) {
+    const nfts = await alchemy.nft.getOwnersForNft(DB_NFT_address, tokenId);
+    return nfts
+}
+
 // Decrypt file nodejs
 import { Polybase } from '@polybase/client'
 import { ethPersonalSign } from "@polybase/eth"
@@ -84,7 +89,12 @@ export default async function MatchRecord(list, accessToken, open) {
             let carRecord = carRecords.find(carRecord => carRecord.fileName == name);
         if (carRecord !== undefined) {
             record.carRecord = carRecord;
+            
+            if(open){
+                record.carRecord.userName = "0x00";
+            }
         } else {
+            
             // Handle the case where no matching car record is found
             console.error(`No car record found with name: ${name}`);
             continue;

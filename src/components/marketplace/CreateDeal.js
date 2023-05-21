@@ -29,6 +29,7 @@ export default function CreateDeal({ cid, onClose, getOpen }) {
             const piece_cid = data.data[0].data.carPayload;
             const result = await fetch(`/api/tableland/request/status?piece_cid=${piece_cid}`);
             const status = await result.json();
+            
             setDeals(status.result)
             setPending(true)
         }
@@ -110,6 +111,9 @@ if(data.data[0] == undefined)  return (
                     <RecordItem label="Location" value={deal.location_ref} />
                     <RecordItem label="Storage" value={deal.storage_price_per_epoch} />
                     <RecordItem label="Timestamp" value={deal.timestampt} />
+                    
+                    
+                    <OpenButton text="Request pending..."  />
                 </div>
                
                 )}

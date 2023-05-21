@@ -10,7 +10,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { WagmiConfig, configureChains, createClient } from 'wagmi';
-import { polygonMumbai } from 'wagmi/chains';
+import { filecoinHyperspace, polygonMumbai } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
 const auth = typeof window !== 'undefined' ? new Auth() : null;
@@ -19,33 +19,9 @@ const db = new Polybase({
 });
 
 
-const hyperspace = {
-  id: 3141,
-  name: 'HyperSpace ',
-  network: 'hyperspace',
-  iconUrl: 'https://example.com/icon.svg',
-  iconBackground: '#fff',
-  nativeCurrency: {
-    decimals: 18,
-    name: 'FIL',
-    symbol: 'Fil',
-  },
-  rpcUrls: {
-    default: {
-      http: ['https://api.hyperspace.node.glif.io/rpc/v1'],
-    },
-  },
-  blockExplorers: {
-    default: { name: 'Filfox', url: 'https://hyperspace.filfox.info/en' },
-    litprotocl: { name: 'SnowTrace', url: 'https://chain.litprotocol.com/' },
-  },
-  testnet: false,
-};
-
-
 
 const { chains, provider } = configureChains(
-  [polygonMumbai, hyperspace],
+  [polygonMumbai, filecoinHyperspace],
   [
     publicProvider()
   ], 

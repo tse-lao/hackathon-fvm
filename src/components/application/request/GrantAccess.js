@@ -1,13 +1,12 @@
+import { data_contribution } from "@/constants";
 import { useContract } from "@/hooks/useContract";
 import { countRows, shareFile } from "@/hooks/useLighthouse";
 import { validateInput } from "@/hooks/useLitProtocol";
 import { useDocument, usePolybase } from "@polybase/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../elements/LoadingSpinner";
 import LoadingIcon from "../elements/loading/LoadingIcon";
-
-
 const PROVIDE_ACCESS = "Please confirm and sign your data to provide access to the contract";
 const VALIDATE_VALUE = "We are confirming if the provided data is corresponding the dataformat of the dataset. ";
 const RECORD_CONTRIBUTION = "Confirm your contribution to the contract, the owner is only able to see decrypt you data if a certain amount of contributions are made";
@@ -16,14 +15,32 @@ const COUNTING_ROWS = "We are counting the rows of the dataset, this might take 
 export default function GrantAccess({ tokenID, metadataCID, address, creator, minRows }) {
   const polybase = usePolybase();
   const { data, error, loading } = useDocument(polybase.collection("File").where("metadata", "==", metadataCID).where("owner", "==", address.toLowerCase()));
+  const [options, setOptions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [counter, setCoutner] = useState(0);
   const { submitData } = useContract();
 
   const [status, setStatus] = useState("active");
 
-
-
+  useEffect(() => {
+    if (data) {
+      //fetch all the contirbutions of this address. 
+      const fetchData = async () => {
+        const result = await fetch(`/api/tableland/contributions?${data_contribution}.tokenID=${tokenID}&${data_contribution}.creator=${address.toLowerCase()}`);
+        const status = await result.json();
+        console.log(status.result)
+        if(status.result.length > 0){
+          //we want only the dataCID in options
+          const dataCID = status.result.map((item) => item.dataCID);
+          setOptions(dataCID)
+          return;
+        }
+       // setSelectedOptions(status.result)
+      }
+      
+      fetchData();
+    }
+  }, [data]);
   const handleCheckboxChange = (e) => {
     const checkedValue = e.target.value;
     const isChecked = e.target.checked;
@@ -94,21 +111,23 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
         className="text-gray-600 italic text-xs mb-4 block"
       >
         Below you can contribute to the project by providing access to your data. You can select multiple data sets to provide access to.
-        The more contributions you make the more you will be rewarded.
+        The more contributions you make the more you will be rewarded. If you cannot unselect an item than it is already submitted to the array
       </span>
       {status == "active" ? (
         <div>
           <div className="divide-y divide-gray-200 max-h-[400px] overflow-auto outline outline-cf-300 rounded-md ring-cf-200">
             {data.data.length > 0 ? data.data.map((item, index) => (
+              
               <label key={index} className="flex items-center py-4 px-4 hover:bg-gray-100 transition-colors duration-150 cursor-pointer">
                 <input
                   type="checkbox"
                   value={item.data.cid}
-                  checked={selectedOptions.includes(item.data.cid)}
+                  checked={selectedOptions.includes(item.data.cid) || options.includes(item.data.cid)}
                   onChange={handleCheckboxChange}
+                  disabled={options.includes(item.data.cid)}
                   className="form-checkbox text-cf-500 rounded-sm"
                 />
-                <span className="ml-4 text-gray-600 text-md overflow-hidden overflow-ellipsis whitespace-nowrap max-w-full">{item.data.name}</span>
+                <span className="ml-4 text-gray-600 text-md overflow-hidden overflow-ellipsis whitespace-nowrap max-w-full">{item.data.name}  </span>
               </label>
             )) : (
               <div className="text-center py-8">
