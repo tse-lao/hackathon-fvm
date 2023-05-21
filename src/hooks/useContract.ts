@@ -245,8 +245,8 @@ export const useContract = () => {
   }
 
   const callLillypadJob = async (
-    _specStart: string,
     input: string,
+    _specStart: string,
     _specEnd: string, 
     jobId: string
   ): Promise<any> => {
