@@ -32,7 +32,6 @@ export async function shareFile(cid, creator, address) {
     cid,
     jwt
   );
-
   return res;
 }
 

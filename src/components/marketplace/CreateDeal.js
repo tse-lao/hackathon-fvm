@@ -45,7 +45,7 @@ export default function CreateDeal({ cid, onClose, getOpen }) {
                 fetchData()
             }
         }
-    }, [cid, loading])
+    }, [cid])
 
 
     const makeProposal = async () => {

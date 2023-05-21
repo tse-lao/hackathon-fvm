@@ -353,7 +353,7 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer
+      provider
     )
     return await splitterInstance.payee(index)
   }
@@ -362,11 +362,12 @@ export const useContract = () => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
-      signer
+      provider
     )
     return await splitterInstance.shares(address)
   }
 
+  //TODO: there is an error here we need to find out what the problem is..
   const distributeShares = async (splitterAddress: string): Promise<any> => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
