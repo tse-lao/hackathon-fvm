@@ -28,13 +28,10 @@ export default function Jobs({children}) {
                 </button>
             </div>
             
-          
-            <div className='flex flex-row gap-12 flex-wrap'>
-                <div className='flex bg-white py-4 px-8 max-h-full overflow-auto'>                   
+                 
+                <div className='flex flex-row gap-12 flex-wrap'>
+                <div className='grid grid-cols-2 py-4 px-8 max-h-full overflow-auto gap-2'>                   
                     <AllJobs />
-                </div>
-                <div className='flex-auto py-4 px-8 bg-white'>
-                    Please select a job to view its details.
                 </div>
             </div>
         </Layout>
