@@ -18,9 +18,7 @@ export default function CreateDeal({ cid, onClose }) {
     const [errorMessage, setErrorMessage] = useState(null)
     const { chain } = useNetwork()
     const { data:blocknumber, isError, isLoading:blockloading } = useBlockNumber()
-
-    const { chains, error, isLoading, pendingChainId, switchNetwork } =
-      useSwitchNetwork()
+    const { switchNetwork } = useSwitchNetwork()
 
     const makeProposal = async () => {
         setMakingDeal(true)

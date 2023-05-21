@@ -50,12 +50,12 @@ export default function Jobs({  }) {
 
             <div className='flex flex-col gap-12 flex-wrap '>
                 <div className='flex-auto py-4 px-8 bg-white '>
-                    <PerformJob key="1" jobID={jobid} />
+                    <PerformJob key="1" jobID={jobid} input={selected} />
                 </div>
                 <div className='grid sm:grid-cols-1 md: grid-cols-2 lg:grid-cols-2 gap-4'>
                     {datasets && datasets.map((dataset, index) => (
-                        <div key={index} className={`grid sm:grid-cols-1 md:grid-cols-1 bg-white items-center px-4 py-4 ${selected.includes(dataset.dbCID) && 'outline'}`} onClick={() => addSelected(dataset.dbCID)} >
-                            <span className='text-sm text-gray-600'>{dataset.dbCID} </span>
+                        <div key={index} className={`grid sm:grid-cols-1 md:grid-cols-1 bg-white items-center px-4 py-4 ${selected.includes(dataset.tokenID) && 'outline'}`} onClick={() => addSelected(dataset.tokenID)} >
+                            <span className='text-sm text-gray-600'>{dataset.tokenID} </span>
                             <span>  {dataset.dbName}</span>
                         </div>
                     ))}

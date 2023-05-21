@@ -215,9 +215,12 @@ export const useContract = () => {
   const callLillypadJob = async (
     _specStart: string,
     input: string,
-    _specEnd: string
+    _specEnd: string, 
+    jobId: string
   ) => {
-    const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd)
+    const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd, jobId, {
+      gasLimit: 10000000,
+    })
     return await tx.wait()
   }
 
@@ -244,7 +247,9 @@ export const useContract = () => {
       1,
       [locationRef, carSize, false, false],
     ]
-    const tx = await TablelandDealClient.makeDealProposal(DealRequestStruct)
+    const tx = await TablelandDealClient.makeDealProposal(DealRequestStruct, {
+      gasLimit: 10000000,
+    })
     return await tx.wait()
   }
 

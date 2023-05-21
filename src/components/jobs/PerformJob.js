@@ -1,15 +1,17 @@
 import { usePolybase } from '@polybase/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import Category from '../application/elements/Category';
 import DataFormatPreview from '../marketplace/DataFormatPreview';
+import ExecuteJob from './ExecuteJob';
 
-export default function PerformJob({ jobID }) {
+export default function PerformJob({ jobID, input }) {
     const polybase = usePolybase();
     const [details, setDetails] = useState(null)
+    const [openModal, setOpenModal] = useState(false)
 
     useEffect(() => {
+
         const fetchJob = async () => {
             const job = await getJob(jobID);
             console.log(job)
@@ -25,10 +27,6 @@ export default function PerformJob({ jobID }) {
         const { data } = await polybase.collection("Jobs").where("id", "==", jobID).get()
         console.log(data[0].data);
         return data[0].data;
-    }
-
-    const startComputing = async () => {
-        toast.info("Starting computation...")
     }
 
 
@@ -60,14 +58,19 @@ export default function PerformJob({ jobID }) {
                         </Link>
                     </div>
                     <span className='text-xs'> {details.jobCid} </span>
+                    {details.input && details.input.map((input, index) => 
+                        <span key={index} className='text-xs'> {input} </span>
+                    )}
 
                     <button
                         className='bg-cf-500 hover:bg-cf-700 text-white font-bold py-2 px-4 rounded-full'
-                        onClick={startComputing}
+                        onClick={() => setOpenModal(!openModal)}
                     >
                         Start computing
                     </button>
                 </div>
+                {openModal && <ExecuteJob data={details} input={input}/> }
+                
         </div>
 
     )

@@ -21,7 +21,7 @@ export default function Jobs({children}) {
     </h1>
                 <button
                     onClick={() => setOpenModal(true)}
-                    className="bg-indigo-500 hover:bg-indigo-700 self-end text-white font-bold py-2 px-4 rounded-full"
+                    className="bg-cf-500 hover:bg-cf-700 self-end text-white font-bold py-2 px-4 rounded-full"
                 >
                     <CreateJob changeOpen={changeOpen} getOpen={openModal} />
                     Create a JOB
