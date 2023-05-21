@@ -18,8 +18,8 @@ export default function ExecuteJob({ data, input, jobID,  onClose }) {
 
     const startComputing = async () => {
         console.log(data.spec_start, data.spec_end, data.id)
-        console.log(input)
-        callLillypadJob(input.toString(), data.spec_start, data.spec_end, data.id).then((result) => {
+        console.log(input[0])
+        callLillypadJob(input[0], data.spec_start, data.spec_end, data.id).then((result) => {
             console.log(result);
         }).catch((error) => {
             console.log(error);
@@ -41,7 +41,7 @@ export default function ExecuteJob({ data, input, jobID,  onClose }) {
                 </div>
                 <div className='flex flex-col'>
                     <label className="font-bold">Job Input</label>
-                    <span>{JSON.stringify(input)}</span>
+                    <span>{input[0]}</span>
                 </div>
 
                 {chain.id == HYPERSPACE_ID ? <ActionButton onClick={startComputing} text="Make Deal" /> :

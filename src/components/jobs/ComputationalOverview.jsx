@@ -11,7 +11,6 @@ export default function ComputationalOverview({ tokenID, dataFormat }) {
 
     return (
         <div className="flex flex-col items-center justify-center">
-
             <CreateJob changeOpen={changeOpen} getOpen={openModal} dataFormat={dataFormat} />
             <div className='flex flex-row gap-12 flex-wrap'>
                 <div className='grid sm:grid-cols-1  md:grid-cols-2  max-h-full overflow-auto gap-4'>

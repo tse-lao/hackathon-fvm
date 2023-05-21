@@ -22,8 +22,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
 
   const [status, setStatus] = useState("active");
 
-  if (loading) return <LoadingSpinner msg="loading files" />
-  if (error) return <div>Error: {error.message}</div>
+
 
   const handleCheckboxChange = (e) => {
     const checkedValue = e.target.value;
@@ -69,21 +68,20 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       const getData = await validateInput(tokenID, selectedOptions[i], count);
 
       setStatus(RECORD_CONTRIBUTION)
-      try {
-        submitData(tokenID, selectedOptions[i], count.toString(), getData.v, getData.r, getData.s);
-        toast.success("Access granted!")          
-      }catch (e) {
-        console.log(e)
-        toast.error(e.message)
-      }
       
-      
+      toast.promise(submitData(tokenID, selectedOptions[i], count.toString(), getData.v, getData.r, getData.s), {
+        pending: "Promise is pending",
+        success: "Promise resolved 👌",
+        error: "Promise rejected 🤯",
+      });
+     
     }
-    
     setStatus("active")
 
   }
-
+  
+  if (loading) return <LoadingSpinner msg="loading files" />
+  if (error) return <div>Error: {error.message}</div>
 
   return (
     <div className="ax-w-lg mx-auto">

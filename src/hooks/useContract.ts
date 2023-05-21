@@ -1,4 +1,5 @@
 import { ethers } from 'ethers'
+import { toast } from 'react-toastify'
 import { useSigner } from 'wagmi'
 import {
   DBAbi,
@@ -21,12 +22,12 @@ export const useContract = () => {
   const { data: signer } = useSigner()
 
   const provider = new ethers.providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com	")
-  const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer)
+  const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
 
   const TablelandStorage = new ethers.Contract(
     crossChainTablelandStorageAddress,
     crossChainTablelandStorageAbi,
-    signer
+    signer!
   )
 
   const TablelandDealClient = new ethers.Contract(
@@ -38,10 +39,10 @@ export const useContract = () => {
   const tablelandBacalhau = new ethers.Contract(
     crossChainBacalhauJobs_address,
     crossChainBacalhauJobsAbi,
-    signer
+    signer!
   )
-  const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, provider)
-  const helperContract = new ethers.Contract(helper, helperAbi, provider)
+  const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, signer!)
+  const helperContract = new ethers.Contract(helper, helperAbi, signer!)
 
   // --------------------------------------------------------- DB_NFT_CONTRACT INTERACTIONS -----------------------------------------------------------------------------------------------
   const getCurrentTokenId = async () => {
@@ -71,7 +72,7 @@ export const useContract = () => {
       minimumRowsOnSubmission,
       { gasLimit: 1000000 }
     )
-    return await tx.wait()
+    return tx
   }
   // ================================ CREATING OPEN DATA SET ======================================== //
 
@@ -104,12 +105,29 @@ export const useContract = () => {
     v: number,
     r: string,
     s: string
-  ) => {
-    const tx = await DB_NFT.submitData(tokenId, dataCID, rows, v, r, s, {
-      gasLimit: 1000000,
-    })
-    return await tx.wait()
-  }
+  ): Promise<any> => {
+    try {
+      const tx = await DB_NFT.submitData(tokenId, dataCID, rows, v, r, s, {
+        gasLimit: 1000000,
+      });
+  
+      console.log(tx);
+      toast.update("Promise is pending", {
+        render: "Transaction sent, waiting for confirmation.",
+      });
+  
+      const receipt = await tx.wait();
+      console.log(receipt);
+      toast.success("Promise resolved 👌");
+      return receipt;
+    } catch (error) {
+      console.log(error);
+      toast.error("Promise rejected 🤯");
+      throw error; 
+    }
+  };
+  
+  
 
   //signature:
   const createDB_NFT = async (
@@ -219,7 +237,7 @@ export const useContract = () => {
     jobId: string
   ) => {
     const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd, jobId, {
-      gasLimit: 10000000,
+      gasLimit: 100000000,
     })
     return await tx.wait()
   }
@@ -233,7 +251,7 @@ export const useContract = () => {
     pieceSize: number,
     label: string,
     startEpoch: number
-  ) => {
+  )  :Promise<any> => {
     let DealRequestStruct = [
       cidHex,
       pieceSize,
@@ -247,10 +265,21 @@ export const useContract = () => {
       1,
       [locationRef, carSize, false, false],
     ]
-    const tx = await TablelandDealClient.makeDealProposal(DealRequestStruct, {
-      gasLimit: 10000000,
-    })
-    return await tx.wait()
+    try {
+      const tx = await TablelandDealClient.makeDealProposal(DealRequestStruct)
+      console.log(tx);
+      toast.update("Promise is pending", {
+        render: "Transaction sent, waiting for confirmation.",
+      });
+  
+      const receipt = await tx.wait();
+      return receipt;
+    } catch (error) {
+      toast.error("Promise rejected 🤯");
+      throw error; 
+    }
+    
+   
   }
 
   // --------------------------------------------------------- ThirdWeb CreateSplitter & Interact with a Splitter  -----------------------------------------------------------------------------------------------
@@ -309,16 +338,27 @@ export const useContract = () => {
     return await splitterInstance.shares(address)
   }
 
-  const distributeShares = async (splitterAddress: string) => {
+  const distributeShares = async (splitterAddress: string): Promise<any> => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
       provider
     )
-    const tx = await splitterInstance.distribute()
-
-    
-    return await tx.wait()
+    try {
+      const tx = await splitterInstance.distribute()
+  
+      console.log(tx);
+      toast.update("Promise is pending", {
+        render: "Transaction sent, waiting for confirmation.",
+      });
+  
+      const receipt = await tx.wait();
+      console.log(receipt);
+      return receipt;
+    } catch (error) {
+      console.log(error);
+      throw error; 
+    }
   }
   
   const getBalance = async (address:string) => {

@@ -79,7 +79,10 @@ export default function App({ Component, pageProps }) {
         <RainbowKitProvider chains={chains}>
           
           <Component {...pageProps} />
-          <ToastContainer />
+          <ToastContainer 
+          position="bottom-center"
+
+          />
         </RainbowKitProvider>
       </WagmiConfig>
     </AuthProvider>

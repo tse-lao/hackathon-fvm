@@ -1,7 +1,6 @@
 import { useContract } from "@/hooks/useContract";
 import useNftStorage from "@/hooks/useNftStorage";
 import { analyzeJSONStructure, readJSONFromFileInput } from "@/lib/dataHelper";
-import { useAuth, usePolybase } from "@polybase/react";
 import { useState } from "react";
 import TagsInput from "react-tagsinput";
 import 'react-tagsinput/react-tagsinput.css';
@@ -14,17 +13,13 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
   const [formData, setFormData] = useState({
     name: "",
     categories: [],
-    description: "",
+    description: "This is some dummy description to speed up the process of testing and demoing. ",
     metadata: "",
     minRows: 0,
     requiredRows: 0,
   });
   const [loadingFile, setLoadingFile] = useState(false);
-
   const [metadata, setMetadata] = useState(null);
-  const { auth, state, loading } = useAuth();
-
-  const polybase = usePolybase();
   const { RequestDB } = useContract();
   const { uploadMetadata } = useNftStorage();
 
@@ -70,18 +65,47 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
     console.log(formData);
 
     if (formData.minRows <= 0) {
-      toast.error("Min rows is invalid");
+      toast.error("You minimum rows must be greater than 0, otherwise you need to create an open Dataset.");
+      return;
     }
+    
+    if(formData.name.length < 3 || formData.name.length > 50, formData.description.length < 25 ){
+      toast.error("Please fill out the form correctly, min length name should be 3 and min length description should be 25 characters.");
+      return;
+    }
+    
 
     try {
-      //    const RequestDB = async( dataFormatCID: string, DBname: string, description: string, categories: string[], requiredRows: number, minimumRowsOnSubmission:number) => {
-      await RequestDB(metadata, formData.name, formData.description, formData.categories, formData.requiredRows, formData.minRows);
+      const tx = await RequestDB(
+        metadata,
+        formData.name,
+        formData.description,
+        formData.categories,
+        formData.requiredRows,
+        formData.minRows
+      );
+      console.log(tx);
+      toast.info("Transaction sent, waiting for confirmation.");
+    
+      // Listen for transaction confirmation
+ 
+      toast.promise(
+        tx,
+        {
+          pending: 'Promise is pending',
+          success: 'Promise resolved 👌',
+          error: 'Promise rejected 🤯'
+        }
+    )
+    const receipt = await tx.wait();
+      console.log(receipt);
+      toast.success("Transaction confirmed.");
+      changeOpen(false)
     } catch (e) {
       console.log(e);
-      toast.error("Error creating request");
+      toast.error("Something went wrong, please try again later.");
     }
-
-  };
+  }
 
 
 

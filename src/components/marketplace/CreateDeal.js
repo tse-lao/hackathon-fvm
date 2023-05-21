@@ -1,6 +1,6 @@
 import { useContract } from '@/hooks/useContract';
 import { useDocument, usePolybase } from '@polybase/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useBlockNumber, useNetwork, useSwitchNetwork } from 'wagmi';
 import ModalLayout from '../ModalLayout';
@@ -16,12 +16,33 @@ export default function CreateDeal({ cid, onClose }) {
     const { makeDealProposal } = useContract();
     const [makingDeal, setMakingDeal] = useState(false)
     const [errorMessage, setErrorMessage] = useState(null)
+    const [record, setRecord] = useState(null)
     const { chain } = useNetwork()
     const { data:blocknumber, isError, isLoading:blockloading } = useBlockNumber()
     const { switchNetwork } = useSwitchNetwork()
+    
+    useEffect(() => {
+       //make a check here to see if the cid is already in teh database. 
+    
+       const fetchData = async () => {
+        const piece_cid = data.data[0].data.carPayload;
+        
+        const result = await fetch(`/api/tableland/request/status?piece_cid=${piece_cid}`); 
+        const status = await result.json();
+        
+        if(status.result.length > 0){
+            setErrorMessage("This payload had already a pending process...")
+        }
+       }
+       
+       if(!loading) {
+        fetchData()
+       }
+    }, [cid, loading])
+    
 
     const makeProposal = async () => {
-        setMakingDeal(true)
+        setMakingDeal(true);
         let record = data.data[0].data;
         const cidHex = record.cidHex;
         const label = record.carPayload;
@@ -37,18 +58,19 @@ export default function CreateDeal({ cid, onClose }) {
         console.log(`${cidHex}:piece_cid, label, ${piece_size} piece_size, ${start_epoch} end_epoch, ${location_ref} location_ref, carSize: ${carSize}`)
         
         
-        await makeDealProposal(location_ref, carSize, cidHex, piece_size, label, start_epoch)
-        .then((result) => { 
-            console.log(result)
-            setMakingDeal(false)
-            toast.success("Deal created!")
-        }).catch((error) => {
-            console.log(error)
-            setErrorMessage(error.message)
-            setMakingDeal(false)
-        })
         
-        useNetwork().switchNetwork(POLYGON)
+        toast.promise(makeDealProposal(location_ref, carSize, cidHex, piece_size, label, start_epoch), {
+            pending: 'Creating deal...',
+            success: 'Deal created!',
+            error: 'Error creating deal',
+            }).then((result) => {
+                console.log(result)
+                setMakingDeal(false);
+                setRecord(result)
+            })
+
+        
+        //useNetwork().switchNetwork(POLYGON)
 
 
 
@@ -58,16 +80,15 @@ export default function CreateDeal({ cid, onClose }) {
         
         <ModalLayout title="Create Deal" onClose={onClose}>
             <div className="flex flex-col w-full h-full py-6 gap-4">
-                {makingDeal && <LoadingSpinner />}
                 {errorMessage && <div className="text-red-500">{errorMessage}</div>}
                 
                 <div className='flex flex-col'>
                     <label className="font-bold">CID</label>
-                    <span>{data.data[0].data.cidHex}</span>
+                    <span className='text-sm'>{data.data[0].data.cidHex}</span>
                 </div>
                 <div className='flex flex-col'>
                     <label className="font-bold">Label</label>
-                    <span>{data.data[0].data.carPayload}</span>
+                    <span className='text-sm'>{data.data[0].data.carPayload}</span>
                 </div>
                 <div className='flex flex-col'>
                     <label className="font-bold">Piece CID</label>
@@ -89,7 +110,7 @@ export default function CreateDeal({ cid, onClose }) {
                 <label className="font-bold">Current Block</label>
                 <span>{blocknumber}</span>
                 </div>
-                {chain.id == HYPERSPACE_ID ? <ActionButton onClick={makeProposal} text="Make Deal" /> : 
+                {chain.id == HYPERSPACE_ID ? <ActionButton loading={makingDeal} onClick={makeProposal} text="Make Deal" /> : 
                 <OpenButton text="Change to HyperSpace"
                     onClick={() => switchNetwork?.(HYPERSPACE_ID)}
                 /> }

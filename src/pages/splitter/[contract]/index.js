@@ -1,3 +1,5 @@
+import { ActionButton } from "@/components/application/elements/buttons/ActionButton";
+import { OpenButton } from "@/components/application/elements/buttons/OpenButton";
 import { useContract } from "@/hooks/useContract";
 import Layout from "@/pages/Layout";
 import { ethers } from 'ethers';
@@ -24,7 +26,6 @@ export default function Splitterr() {
       const balanceGet = await getBalance(contract);
       setBalance(balanceGet);
       setPayeeCount(payCount);
-      console.log(payCount)
       const payees = [];
       const shares = {};
       for(let i = 0; i < payCount; i++){
@@ -36,27 +37,23 @@ export default function Splitterr() {
         
         
       }
-      
       setIsPayee(payees.includes(address));
-
       setPayees(payees);
-      
       setShares(shares);
     }
     if(contract){fetchPayees()}
   }, [contract]);
   
     const withdrawFunds = async () => {
-        if(isPayee){    
+        if(!isPayee){    
             toast.error("You are not a payee of this contract.");
         }
         
-        try {
-            await distributeShares(contract);
-        } catch (e) {
-            toast.error("Error withdrawing funds.")
-            console.log(e);
-        }
+        toast.promise(distributeShares(contract), {
+            pending: "Withdrawing funds...",
+            success: "Funds withdrawn.",
+            error: "Error withdrawing funds."
+        })
     }
   return (
     <Layout>
@@ -78,13 +75,10 @@ export default function Splitterr() {
         ))}
       
       </div>
-    {isPayee && (
-        <button 
-      className="mt-4 w-full py-2 px-4 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75" 
-      onClick={withdrawFunds}
-    >
-      Distribute Shares
-    </button>
+    {isPayee ? (
+      <ActionButton onClick={withdrawFunds} text="Distribute Shares" />
+    ): (
+      <OpenButton text="Only Payees can withdraw funds" disabled={true} />
     )}
     </div>
   </div>
