@@ -1,14 +1,18 @@
 import StravaActivity from "@/components/application/connections/StravaActivity";
 import Connected from "@/components/application/elements/Connected";
+import { getLighthouse, readJWT, uploadCarFileFromCid } from "@/hooks/useLighthouse";
+import { analyzeJSONStructure, getMetadataCID } from "@/lib/dataHelper";
+import lighthouse from '@lighthouse-web3/sdk';
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useAccount } from "wagmi";
 import Layout from "../Layout";
-
 
 export default function Strava() {
     const name = "Strava"
     const router = useRouter();
+    const {address} = useAccount();
     const [apiConnected, setApiConnected] = useState(false);
     const [accessToken, setAccessToken] = useState(null);
     const [stravaData, setStravaData] = useState({});
@@ -51,7 +55,6 @@ export default function Strava() {
 
         localStorage.setItem('strava_userID', data.id);
         setStravaData(data);
-        console.log(data);
     }
 
     const getActivities = async () => {
@@ -76,6 +79,37 @@ export default function Strava() {
     
     const exportActivities = async () => {
         toast.success('Exporting activities...');
+        
+        //take the blob of the json and turn it into a file. 
+        let jsonBlob = new Blob([JSON.stringify(activities)], { type: "application/json" });
+        //now we have blob where we can get the metadata from .
+        const analyze = await analyzeJSONStructure(activities);
+        const metadata = await getMetadataCID(JSON.stringify(analyze));
+        console.log(metadata);
+        
+        const file = new File([jsonBlob], "strava.json", { type: "application/json" });
+        const apiKey = await getLighthouse(address);
+        const jwt = await readJWT(address)
+        const mockEvent = {
+            target: {
+                files: [file],
+            },
+            persist: () => { },
+        };
+        
+        const response = await lighthouse.uploadEncrypted(
+            mockEvent,
+            apiKey, 
+            address, 
+            jwt
+        )
+        
+        //from ehere we need to call the function of ]
+
+        
+        const result = await uploadCarFileFromCid(response.data.Hash, address, metadata); 
+        
+        console.log(result);
         
     }
 

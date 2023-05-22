@@ -2,6 +2,7 @@ import { useCollection, usePolybase } from "@polybase/react";
 import { useEffect } from "react";
 import LoadingSpinner from "../../elements/LoadingSpinner";
 import LoadingIcon from "../../elements/loading/LoadingIcon";
+import DataNotFound from "../../elements/message/DataNotFound";
 import DriveItem from "./data/DriveItem";
 
 export default function Drive({address}) {
@@ -22,13 +23,13 @@ export default function Drive({address}) {
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                 <div className="overflow-hidden ring-opacity-5 sm:rounded-lg">
-                    <div className="min-w-full">
+                    <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 gap-2">
                         {data.data.length > 0 && !loading ?
                             data.data.map((item) =>
                                 <DriveItem file={item.data} key={item.data.id} />
                             ) : (
                                 <div className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {loading ? <LoadingSpinner /> : <span>No files found</span>}
+                                {loading ? <LoadingSpinner /> : <DataNotFound message="No files found" />}
                                 </div>
                                 
                             )}

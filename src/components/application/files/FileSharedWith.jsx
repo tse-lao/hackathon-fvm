@@ -1,3 +1,4 @@
+import { readJWT } from "@/hooks/useLighthouse";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import lighthouse from "@lighthouse-web3/sdk";
 import { useDocument } from "@polybase/react";
@@ -47,17 +48,19 @@ export default function FileSharedWith({ cid }) {
     const sharePrivateFile = async () => {
         // Then get auth message and sign
         // Note: the owner of the file should sign the message.
-        const { publicKey, signedMessage } = await signAuthMessage();
+        
+        const jwt = await readJWT(address)
+        console.log(cid);
 
         //neeed to collect public key o a user. 
         const publicKeyUserB = [publicShareKey];
 
         try {
             await lighthouse.shareFile(
-                publicKey,
+                address,
                 publicKeyUserB,
                 cid,
-                signedMessage
+                jwt
             );
         } catch (e) {
             setErrorMessage(e)

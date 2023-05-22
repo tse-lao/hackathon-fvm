@@ -4,12 +4,7 @@ import ProfileStats from '@/components/application/profile/ProfileStats'
 import Layout from '@/pages/Layout'
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
-const tabs = [
-  { name: 'API Connections', href: '#', current: true },
-  { name: 'Contributions', href: '#', current: false },
-  { name: 'DataSets', href: '#', current: false },
-  { name: 'Chain Interactions', href: '#', current: false },
-]
+
 
 const stats = [
   { id: 1, name: 'Total Contributions', stat: '71,897', change: '122', changeType: 'increase' },
@@ -20,6 +15,13 @@ const stats = [
 export default function Profile() {
     const [loading, setLoading] = useState(false)
     const {address} = useAccount();
+    
+    const tabs = [
+      { name: 'API Connections', href: '#', current: true },
+      { name: 'Contributions', href: '#', current: false },
+      { name: 'DataSets', href: '#', current: false },
+      { name: 'Chain Interactions', href: '#', current: false },
+    ]
 
         useEffect(() => {
             setLoading(false)

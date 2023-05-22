@@ -4,8 +4,8 @@ import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
 import CreateDeal from '@/components/marketplace/CreateDeal';
-import { signAuthMessage } from '@/lib/createLighthouseApi';
-import readBlobAsJson, { readTextAsJson } from '@/lib/dataHelper';
+import { downloadCid, readJWT } from '@/hooks/useLighthouse';
+import { readBlobAsJson, readTextAsJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
 import lighthouse from '@lighthouse-web3/sdk';
 import { useDocument, usePolybase } from '@polybase/react';
@@ -55,26 +55,27 @@ export default function ViewFile() {
                 readContent(status.data.mimeType, file);
             }
             
-            if(data != null){
+            if(data.data.length > 0){
+                console.log(data);
                 const deal = await fetch(`/api/tableland/request?cid=${data.data[0].data.carPayload}`)
                 const dealData = await deal.json();
                 console.log(dealData);       
             }
         }
 
-        if (cid) { getFile(); setLoading(false) }
+        if (cid && data) { getFile(); setLoading(false) }
 
     }, [cid, data])
 
     /* Decrypt file */
     const decrypt = async () => {
-        const { signedMessage, publicKey } = await signAuthMessage(address);
-
+        const jwt = await readJWT(address);
+        console.log(jwt)
 
         const keyObject = await lighthouse.fetchEncryptionKey(
             cid,
-            publicKey,
-            signedMessage
+            address,
+            jwt
         );
 
         const fileType = fileInfo.mimeType;
@@ -96,13 +97,8 @@ export default function ViewFile() {
                 const url = URL.createObjectURL(content);
                 setFileURL(url);
             case MIMETYPE_APP_JSON:
-                await readTextAsJson(content, (error, json) => {
-                    if (error) {
-                        toast.error('Failed to read the Blob as JSON:', error);
-                    } else {
-
-                        setFileURL(json)
-                    }
+                await readBlobAsJson(content).then((json) => {
+                    setFileURL(json)
                 });
             case MIMETYPE_TEXT_PLAIN:
                 await readTextAsJson(content, (error, json) => {
@@ -169,6 +165,12 @@ export default function ViewFile() {
                             >
                                 Create Deal
                             </button>
+                            <button
+                            onClick={() => downloadCid(cid, address, fileInfo.fileName)}
+                            className="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Download
+                        </button>
                         </div>
                     </div>
 
@@ -190,7 +192,7 @@ export default function ViewFile() {
                         {/* Sidebar */}
                         <div className="w-120 p-4 w-[350px] bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">
                             <FileDetailInformation detail={fileInfo} className="mt-4 mb-4" cid={cid} address={address} />
-                            <FileSharedWith detail={fileInfo} />
+                            <FileSharedWith detail={fileInfo} cid={cid} />
                         </div>
                     </div>
                 </div>

@@ -1,24 +1,9 @@
-/* 交流QQ群:75四五七3七7八 */
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
-
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
   
   export default function Tabs({tabs, selected, active}) {
+    
     return (
       <div>
         <div className="sm:hidden">

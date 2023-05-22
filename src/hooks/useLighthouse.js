@@ -249,7 +249,7 @@ export const getDataDepoAuth = async (address) => {
   }
 };
 
-export async function uploadCarFileFromCid(cid, address) {
+export async function uploadCarFileFromCid(cid, address, metadata, fileName) {
   //we want to prepare the cid for upload by reading turning it into file 
   
   let endpoint = `https://gateway.lighthouse.storage/ipfs/${cid}`;
@@ -265,14 +265,28 @@ export async function uploadCarFileFromCid(cid, address) {
   const result = await uploadCarFile([file], setUploadedProgress, access);
   //now if its success we can go and match it 
   
+  let open = true
   //wait here for a bit
+  let newMetadata = metadata;
+  let name = fileName
+  
+  if(!metadata){
+    newMetadata = "added_manually_by_encryption"
+    open = false
+  }
+  if(!fileName){
+    name = cid
+  }
+  
   await sleep(5000);
-  const polybaseRecord = await MatchRecord([{name: cid, cid: cid, metadata: "added_manually_by_encryption", type: "text/plain"}], access, false);
+  const polybaseRecord = await MatchRecord([{name: name, cid: cid, metadata: newMetadata, type: "text/plain"}], access, open);
   
   console.log(polybaseRecord)
   return polybaseRecord
   
 }
+
+
 
 async function setUploadedProgress (progress) {
   console.log(progress)

@@ -1,6 +1,5 @@
 // components/FileItem.js
 
-import { FolderIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -18,21 +17,13 @@ export default function DriveItem({ file }) {
 
   return (
     <>
-      <div className='flex flex-col mb-2 bg-white border rounded-md shadow-sm  '>
+      <div className='col-span-1 flex-col mb-2 bg-white border rounded-md shadow-sm  '>
         <div className="flex justify-between items-center cursor-pointer p-4 hover:bg-gray-200" key={file.id}  onClick={handleClick}>
           <div className="flex items-center space-x-4">
-            <div className="p-2 bg-gray-200 rounded-full">
-              {file.type === null ? (
-                <FolderIcon className="fas fa-folder text-yellow-500" />
-              ) : (
-                <PhotoIcon className="fas fa-file text-blue-500" />
-              )}
-            </div>
-            <span className="text-gray-800 font-medium">{file.name}</span>
+            <span className="text-gray-800 text-sm font-medium">{file.name}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-500">{file.type}</span>
-            <span className="text-sm text-gray-500">{file.addedAt}</span>
+            <span className="text-xs text-gray-500">{file.type}</span>
           </div>
 
 
@@ -70,7 +61,7 @@ export default function DriveItem({ file }) {
 const DetailItem = ({ label, value, extraStyling = "" }) => (
   <div className={`flex flex-col p-4 `}>
     <span className="font-bold text-gray-600">{label}</span>
-    <span className="text-sm text-gray-600">{value}</span>
+    <span className="text-sm text-gray-600 truncate">{value}</span>
   </div>
 );
 
