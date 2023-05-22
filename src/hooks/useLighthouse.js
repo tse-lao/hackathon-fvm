@@ -220,6 +220,11 @@ export async function countRows(cid, address){
   console.log(decrypted)
   const jsonData = await readBlobAsJson(decrypted);
   
+  //check if hte jsonData is an array 
+  if(Array.isArray(jsonData)){
+    return jsonData.length;
+  }
+  
   //get the first array in jsonData if not then just reutnr 1
   
   if(containsArray(jsonData)){
