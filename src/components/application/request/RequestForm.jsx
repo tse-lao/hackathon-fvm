@@ -19,6 +19,7 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
     minRows: 0,
     requiredRows: 0,
   });
+
   const [loadingFile, setLoadingFile] = useState(false);
   const [metadata, setMetadata] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -97,7 +98,7 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
         }
     ).then(() => {
         changeOpen(false)
-        window.location.reload()
+        window.location.reload();
     })
     
   }

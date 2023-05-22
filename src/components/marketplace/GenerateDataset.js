@@ -1,9 +1,11 @@
 import { useContract } from '@/hooks/useContract';
+import { uploadCarFileFromCid } from '@/hooks/useLighthouse';
 import { getSignature, retrieveMergeCID } from '@/hooks/useLitProtocol';
 import { getContributionSplit } from '@/hooks/useTableland';
 import { ethers } from 'ethers';
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 import ModalLayout from '../ModalLayout';
 import LoadingIcon from '../application/elements/loading/LoadingIcon';
@@ -15,10 +17,11 @@ export default function GenerateDataset({ tokenId, onClose }) {
     const [mintPrice, setMintPrice] = useState(0.001);
     const [loading, setLoading] = useState(false);
     const { CreateSpitter, createDB_NFT } = useContract();
-
+    const [payload, setPayload] = useState(null);
     async function createSplitterContract() {
         setLoading(true);
         const contributors = await getContributionSplit(tokenId);
+        console.log(contributors);
         try {
             const hash = await CreateSpitter(address, contributors.contributors, contributors.percentage);
             console.log(hash);
@@ -41,6 +44,13 @@ export default function GenerateDataset({ tokenId, onClose }) {
         try {
             const result = await retrieveMergeCID(tokenId, address);
             console.log(result)
+            
+            const uploadCarFile = await uploadCarFileFromCid(result, address);
+            console.log(uploadCarFile[0].data);
+            
+            setPayload(uploadCarFile[0].data.cidHex);
+            
+            //let see if we can get back the payload. 
             setMergedCID(result);
         } catch (e) {
             console.log(e);
@@ -55,16 +65,18 @@ export default function GenerateDataset({ tokenId, onClose }) {
         const toSign = tokenId.concat("", mergedCID).concat("", price).concat("", splitterContract);
         const sign = await getSignature(toSign);
 
-        try {
-            await createDB_NFT(tokenId, mergedCID, mintPrice, splitterContract, sign.v, sign.r, sign.s)
-            window.location.realod()
-        }
-        catch (e) {
-            console.log(e)
-        }
+        
+        toast.promise(createDB_NFT(tokenId, mergedCID, mintPrice, splitterContract, payload, sign.v, sign.r, sign.s),{
+            pending: 'Preparing Database into NFT',
+            success: 'Database ready for minting, enjoy the rewards!',
+            error: 'Oops, something went wrong.'
+        }).then(() => {
+            setLoading(false);
+            onClose();
+            window.location.reload()
+        })
         //console.log(result);s
-        setLoading(false);
-        onClose();
+       
         
 
     }
@@ -81,7 +93,7 @@ export default function GenerateDataset({ tokenId, onClose }) {
                         Splitter Contract
                     </h2>
                     {splitterContract ? (
-                        <Link href={`https://mumbai.polygonscan.com/address/${splitterContract}`} className='text-cf-600 hover: text-cf-800'>
+                        <Link href={`/splitter/address/${splitterContract}`} className='text-cf-600 hover: text-cf-800' blank>
                             {splitterContract}
                         </Link>
                     ) : 
@@ -112,6 +124,8 @@ export default function GenerateDataset({ tokenId, onClose }) {
                     {mergedCID ? (
                         <span>
                             {mergedCID}
+                            
+                            Payload: {payload}
                         </span>
                     ) :
                         splitterContract && 

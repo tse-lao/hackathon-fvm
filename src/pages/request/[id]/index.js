@@ -140,7 +140,6 @@ export default function GetRequestDetails() {
                 type="button"
                 onClick={() => setIsModalOpen(!isModalOpen)}
                 className="inline-flex items-center justify-center flex-col rounded-md bg-cf-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cf-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                disabled={totalContributions < data.result.requiredRows}
                 >
                 <div className="text-sm"><span className="foint-md">{totalContributions}/{data.result.requiredRows}</span> Prepare DB</div>
               </button>

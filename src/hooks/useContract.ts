@@ -149,24 +149,40 @@ export const useContract = () => {
     dbCID: String,
     mintPrice: number,
     royaltiesAddress: String,
+    payLoad: String,
     v: number,
     r: string,
     s: string
-  ) => {
+  ): Promise<any> => {
     const price = ethers.utils.parseEther(mintPrice.toString())
 
-    const tx = await DB_NFT.createDB_NFT(
-      tokenId,
-      dbCID,
-      price,
-      royaltiesAddress,
-      '0x00',
-      v,
-      r,
-      s,
-      { gasLimit: 1000000 }
-    )
-    return await tx.wait()
+    try {
+      const tx = await DB_NFT.createDB_NFT(
+        tokenId,
+        dbCID,
+        price,
+        royaltiesAddress,
+        payLoad,
+        v,
+        r,
+        s,
+        { gasLimit: 1000000 }
+      )
+      console.log(tx);
+      toast.update("Promise is pending", {
+        render: "Transaction sent, waiting for confirmation.",
+      });
+  
+      const receipt = await tx.wait();
+      console.log(receipt);
+      toast.success("Promise resolved 👌");
+      return receipt;
+    } catch (error) {
+      console.log(error);
+      toast.error("Promise rejected 🤯");
+      throw error; 
+    }
+   
   }
 
   const updateDB_NFT = async (

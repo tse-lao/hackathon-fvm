@@ -4,6 +4,7 @@ import { getCurrentDateAsString } from '@/lib/helpers';
 import { getJWT } from '@lighthouse-web3/kavach';
 import lighthouse from '@lighthouse-web3/sdk';
 import { ethers } from 'ethers';
+import MatchRecord from './useBlockchain';
 
 export async function signAuthMessage() {
 
@@ -105,6 +106,7 @@ export async function uploadCarFile(
     const sec = "https://data-depot.lighthouse.storage/api"
     const endpoint = `${sec}/upload/upload_files`
 
+    console.log(endpoint)
     let check = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -202,6 +204,7 @@ export async function countRows(cid, address){
     );
 
   const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
+  console.log(decrypted)
   const jsonData = await readBlobAsJson(decrypted);
   
   let count = jsonData.length;
@@ -213,7 +216,6 @@ export default async function getApiKey (){
   const {signedMessage, publicKey} = await signAuthMessage()
 
   console.log(signedMessage);
-  console.log(publicKey);
 
   
   const response = await lighthouse.getApiKey(publicKey, signedMessage);
@@ -247,3 +249,69 @@ export const getDataDepoAuth = async (address) => {
   }
 };
 
+export async function uploadCarFileFromCid(cid, address) {
+  //we want to prepare the cid for upload by reading turning it into file 
+  
+  let endpoint = `https://gateway.lighthouse.storage/ipfs/${cid}`;
+  console.log(endpoint)
+  //let blob = await fetch(endpoint).then(r => r.blob());
+  let blob = await readBlobFromEndpoint(endpoint);
+  console.log(blob)
+  const accessToken = await getDataDepoAuth(address);
+  const access = accessToken.data.access_token
+  //prepae the file for upload
+  const file = new File([blob], cid, {type: "text/plain"});
+
+  const result = await uploadCarFile([file], setUploadedProgress, access);
+  //now if its success we can go and match it 
+  
+  //wait here for a bit
+  await sleep(5000);
+  const polybaseRecord = await MatchRecord([{name: cid, cid: cid, metadata: "added_manually_by_encryption", type: "text/plain"}], access, false);
+  
+  console.log(polybaseRecord)
+  return polybaseRecord
+  
+}
+
+async function setUploadedProgress (progress) {
+  console.log(progress)
+}
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function readBlobFromEndpoint(endpointUrl) {
+  // Create a new XMLHttpRequest object
+  console.log("waiting for reading...")
+  return new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("GET", endpointUrl, true);
+    xhr.responseType = "blob";
+
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        var blob = xhr.response;
+        var reader = new FileReader();
+
+        reader.onload = function(event) {
+          var fileContent = event.target.result;
+          console.log("File content:", fileContent);
+          resolve(fileContent);
+        };
+
+        reader.readAsText(blob);
+      } else {
+        console.error("Error occurred while reading the blob:", xhr.status);
+        reject(xhr.status);
+      }
+    };
+
+    xhr.send();
+  });
+}
+
+// Usage:
+var endpointUrl = "https://example.com/download/blob";
+readBlobFromEndpoint(endpointUrl);
