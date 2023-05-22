@@ -254,8 +254,8 @@ export async function uploadCarFileFromCid(cid, address) {
   
   let endpoint = `https://gateway.lighthouse.storage/ipfs/${cid}`;
   console.log(endpoint)
-  //let blob = await fetch(endpoint).then(r => r.blob());
-  let blob = await readBlobFromEndpoint(endpoint);
+  let blob = await fetchWithRetry(endpoint, 5000, 5);
+  
   console.log(blob)
   const accessToken = await getDataDepoAuth(address);
   const access = accessToken.data.access_token
@@ -281,6 +281,27 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function fetchWithRetry(endpoint, delay = 1000, maxRetries = 3) {
+  let retries = 0;
+  let blob = null;
+
+  while (retries < maxRetries && !blob) {
+    try {
+      blob = await fetch(endpoint).then(r => r.blob());
+    } catch (error) {
+      console.log(`Error occurred: ${error}`);
+    }
+
+    if (!blob) {
+      retries++;
+      console.log(`Retrying in ${delay} milliseconds...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
+  return blob;
+}
+/* 
 async function readBlobFromEndpoint(endpointUrl) {
   // Create a new XMLHttpRequest object
   console.log("waiting for reading...")
@@ -311,7 +332,4 @@ async function readBlobFromEndpoint(endpointUrl) {
     xhr.send();
   });
 }
-
-// Usage:
-var endpointUrl = "https://example.com/download/blob";
-readBlobFromEndpoint(endpointUrl);
+ */

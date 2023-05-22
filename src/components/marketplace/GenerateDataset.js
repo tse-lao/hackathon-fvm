@@ -16,6 +16,7 @@ export default function GenerateDataset({ tokenId, onClose }) {
     const [mergedCID, setMergedCID] = useState(null);
     const [mintPrice, setMintPrice] = useState(0.001);
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
     const { CreateSpitter, createDB_NFT } = useContract();
     const [payload, setPayload] = useState(null);
     async function createSplitterContract() {
@@ -73,7 +74,7 @@ export default function GenerateDataset({ tokenId, onClose }) {
         }).then(() => {
             setLoading(false);
             onClose();
-            window.location.reload()
+            router.push(`/market/${tokenId}`);
         })
         //console.log(result);s
        
