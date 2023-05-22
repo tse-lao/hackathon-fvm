@@ -137,7 +137,6 @@ export default function UploadModal({ onClose }) {
 
                 
                 cid = encryptedResult.data.Hash;
-                // window.location.reload();
 
 
             } catch (e) {   toast.error(e.message)}
@@ -158,6 +157,8 @@ export default function UploadModal({ onClose }) {
         
         
         let dataDepo = []
+        
+        console.log(dataDepo)
         for(let i = 0; i < list.length; i++){
         //change the blob of each file element with the blob of the encrypted file.
             let cid = list[i].cid;
@@ -170,11 +171,13 @@ export default function UploadModal({ onClose }) {
         console.log(dataDepo)
         
 
+        
         const authToken = await lighthouse.dataDepotAuth(api);
         console.log(authToken.data.access_token)
         
-        await uploadCarFile(dataDepo, progressCallback, authToken.data.access_token);
-        
+
+        const result = await uploadCarFile(dataDepo, progressCallback, authToken.data.access_token);
+        console.log(result)
         await sleep(1000);
          await MatchRecord(list, authToken.data.access_token)
       

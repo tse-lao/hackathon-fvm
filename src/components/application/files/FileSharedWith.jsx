@@ -11,6 +11,7 @@ export default function FileSharedWith({ cid }) {
     const [publicShareKey, setPublicShareKey] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
     const { address } = useAccount();
+    const [refresh, setRefresh] = useState(false);
 
     const [accessControl, setAccessControl] = useState({
         conditions: [],
@@ -31,7 +32,7 @@ export default function FileSharedWith({ cid }) {
         };
 
         getAccessConditions();
-    }, [])
+    }, [refresh])
 
     const signAuthMessage = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -62,6 +63,8 @@ export default function FileSharedWith({ cid }) {
                 cid,
                 jwt
             );
+            
+            setRefresh(!refresh);
         } catch (e) {
             setErrorMessage(e)
         }

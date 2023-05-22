@@ -48,10 +48,15 @@ export default function Metadata() {
 
                 const result = await analyzeJSONStructure(json);
                 console.log(result)
-
-                const arrays = await generateMetadata(json);
-                console.log(arrays)
-
+                
+                //check if the provided value is an array 
+                let check = Array.isArray(result);
+                console.log(check)
+                const arrays = findArrays(result);
+                
+                const codeInfo = generateJsonCodeInfo(json)
+                console.log(result)
+                
                 setShowMeta(arrays);
             } catch (error) {
                 console.log(error)
@@ -59,46 +64,31 @@ export default function Metadata() {
         };
     }
 
-
-    // Recursive function to identify all arrays within parsed JSON data
-    function identifyArrays(parsedData, name = '') {
-        let arrayCounts = {};
-        for (let key in parsedData) {
-            if (Array.isArray(parsedData[key])) {
-                arrayCounts[name + key] = parsedData[key].length;
-            }
-            if (typeof parsedData[key] === 'object' && parsedData[key] !== null) {
-                let nestedCounts = identifyArrays(parsedData[key], name + key + '.');
-                arrayCounts = { ...arrayCounts, ...nestedCounts };
-            }
-        }
-        return arrayCounts;
-    }
-
-
-        let parsedData = JSON.parse(jsonData);
-
-
-    function generateMetadata(parsedData, name = '') {
-        let metadata = {};
-        for (let key in parsedData) {
-            if (Array.isArray(parsedData[key]) && parsedData[key].length > 0) {
-                let structure = {};
-                for (let subKey in parsedData[key][0]) {
-                    structure[subKey] = typeof parsedData[key][0][subKey];
-                }
-                metadata[name + key] = structure;
-            }
-            if (typeof parsedData[key] === 'object' && parsedData[key] !== null) {
-                let nestedMetadata = generateMetadata(parsedData[key], name + key + '.');
-                metadata = { ...metadata, ...nestedMetadata };
-            }
-        }
+    function findArrays(metadata, path = []) {
+        let arrays = [];
         
-        setShowMeta(metadata);
-        return metadata;
+        if (Array.isArray(metadata)) {
+            for (let i = 0; i < metadata.length; i++) {
+                arrays.push(...findArrays(metadata[i], [...path, i]));
+            }
+        } else {
+            for (let key in metadata) {
+                if (metadata[key].type === 'array') {
+                    arrays.push([...path, key].join('.'));
+                }
+    
+                if (metadata[key].children) {
+                    arrays.push(...findArrays(metadata[key].children, [...path, key]));
+                }
+            }
+        }
+    
+        return arrays;
     }
 
+
+    function count(){
+    }
     return (
         <Layout>
             <div className="flex flex-col">

@@ -194,6 +194,19 @@ function downloadBlob(blob, fileName) {
     document.body.removeChild(link);
   }, 1000); // Delay in milliseconds (adjust as needed)
 }
+function getFirstArray(obj) {
+  for (let key in obj) {
+      if (Array.isArray(obj[key])) {
+          return obj[key];
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          let nestedResult = getFirstArray(obj[key]);
+          if (nestedResult) {
+              return nestedResult;
+          }
+      }
+  }
+  return null;
+}
 
 export async function countRows(cid, address){
   let jwt = await readJWT(address);
@@ -207,9 +220,32 @@ export async function countRows(cid, address){
   console.log(decrypted)
   const jsonData = await readBlobAsJson(decrypted);
   
+  //get the first array in jsonData if not then just reutnr 1
+  
+  if(containsArray(jsonData)){
+    let firstArray = getFirstArray(jsonData);
+    return firstArray.length;
+  } else {
+    return 1;
+  }
+  
+  
   let count = jsonData.length;
   
   return count;
+}
+
+function containsArray(obj) {
+  for (let key in obj) {
+      if (Array.isArray(obj[key])) {
+          return true;
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          if (containsArray(obj[key])) {
+              return true;
+          }
+      }
+  }
+  return false;
 }
 
 export default async function getApiKey (){
