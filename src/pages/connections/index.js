@@ -5,8 +5,38 @@ const connections = [
     {
         id: 1,
         name: "Strava",
-        status: "not_connected",
+        status: "ready ",
         category: "health",
+    },
+    {
+        id: 2,
+        name: "Facebook",
+        status: "coming soon",
+        category: "social_media",
+    },
+    {
+        id: 3,
+        name: "Twitter",
+        status: "coming soon",
+        category: "social_media",
+    },
+    {
+        id: 4,
+        name: "Spotify",
+        status: "coming soon",
+        category: "social_media",
+    },
+    {
+        id: 5,
+        name: "Netflix",
+        status: "coming soon",
+        category: "social_media",
+    },
+    {
+        id: 6,
+        name: "Google",
+        status: "coming soon",
+        category: "social_media",
     },
 
 ];
@@ -57,7 +87,7 @@ export default function Connections() {
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
                       {filteredConnections.map((connection) => (
-                        <Link key={connection.id} href={`/connections/${connection.name.toLowerCase()}`}>
+                        <Link key={connection.id} href={connection.status == 'coming soon' ? '#' : `/connections/${connection.name.toLowerCase()}`}>
 
                       <div
                           key={connection.id}

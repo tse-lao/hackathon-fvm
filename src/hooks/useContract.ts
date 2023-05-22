@@ -384,12 +384,14 @@ export const useContract = () => {
   }
 
   //TODO: there is an error here we need to find out what the problem is..
-  const distributeShares = async (splitterAddress: string): Promise<any> => {
+  const distributeShares = async (splitterAddress: string, address:string): Promise<any> => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
       signer!
     )
+    
+    console.log(splitterInstance)
     try {
       const tx = await splitterInstance.distribute()
   

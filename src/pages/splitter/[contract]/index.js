@@ -49,7 +49,7 @@ export default function Splitterr() {
             toast.error("You are not a payee of this contract.");
         }
         
-        toast.promise(distributeShares(contract), {
+        toast.promise(distributeShares(contract, address), {
             pending: "Withdrawing funds...",
             success: "Funds withdrawn.",
             error: "Error withdrawing funds."

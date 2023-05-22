@@ -1,6 +1,7 @@
 import { Tab } from "@headlessui/react"
 import { Fragment } from "react"
 import Contributions from "../application/data/Contributions"
+import AllComputations from "../jobs/AllComputations"
 import ComputationalOverview from "../jobs/ComputationalOverview"
 import AllTokenHolders from "./token/AllTokenHolders"
   
@@ -8,7 +9,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
   
-export default function ProductDetailTab({tokenID, dataFormat}) {
+export default function ProductDetailTab({tokenID, dataFormat, dbCID}) {
   
   return (
     <Tab.Group as="div">
@@ -36,7 +37,7 @@ export default function ProductDetailTab({tokenID, dataFormat}) {
             )
           }
         >
-            Computation Overview
+          Computation Optionss
         </Tab>
         <Tab
           className={({ selected }) =>
@@ -50,6 +51,18 @@ export default function ProductDetailTab({tokenID, dataFormat}) {
         >
           Token Holders
         </Tab>
+        <Tab
+        className={({ selected }) =>
+          classNames(
+            selected
+              ? 'border-cf-600 text-cf-600'
+              : 'border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-800',
+            'whitespace-nowrap border-b-2 py-6 text-sm font-medium'
+          )
+        }
+      >
+        Performed Computations
+      </Tab>
       
       </Tab.List>
     </div>
@@ -67,6 +80,10 @@ export default function ProductDetailTab({tokenID, dataFormat}) {
       <Tab.Panel className="pt-10">
         <h3 className="sr-only">Token Holders</h3>
         <AllTokenHolders tokenID={tokenID}/>
+      </Tab.Panel>
+      <Tab.Panel className="pt-10">
+      <h3 className="sr-only">Performed</h3>
+      <AllComputations dbCID={dbCID} input={dataFormat}/>
       </Tab.Panel>
     </Tab.Panels>
   </Tab.Group>
