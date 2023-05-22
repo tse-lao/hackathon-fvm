@@ -1,4 +1,4 @@
-export const DB_NFT_address = "0x780077307BE090E24Eb2Ed0d70393711Cc986540"
+export const DB_NFT_address = "0xc672dAf06B35f18365F481eE619c6f01BaACc961"
 export const crossChainBacalhauJobs_address = "0xc7EED8B7F5c773ECF780216E808E740f40cE6Ea1"
 export const crossChainTablelandStorageAddress = "0x05266c6B991Bf2066c9cc67d28432D6b54dc01B9"
 

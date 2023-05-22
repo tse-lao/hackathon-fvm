@@ -8,13 +8,15 @@ import "./interfaces/IBacalhauTablelandStorage.sol";
 // A way to input new jobs startSpec EndSpec and input format into arrays we put that also inside a table
 
 contract tablelandBacalhauJobs is LilypadCallerInterface, Ownable {
-    
+
     LilypadEventsUpgradeable bridge;
     IBacalhauTablelandStorage private BacalhauTablelandStorage;
 
     uint256 public lilypadFee; //=30000000000000000;
 
     mapping(address => uint) public userFunds;
+
+    mapping(string => bool) public jobExecuted;
 
     constructor(
         LilypadEventsUpgradeable _bridgeContractAddress,
@@ -55,11 +57,15 @@ contract tablelandBacalhauJobs is LilypadCallerInterface, Ownable {
         //     userFunds[sender] >= lilypadFee,
         //     'Not enough to run Lilypad job'
         // );
+        string memory jobSpec = string.concat(_specStart, input, _specEnd);
+        require(!jobExecuted[jobSpec], "this job is already executed");
         require(address(this).balance >= lilypadFee, "Not enough to run Lilypad job");
 
+        jobExecuted[jobSpec] = true;
+        
         uint bridgeJobId = bridge.runLilypadJob{value: lilypadFee}(
             address(this),
-            string.concat(_specStart, input, _specEnd),
+            jobSpec,
             uint8(LilypadResultType.CID)
         );
         require(bridgeJobId > 0, "job didn't return a value");

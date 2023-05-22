@@ -1,9 +1,15 @@
 [{
         "inputs": [{
-            "internalType": "contract ITablelandStorage",
-            "name": "tablelandStorage",
-            "type": "address"
-        }],
+                "internalType": "contract ITablelandStorage",
+                "name": "_tablelandStorage",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_signerAddress",
+                "type": "address"
+            }
+        ],
         "stateMutability": "nonpayable",
         "type": "constructor"
     },
@@ -140,17 +146,6 @@
         "type": "event"
     },
     {
-        "inputs": [],
-        "name": "PKP",
-        "outputs": [{
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [{
                 "internalType": "string",
                 "name": "dataFormatCID",
@@ -172,9 +167,9 @@
                 "type": "string[]"
             },
             {
-                "internalType": "uint256",
+                "internalType": "int256",
                 "name": "requiredRows",
-                "type": "uint256"
+                "type": "int256"
             },
             {
                 "internalType": "uint256",
@@ -190,10 +185,10 @@
     {
         "inputs": [{
             "internalType": "address",
-            "name": "newPKP",
+            "name": "_signerAddress",
             "type": "address"
         }],
-        "name": "assignNewPKP",
+        "name": "addsignerAddress",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -248,6 +243,33 @@
             },
             {
                 "internalType": "string",
+                "name": "dataCID",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "rows",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "SubmitProof",
+                "type": "bytes32[]"
+            }
+        ],
+        "name": "contribute",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
                 "name": "dbCID",
                 "type": "string"
             },
@@ -263,7 +285,7 @@
             },
             {
                 "internalType": "string",
-                "name": "piece_cid",
+                "name": "label",
                 "type": "string"
             },
             {
@@ -282,7 +304,7 @@
                 "type": "bytes32"
             }
         ],
-        "name": "createDB_NFT",
+        "name": "createDBNFT",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -295,7 +317,7 @@
             },
             {
                 "internalType": "string",
-                "name": "piece_cid",
+                "name": "label",
                 "type": "string"
             },
             {
@@ -326,6 +348,54 @@
     },
     {
         "inputs": [{
+                "internalType": "string",
+                "name": "repoName",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "internalType": "string[]",
+                "name": "AccessProof",
+                "type": "string[]"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "AccessRoot",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "string[]",
+                "name": "SubmitProof",
+                "type": "string[]"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "SubmitRoot",
+                "type": "bytes32"
+            }
+        ],
+        "name": "createPrivateRepo",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTablelandStorage",
+        "outputs": [{
+            "internalType": "contract ITablelandStorage",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
                 "internalType": "address",
                 "name": "contributor",
                 "type": "address"
@@ -337,6 +407,32 @@
             }
         ],
         "name": "hasAccess",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "tokenid",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "Accessproof",
+                "type": "bytes32[]"
+            },
+            {
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            }
+        ],
+        "name": "hasRepoAccess",
         "outputs": [{
             "internalType": "bool",
             "name": "",
@@ -372,7 +468,7 @@
             "name": "tokenid",
             "type": "uint256"
         }],
-        "name": "mint",
+        "name": "mintDB",
         "outputs": [],
         "stateMutability": "payable",
         "type": "function"
@@ -386,6 +482,17 @@
             "type": "address"
         }],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "_signerAddress",
+            "type": "address"
+        }],
+        "name": "removesignerAddress",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -483,34 +590,52 @@
                 "type": "uint256"
             },
             {
-                "internalType": "string",
-                "name": "dataCID",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "rows",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint8",
-                "name": "v",
-                "type": "uint8"
+                "internalType": "string[]",
+                "name": "SubmitProof",
+                "type": "string[]"
             },
             {
                 "internalType": "bytes32",
-                "name": "r",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "s",
+                "name": "SubmitRoot",
                 "type": "bytes32"
             }
         ],
-        "name": "submitData",
+        "name": "setRepoSubmitAccess",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string[]",
+                "name": "Accessproof",
+                "type": "string[]"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "AccessRoot",
+                "type": "bytes32"
+            }
+        ],
+        "name": "setRepoViewAccess",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "signerAddress",
+        "outputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -563,7 +688,7 @@
             },
             {
                 "internalType": "string",
-                "name": "piece_cid",
+                "name": "label",
                 "type": "string"
             },
             {
@@ -582,7 +707,29 @@
                 "type": "bytes32"
             }
         ],
-        "name": "updateDB_NFT",
+        "name": "updateDB",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "dbCID",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "label",
+                "type": "string"
+            }
+        ],
+        "name": "updateDB_NFT1",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

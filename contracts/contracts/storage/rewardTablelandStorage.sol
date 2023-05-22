@@ -19,7 +19,7 @@ contract rewardTablelandStorage is Ownable {
     string public bounty_tableName;
     string private constant BOUNTY_TABLE_PREFIX = "bounty";
     string private constant BOUNTY_SCHEMA =
-        "label text, location_ref text, reward text, donatedTokens text, size text, minAcceptedDealDuration text";
+        "label text, location_ref text, donatedTokens text, size text, minAcceptedDealDuration text";
 
     uint256 claim_tableID;
     string public claim_tableName;
@@ -66,7 +66,7 @@ contract rewardTablelandStorage is Ownable {
     function bountyInsertion(
         string memory label,
         string memory location_ref,
-        uint256 bountyreward,
+        uint256 donatedTokens,
         uint256 size,
         int64 minAcceptedDealDuration
     ) public onlyOwner {
@@ -75,15 +75,13 @@ contract rewardTablelandStorage is Ownable {
             SQLHelpers.toInsert(
                 BOUNTY_TABLE_PREFIX,
                 bounty_tableID,
-                "label, location_ref, reward, donatedTokens, size, minAcceptedDealDuration",
+                "label, location_ref, donatedTokens, size, minAcceptedDealDuration",
                 string.concat(
                     SQLHelpers.quote(label),
                     ",",
                     SQLHelpers.quote(location_ref),
                     ",",
-                    SQLHelpers.quote(Strings.toString(bountyreward)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(0)),
+                    SQLHelpers.quote(Strings.toString(donatedTokens)),
                     ",",
                     SQLHelpers.quote(Strings.toString(size)),
                     ",",

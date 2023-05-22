@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@zondax/filecoin-solidity/contracts/v0.8/utils/Actor.sol";
 import "@zondax/filecoin-solidity/contracts/v0.8/MarketAPI.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
@@ -10,7 +11,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./interfaces/IRewardTablelandStorage.sol";
 import "./interfaces/IDealReward.sol";
 
-contract tablelandDealRewarder is IDealReward {
+contract tablelandDealRewarder is IDealReward, Ownable {
     // Create a orice per GB per epoch variable and take input the piece_size to generate the bountyReward in a generic way
     IRewardTablelandStorage private RewardTablelandStorage;
 
@@ -28,6 +29,10 @@ contract tablelandDealRewarder is IDealReward {
 
     mapping(bytes => mapping(uint64 => bool)) public pieceToSPs;
 
+    int64 public price_per_epoch = 0;
+
+    int64 public standardAcceptedDealDuration = 2102400;
+
     constructor(IRewardTablelandStorage rewardTablelandStorage) {
         RewardTablelandStorage = rewardTablelandStorage;
     }
@@ -36,24 +41,19 @@ contract tablelandDealRewarder is IDealReward {
     /// @param label: cid of the bounty
     /// @param piece_cid_bytes: reward for each client or storageProvider that will make a deal for that piece_cid
     /// @param location_ref: size of the file
-    /// @param bountyReward: size of the file
-    /// @param minAcceptedDealDuration: size of the file
     /// @param size: size of the file
     function createBounty(
         string memory label,
         bytes memory piece_cid_bytes,
         string memory location_ref,
-        uint256 bountyReward,
-        int64 minAcceptedDealDuration,
         uint256 size
-    ) public {
+    ) public payable {
         require(pieceToBounty[piece_cid_bytes].created == false, "Bounty exists");
-        require(minAcceptedDealDuration > 0);
         // string memory key = bytes32ToString(hash);
         bounty memory newBounty = bounty({
-            bountyReward: bountyReward,
-            donatedTokens: 0,
-            minDealDays: minAcceptedDealDuration,
+            size: size,
+            donatedTokens: msg.value,
+            minDealDays: standardAcceptedDealDuration,
             created: true
         });
 
@@ -65,9 +65,9 @@ contract tablelandDealRewarder is IDealReward {
         RewardTablelandStorage.bountyInsertion(
             label,
             location_ref,
-            bountyReward,
+            msg.value,
             size,
-            minAcceptedDealDuration
+            standardAcceptedDealDuration
         );
     }
 
@@ -109,11 +109,11 @@ contract tablelandDealRewarder is IDealReward {
 
         pieceToSPs[piece_cid][provider] = true;
 
-        uint bountyReward = pieceToBounty[piece_cid].bountyReward;
+        int64 bountyReward = int64(int256(pieceToBounty[piece_cid].size)) * price_per_epoch;
 
         reward(client, bountyReward);
         // piece_cidToDeals[piece_cid].add(uint256(deal_id));
-        pieceToBounty[piece_cid].donatedTokens -= pieceToBounty[piece_cid].bountyReward;
+        pieceToBounty[piece_cid].donatedTokens -= uint64(bountyReward);
 
         RewardTablelandStorage.claimInsertion(
             piecelabel[piece_cid],
@@ -145,7 +145,8 @@ contract tablelandDealRewarder is IDealReward {
     ) internal view {
         require(pieceToBounty[piece_cid].created, "bounty on funding phase OR isFullyClaimed");
         require(
-            (pieceToBounty[piece_cid].donatedTokens - pieceToBounty[piece_cid].bountyReward) >=
+            (pieceToBounty[piece_cid].donatedTokens -
+                (pieceToBounty[piece_cid].size * uint64(price_per_epoch))) >=
                 pieceToBounty[piece_cid].donatedTokens,
             "bounty needs more funding to get claimed"
         );
@@ -161,7 +162,7 @@ contract tablelandDealRewarder is IDealReward {
     /// @dev that contributed to the DAO for replicating a piece_cid
     /// @param actorID: actor at actor_id
     /// @param BountyReward: Amount of $FIL
-    function reward(uint64 actorID, uint256 BountyReward) internal {
+    function reward(uint64 actorID, int256 BountyReward) internal {
         bytes memory emptyParams = "";
         delete emptyParams;
         Actor.callByID(
@@ -169,7 +170,7 @@ contract tablelandDealRewarder is IDealReward {
             METHOD_SEND,
             Misc.NONE_CODEC,
             emptyParams,
-            BountyReward,
+            uint256(BountyReward),
             false
         );
     }
@@ -190,5 +191,9 @@ contract tablelandDealRewarder is IDealReward {
             (int256, uint64, bytes)
         );
         return (success, exit, return_codec, return_value);
+    }
+
+    function setPricePerEpoch(int64 new_price_per_epoch) public onlyOwner {
+        price_per_epoch = new_price_per_epoch;
     }
 }

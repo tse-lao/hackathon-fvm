@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/utils/Strings.sol';
-import '@tableland/evm/contracts/utils/SQLHelpers.sol';
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@tableland/evm/contracts/utils/SQLHelpers.sol";
 import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
-import '@openzeppelin/contracts/token/ERC1155/IERC1155.sol';
 
 /** @title DB_NFT. */
 /// @author Nick Lionis (github handle : nijoe1 )
 /// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
 /// All the data inside the tables are pointing on an IPFS CID.
-contract TablelandStorage is  Ownable {
+contract TablelandStorage is Ownable {
     ITablelandTables private tablelandContract;
     string main;
     string attribute;
@@ -23,27 +22,27 @@ contract TablelandStorage is  Ownable {
     string[] public tables;
     uint256[] private tableIDs;
 
-    IERC1155 public DB_NFT;
-    string private _baseURIString;
+    string private baseURIString;
 
-    string private constant MAIN_TABLE_PREFIX = 'file_main';
+    string private constant MAIN_TABLE_PREFIX = "main_table";
     string private constant MAIN_SCHEMA =
-        'tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minimumRowsOnSubmission text, requiredRows text, label text';
+        "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minRows text, requiredRows text, label text, blockTimestamp text";
 
-    string private constant ATTRIBUTE_TABLE_PREFIX = 'file_attribute';
-    string private constant ATTRIBUTE_SCHEMA =
-        'tokenID text, trait_type text, value text';
+    string private constant ATTRIBUTE_TABLE_PREFIX = "attribute_table";
+    string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
 
-    string private constant SUBMISSION_TABLE_PREFIX = 'data_contribution';
+    string private constant SUBMISSION_TABLE_PREFIX = "contribution_table";
     string private constant SUBMISSION_SCHEMA =
-        'tokenID text, dataCID text, rows text, creator text';
+        "tokenID text, dataCID text, rows text, blockTimestamp text, creator text";
+
+    string private constant MERKLE_TREE_TABLE_PREFIX = "merkleHelper_table";
+    string private constant MERKLE_TREE_SCHEMA =
+        "tokenID text, address text, addressIndex text, AccessFor text, blockTimestamp text";
 
     // ["data_contribution_80001_6068","file_main_80001_6069","file_attribute_80001_6070"]
-
+    // "https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement="
     // "0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6"
-    constructor(
-
-    ){
+    constructor(string memory _baseURIString) {
         tablelandContract = TablelandDeployments.get();
 
         createStatements.push(
@@ -53,26 +52,20 @@ contract TablelandStorage is  Ownable {
         createStatements.push(
             SQLHelpers.toCreateFromSchema(ATTRIBUTE_SCHEMA, ATTRIBUTE_TABLE_PREFIX)
         );
+        createStatements.push(
+            SQLHelpers.toCreateFromSchema(MERKLE_TREE_SCHEMA, MERKLE_TREE_TABLE_PREFIX)
+        );
 
         tableIDs = tablelandContract.create(address(this), createStatements);
 
         tables.push(SQLHelpers.toNameFromId(SUBMISSION_TABLE_PREFIX, tableIDs[0]));
         tables.push(SQLHelpers.toNameFromId(MAIN_TABLE_PREFIX, tableIDs[1]));
         tables.push(SQLHelpers.toNameFromId(ATTRIBUTE_TABLE_PREFIX, tableIDs[2]));
+        tables.push(SQLHelpers.toNameFromId(MERKLE_TREE_TABLE_PREFIX, tableIDs[3]));
 
-        setTableInfo(
-            tables[0],
-            tableIDs[0],
-            tables[1],
-            tableIDs[1],
-            tables[2],
-            tableIDs[2]
-        );
-        _baseURIString = 'https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement=';
-    }
+        setTableInfo(tables[0], tableIDs[0], tables[1], tableIDs[1], tables[2], tableIDs[2]);
 
-    function setContract(IERC1155 nft) public onlyOwner {
-        DB_NFT = IERC1155(nft);
+        baseURIString = _baseURIString;
     }
 
     function setTableInfo(
@@ -91,12 +84,9 @@ contract TablelandStorage is  Ownable {
         attributeID = attributeId;
     }
 
-
-    function toUpdate(
-        string memory set,
-        string memory filter
-    ) public onlyOwner{
-        mutate(mainID , SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, mainID, set, filter));
+    function toUpdate(string[] memory set, string memory filter) public onlyOwner {
+        mutate(mainID, SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, mainID, set[0], filter));
+        mutate(mainID, SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, mainID, set[1], filter));
     }
 
     function insertMainStatement(
@@ -105,35 +95,75 @@ contract TablelandStorage is  Ownable {
         string memory dbName,
         string memory description,
         string memory dbCID,
-        uint256 minimumRowsOnSubmission,
+        uint256 minRows,
         uint256 requiredRows,
         string memory label
-    ) public onlyOwner{
-        
-             mutate(mainID, SQLHelpers.toInsert(
+    ) public onlyOwner {
+        mutate(
+            mainID,
+            SQLHelpers.toInsert(
                 MAIN_TABLE_PREFIX,
                 mainID,
-                'tokenID, dataFormatCID, dbName, description, dbCID, minimumRowsOnSubmission, requiredRows, label',
+                "tokenID, dataFormatCID, dbName, description, dbCID, minRows, requiredRows, label, blockTimestamp",
                 string.concat(
                     SQLHelpers.quote(Strings.toString(tokenid)),
-                    ',',
+                    ",",
                     SQLHelpers.quote(dataFormatCID),
-                    ',',
+                    ",",
                     SQLHelpers.quote(dbName),
-                    ',',
+                    ",",
                     SQLHelpers.quote(description),
-                    ',',
+                    ",",
                     SQLHelpers.quote(dbCID),
-                    ',',
-                    SQLHelpers.quote(Strings.toString(minimumRowsOnSubmission)),
-                    ',',
+                    ",",
+                    SQLHelpers.quote(Strings.toString(minRows)),
+                    ",",
                     SQLHelpers.quote(Strings.toString(requiredRows)),
-                    ',',
-                    SQLHelpers.quote(label)
+                    ",",
+                    SQLHelpers.quote(label),
+                    ",",
+                    SQLHelpers.quote(Strings.toString(block.timestamp))
                 )
-            ));
+            )
+        );
     }
 
+    function insertMainOpenDBStatement(
+        uint256 tokenid,
+        string memory dataFormatCID,
+        string memory dbName,
+        string memory description,
+        string memory dbCID,
+        string memory label
+    ) public onlyOwner {
+        mutate(
+            mainID,
+            SQLHelpers.toInsert(
+                MAIN_TABLE_PREFIX,
+                mainID,
+                "tokenID, dataFormatCID, dbName, description, dbCID, minRows, requiredRows, label, blockTimestamp",
+                string.concat(
+                    SQLHelpers.quote(Strings.toString(tokenid)),
+                    ",",
+                    SQLHelpers.quote(dataFormatCID),
+                    ",",
+                    SQLHelpers.quote(dbName),
+                    ",",
+                    SQLHelpers.quote(description),
+                    ",",
+                    SQLHelpers.quote(dbCID),
+                    ",",
+                    SQLHelpers.quote(Strings.toString(0)),
+                    ",",
+                    SQLHelpers.quote(Strings.toString(0)),
+                    ",",
+                    SQLHelpers.quote(label),
+                    ",",
+                    SQLHelpers.quote(Strings.toString(block.timestamp))
+                )
+            )
+        );
+    }
 
     function mutate(uint256 tableId, string memory statement) internal {
         tablelandContract.mutate(address(this), tableId, statement);
@@ -144,42 +174,48 @@ contract TablelandStorage is  Ownable {
         string memory dataCID,
         uint256 rows,
         address creator
-    ) public  onlyOwner{
-        
-            mutate(contributionID, SQLHelpers.toInsert(
+    ) public onlyOwner {
+        mutate(
+            contributionID,
+            SQLHelpers.toInsert(
                 SUBMISSION_TABLE_PREFIX,
                 contributionID,
-                'tokenID, dataCID, rows, creator',
+                "tokenID, dataCID, rows, blockTimestamp, creator",
                 string.concat(
                     SQLHelpers.quote(Strings.toString(tokenid)),
-                    ',',
+                    ",",
                     SQLHelpers.quote(dataCID),
-                    ',',
+                    ",",
                     SQLHelpers.quote(Strings.toString(rows)),
-                    ',',
+                    ",",
+                    SQLHelpers.quote(Strings.toString(block.timestamp)),
+                    ",",
                     SQLHelpers.quote(Strings.toHexString(creator))
                 )
-            ));
+            )
+        );
     }
 
     function insertAttributeStatement(
         uint256 tokenid,
         string memory trait_type,
         string memory value
-    ) public onlyOwner{
-        mutate(attributeID,
+    ) public onlyOwner {
+        mutate(
+            attributeID,
             SQLHelpers.toInsert(
                 ATTRIBUTE_TABLE_PREFIX,
                 attributeID,
-                'tokenID, trait_type, value',
+                "tokenID, trait_type, value",
                 string.concat(
                     SQLHelpers.quote((Strings.toString(tokenid))),
-                    ',',
+                    ",",
                     SQLHelpers.quote(trait_type),
-                    ',',
+                    ",",
                     SQLHelpers.quote(value)
                 )
-            ));
+            )
+        );
     }
 
     /// @notice Overriten URI function of the ERC1155 to fit Tableland based NFTs
@@ -189,24 +225,24 @@ contract TablelandStorage is  Ownable {
         return
             string(
                 abi.encodePacked(
-                    _baseURIString,
-                    'SELECT%20',
-                    'json_object%28%27tokenID%27%2C',
+                    baseURIString,
+                    "SELECT%20",
+                    "json_object%28%27tokenID%27%2C",
                     main,
-                    '%2EtokenID%2C%27dbName%27%2CdbName%2C%27dbCID%27%2CdbCID%2C%27description%27%2Cdescription%2C%27dataFormatCID%27%2CdataFormatCID%2C%27attributes%27%2Cjson_group_array%28json_object%28%27trait_type%27%2Ctrait_type%2C%27value%27%2Cvalue%29%29%29%20',
-                    'FROM%20',
+                    "%2EtokenID%2C%27dbName%27%2CdbName%2C%27dbCID%27%2CdbCID%2C%27description%27%2Cdescription%2C%27dataFormatCID%27%2CdataFormatCID%2C%27attributes%27%2Cjson_group_array%28json_object%28%27trait_type%27%2Ctrait_type%2C%27value%27%2Cvalue%29%29%29%20",
+                    "FROM%20",
                     main,
-                    '%20JOIN%20',
+                    "%20JOIN%20",
                     attribute,
-                    '%20WHERE%20',
+                    "%20WHERE%20",
                     main,
-                    '%2EtokenID%20%3D%20',
+                    "%2EtokenID%20%3D%20",
                     attribute,
-                    '%2EtokenID%20and%20',
+                    "%2EtokenID%20and%20",
                     main,
-                    '%2EtokenID%3D',
+                    "%2EtokenID%3D",
                     Strings.toString(tokenId),
-                    '&mode=list'
+                    "&mode=list"
                 )
             );
     }
@@ -214,10 +250,38 @@ contract TablelandStorage is  Ownable {
     /// @notice Setting the tableland gateway prefix
     /// @dev only for tableland updates
     function setTableURI(string memory baseURI) public onlyOwner {
-        _baseURIString = baseURI;
+        baseURIString = baseURI;
     }
 
-
+    function insertTokenProof(
+        uint256 tokenId,
+        string[] memory addresses,
+        string memory accessFor
+    ) public onlyOwner {
+        ITablelandTables.Statement[] memory statements = new ITablelandTables.Statement[](
+            addresses.length
+        );
+        for (uint256 i = 0; i < addresses.length; i++) {
+            statements[i].tableId = tableIDs[3];
+            statements[i].statement = SQLHelpers.toInsert(
+                MERKLE_TREE_TABLE_PREFIX,
+                tableIDs[3],
+                "tokenID, address, addressIndex, AccessFor, blockTimestamp",
+                string.concat(
+                    SQLHelpers.quote((Strings.toString(tokenId))),
+                    ",",
+                    SQLHelpers.quote(addresses[i]),
+                    ",",
+                    SQLHelpers.quote(Strings.toString(i)),
+                    ",",
+                    SQLHelpers.quote(accessFor),
+                    ",",
+                    SQLHelpers.quote(Strings.toString(block.timestamp))
+                )
+            );
+        }
+        tablelandContract.mutate(address(this), statements);
+    }
 
     // Returns the address that signed a given string message
     function verifyString(
@@ -228,7 +292,7 @@ contract TablelandStorage is  Ownable {
         address pkp
     ) public pure returns (bool res) {
         // The message header; we will fill in the length next
-        string memory header = '\x19Ethereum Signed Message:\n000000';
+        string memory header = "\x19Ethereum Signed Message:\n000000";
         uint256 lengthOffset;
         uint256 length;
         assembly {
@@ -286,7 +350,7 @@ contract TablelandStorage is  Ownable {
     function sendViaCall(address payable _to) public payable {
         // Call returns a boolean value indicating success or failure.
         // This is the current recommended method to use.
-        (bool sent, bytes memory data) = _to.call{value: msg.value}('');
-        require(sent, 'Failed to send Ether');
+        (bool sent, bytes memory data) = _to.call{value: msg.value}("");
+        require(sent, "Failed to send Ether");
     }
 }

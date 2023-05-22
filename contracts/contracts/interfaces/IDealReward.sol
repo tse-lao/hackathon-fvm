@@ -4,8 +4,8 @@ pragma solidity ^0.8.13;
 interface IDealReward {
 
     struct bounty {
-        uint bountyReward;
-        uint donatedTokens;
+        uint256 size;
+        uint256 donatedTokens;
         int64 minDealDays;
         bool created;
     }

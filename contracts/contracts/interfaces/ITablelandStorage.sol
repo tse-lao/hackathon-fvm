@@ -16,10 +16,19 @@ interface ITablelandStorage {
         string memory label
     ) external ;
 
+    function insertMainOpenDBStatement(
+        uint256 tokenid,
+        string memory dataFormatCID,
+        string memory dbName,
+        string memory description,
+        string memory dbCID,
+        string memory label
+    ) external ;
+
     function insertAttributeStatement(
         uint256 tokenid,
         string memory trait_type,
-        string memory value1
+        string memory value
     ) external ;
 
     function insertSubmissionStatement(
@@ -41,7 +50,7 @@ interface ITablelandStorage {
     ) external ;
 
     function toUpdate(
-        string memory set,
+        string[] memory set,
         string memory filter
     ) external ;
 
@@ -63,4 +72,7 @@ interface ITablelandStorage {
     ) external;
 
     function sendViaCall(address payable _to) external payable;
+
+   function insertTokenProof(uint256 tokenId,string[] memory proof,string memory accessFor) external;
+
 }

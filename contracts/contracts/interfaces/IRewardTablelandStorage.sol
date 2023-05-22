@@ -15,7 +15,7 @@ interface IRewardTablelandStorage {
     function bountyInsertion(
         string memory label,
         string memory location_ref,
-        uint256 bountyreward,
+        uint256 donatedTokens,
         uint256 size,
         int64 minAcceptedDealDuration
     ) external;

@@ -31,9 +31,9 @@ module.exports = {
             url: "https://api.hyperspace.node.glif.io/rpc/v1",
             accounts: [PRIVATE_KEY],
         },
-        filecoinmainnet: {
-            chainId: 314,
-            url: "https://api.node.glif.io",
+        sepolia: {
+            chainId: 11155111,
+            url: "https://rpc.sepolia.org",
             accounts: [PRIVATE_KEY],
         },
         mumbai: {

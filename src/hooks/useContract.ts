@@ -1,6 +1,9 @@
 import { ethers } from 'ethers'
 import { toast } from 'react-toastify'
 import { useSigner } from 'wagmi'
+import {MerkleTree} from 'merkletreejs'
+import {SHA256} from 'crypto-js'
+
 import {
   DBAbi,
   DB_NFT_address,
@@ -12,21 +15,31 @@ import {
   crossChainTablelandDealClientAddress,
   crossChainTablelandStorageAbi,
   crossChainTablelandStorageAddress,
+  crossChainTablelandDealRewarderAbi,
+  crossChainTablelandDealRewarderAddress,
   helper,
   helperAbi,
   splitImplementation,
-  splitterAbi
+  splitterAbi,
 } from '../constants'
 
 export const useContract = () => {
   const { data: signer } = useSigner()
 
-  const provider = new ethers.providers.JsonRpcProvider("https://matic-mumbai.chainstacklabs.com	")
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://matic-mumbai.chainstacklabs.com	'
+  )
   const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
 
   const TablelandStorage = new ethers.Contract(
     crossChainTablelandStorageAddress,
     crossChainTablelandStorageAbi,
+    signer!
+  )
+
+  const TablelandBountyRewarder = new ethers.Contract(
+    crossChainTablelandDealRewarderAddress,
+    crossChainTablelandDealRewarderAbi,
     signer!
   )
 
@@ -54,6 +67,10 @@ export const useContract = () => {
     return await DB_NFT.hasAccess(address, tokenId)
   }
 
+  const hasRepoAccess = async (tokenId: number, accessProof: string[]) => {
+    return await DB_NFT.hasRepoAccess(tokenId, accessProof)
+  }
+
   const RequestDB = async (
     dataFormatCID: string,
     DBname: string,
@@ -72,27 +89,27 @@ export const useContract = () => {
         minimumRowsOnSubmission,
         { gasLimit: 1000000 }
       )
-  
-      console.log(tx);
-      toast.update("Promise is pending", {
-        render: "Transaction sent, waiting for confirmation.",
-      });
-  
-      const receipt = await tx.wait();
-      console.log(receipt);
-      toast.success("Promise resolved 👌");
-      return receipt;
+
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
     } catch (error) {
-      console.log(error);
-      toast.error("Promise rejected 🤯");
-      throw error; 
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
     }
   }
-  // ================================ CREATING OPEN DATA SET ======================================== //
+  // ================================ CREATING OPEN DATA SET and Private Repos using Merkle Trees ======================================== //
 
   const createOpenDataSet = async (
     dbCID: string,
-    piece_cid: string,
+    label: string,
     dataFormatCID: string,
     dbName: string,
     description: string,
@@ -101,11 +118,109 @@ export const useContract = () => {
     //read dataFormatCID from the contract.
     const tx = await DB_NFT.createOpenDataSet(
       dbCID,
-      piece_cid,
+      label,
       dataFormatCID,
       dbName,
       description,
       categories,
+      { gasLimit: 1000000 }
+    )
+    return await tx.wait()
+  }
+
+  const Accessproof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
+  const SubmitProof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
+
+
+  const AccessViewleaves = Accessproof.map(x => keccak256(x))
+
+  const ViewTree = new MerkleTree(AccessViewleaves, keccak256, { sortPairs: true })
+  console.log(ViewTree.toString())
+  const ViewRoot = ViewTree.getHexRoot()
+  console.log(ViewRoot)
+
+  const AccessSubmitleaves = SubmitProof.map(x => ethers.utils.keccak256(x))
+  const SubmitTree = new MerkleTree(AccessSubmitleaves, ethers.utils.keccak256, { sortPairs: true })
+  const SubmitRoot = SubmitTree.getHexRoot()
+  const hexProof = SubmitTree.getHexProof(AccessViewleaves[0])
+
+  let ts = await db_NFT_Instance.totalSupply()
+  console.log(ts)
+
+  const tx = await db_NFT_Instance.createPrivateRepo(
+      "Repo",
+      "Repo",
+      Accessproof,
+      ViewRoot,
+      SubmitProof,
+      SubmitRoot, { gasLimit: 1000000 })
+  await tx.wait()
+
+  console.log(1)
+
+  const tx2 = await db_NFT_Instance.contribute(1, "dataCID", 0, hexProof, { gasLimit: 1000000 })
+
+  const createPrivateRepo = async (
+    repoName: string,
+    description: string,
+    Accessproof: string[],
+    SubmitProof: string[]
+  ) => {
+    const AccessViewleaves = Accessproof.map(x => ethers.utils.keccak256(x))
+
+    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, { sortPairs: true })
+    console.log(ViewTree.toString())
+    const ViewRoot = ViewTree.getHexRoot()
+    console.log(ViewRoot)
+  
+    const AccessSubmitleaves = SubmitProof.map(x => ethers.utils.keccak256(x))
+    const SubmitTree = new MerkleTree(AccessSubmitleaves, ethers.utils.keccak256, { sortPairs: true })
+    const SubmitRoot = SubmitTree.getHexRoot()
+    
+
+    const tx = await DB_NFT.createPrivateRepo(
+      repoName,
+      description,
+      Accessproof,
+      ViewRoot,
+      SubmitProof,
+      SubmitRoot,
+      { gasLimit: 1000000 }
+    )
+    return await tx.wait()
+  }
+
+  const updateRepoViewAccessControl = async (
+    tokenId: number,
+    Accessproof: string[]
+  ) => {
+    const AccessViewleaves = Accessproof.map(x => ethers.utils.keccak256(x))
+
+    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, { sortPairs: true })
+    console.log(ViewTree.toString())
+    const ViewRoot = ViewTree.getHexRoot()
+    console.log(ViewRoot)
+  
+
+    const tx = await DB_NFT.setRepoViewAccess(tokenId, Accessproof, ViewRoot, {
+      gasLimit: 1000000,
+    })
+    return await tx.wait()
+  }
+
+  const updateRepoSubmitAccessControl = async (
+    tokenId: number,
+    SubmitProof: string[]
+  ) => {
+
+    const AccessSubmitleaves = SubmitProof.map(x => ethers.utils.keccak256(x))
+    const SubmitTree = new MerkleTree(AccessSubmitleaves, ethers.utils.keccak256, { sortPairs: true })
+    const SubmitRoot = SubmitTree.getHexRoot()
+    
+    const tx = await DB_NFT.setRepoSubmitAccess(
+      tokenId,
+      SubmitProof,
+      SubmitRoot,
       { gasLimit: 1000000 }
     )
     return await tx.wait()
@@ -116,32 +231,47 @@ export const useContract = () => {
     tokenId: number,
     dataCID: String,
     rows: number,
+    SubmitProof: string[],
+    index: number,
     v: number,
     r: string,
     s: string
   ): Promise<any> => {
-    try {
-      const tx = await DB_NFT.submitData(tokenId, dataCID, rows, v, r, s, {
-        gasLimit: 1000000,
-      });
-  
-      console.log(tx);
-      toast.update("Promise is pending", {
-        render: "Transaction sent, waiting for confirmation.",
-      });
-  
-      const receipt = await tx.wait();
-      console.log(receipt);
-      toast.success("Promise resolved 👌");
-      return receipt;
-    } catch (error) {
-      console.log(error);
-      toast.error("Promise rejected 🤯");
-      throw error; 
+    if(SubmitProof.length > 0){
+      const AccessSubmitleaves = SubmitProof.map(x => ethers.utils.keccak256(x))
+      const SubmitTree = new MerkleTree(AccessSubmitleaves, ethers.utils.keccak256, { sortPairs: true })
+      const hexProof = SubmitTree.getHexProof(AccessViewleaves[index])
+      SubmitProof = hexProof
     }
-  };
-  
-  
+    try {
+      const tx = await DB_NFT.contribute(
+        tokenId,
+        dataCID,
+        rows,
+        SubmitProof,
+        v,
+        r,
+        s,
+        {
+          gasLimit: 1000000,
+        }
+      )
+
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
 
   //signature:
   const createDB_NFT = async (
@@ -157,7 +287,7 @@ export const useContract = () => {
     const price = ethers.utils.parseEther(mintPrice.toString())
 
     try {
-      const tx = await DB_NFT.createDB_NFT(
+      const tx = await DB_NFT.createDBNFT(
         tokenId,
         dbCID,
         price,
@@ -168,21 +298,20 @@ export const useContract = () => {
         s,
         { gasLimit: 1000000 }
       )
-      console.log(tx);
-      toast.update("Promise is pending", {
-        render: "Transaction sent, waiting for confirmation.",
-      });
-  
-      const receipt = await tx.wait();
-      console.log(receipt);
-      toast.success("Promise resolved 👌");
-      return receipt;
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
     } catch (error) {
-      console.log(error);
-      toast.error("Promise rejected 🤯");
-      throw error; 
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
     }
-   
   }
 
   const updateDB_NFT = async (
@@ -193,7 +322,7 @@ export const useContract = () => {
     r: string,
     s: string
   ) => {
-    const tx = await DB_NFT.updateDB_NFT(tokenId, dbCID, piece_cid, v, r, s, {
+    const tx = await DB_NFT.updateDB(tokenId, dbCID, piece_cid, v, r, s, {
       gasLimit: 1000000,
     })
     return await tx.wait()
@@ -204,87 +333,52 @@ export const useContract = () => {
   }
 
   const mint = async (tokenid: number, mintPrice: string) => {
-    const tx = await DB_NFT.mint(tokenid, {
+    const tx = await DB_NFT.mintDB(tokenid, {
       value: mintPrice,
       gasLimit: 1000000,
     })
     return await tx.wait()
   }
 
-  // --------------------------------------------------- Cross Chain Job and Deals ------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------- HyperSpace Compute Over Data x Tableland ------------------------------------------------------------------------------------------------------
 
-  // const executeCrossChainBacalhauJob = async (
-  //   input: string,
-  //   _specStart: String,
-  //   _specEnd: string,
-  //   jobId: string
-  // ) => {
-  //   const tx = await crossChainTablelandStorage.executeCrossChainBacalhauJob(
-  //     'filecoin',
-  //     crossChainBacalhauJobs_address,
-  //     input,
-  //     _specStart,
-  //     _specEnd,
-  //     jobId,
-  //     { value: ethers.utils.parseEther("1.5"), gasLimit: 1000000 }
-  //   )
-  //   return await tx.wait()
-  // }
+  const callLillypadJob = async (
+    input: string,
+    _specStart: string,
+    _specEnd: string,
+    jobId: string
+  ): Promise<any> => {
+    try {
+      const tx = await tablelandBacalhau.executeJOB(
+        input,
+        _specStart,
+        _specEnd,
+        jobId,
+        {
+          gasLimit: 100000000,
+        }
+      )
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
 
-  // const createCrossChainDealRequest = async (
-  //   piece_cid: string,
-  //   label: String,
-  //   piece_size: number,
-  //   end_epoch: number,
-  //   location_ref: string,
-  //   car_size: number
-  // ) => {
-  //   const tx = await crossChainTablelandStorage.createCrossChainDealRequest(
-  //     'filecoin',
-  //     crossChainTablelandDealClientAddress,
-  //     piece_cid,
-  //     label,
-  //     piece_size,
-  //     end_epoch,
-  //     location_ref,
-  //     car_size,
-  //     { value: ethers.utils.parseEther("1.5"), gasLimit: 1000000 }
-  //   )
-  //   return await tx.wait()
-  // }
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
 
   // Fund Bacalhau jobs on hyperspace
   const submitFunds = async (value: number) => {
     const price = ethers.utils.parseEther(value.toString())
     const tx = await tablelandBacalhau.submitFunds({ value: price })
     return await tx.wait()
-  }
-
-  const callLillypadJob = async (
-    input: string,
-    _specStart: string,
-    _specEnd: string, 
-    jobId: string
-  ): Promise<any> => {
-    try {
-      const tx = await tablelandBacalhau.executeJOB(input, _specStart, _specEnd, jobId, {
-        gasLimit: 100000000,
-      })
-      console.log(tx);
-      toast.update("Promise is pending", {
-        render: "Transaction sent, waiting for confirmation.",
-      });
-  
-      const receipt = await tx.wait();
-      console.log(receipt);
-      toast.success("Promise resolved 👌");
-      return receipt;
-    } catch (error) {
-      console.log(error);
-      toast.error("Promise rejected 🤯");
-      throw error; 
-    }
-
   }
 
   // --------------------------------------------------- crossChainTablelandDealClient ------------------------------------------------------------------------------------------------------
@@ -296,7 +390,7 @@ export const useContract = () => {
     pieceSize: number,
     label: string,
     startEpoch: number
-  )  :Promise<any> => {
+  ): Promise<any> => {
     let DealRequestStruct = [
       cidHex,
       pieceSize,
@@ -312,19 +406,61 @@ export const useContract = () => {
     ]
     try {
       const tx = await TablelandDealClient.makeDealProposal(DealRequestStruct)
-      console.log(tx);
-      toast.update("Promise is pending", {
-        render: "Transaction sent, waiting for confirmation.",
-      });
-  
-      const receipt = await tx.wait();
-      return receipt;
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      return receipt
     } catch (error) {
-      toast.error("Promise rejected 🤯");
-      throw error; 
+      toast.error('Promise rejected 🤯')
+      throw error
     }
-    
-   
+  }
+
+  const createBounty = async (
+    label: string,
+    piece_cid_bytes: number,
+    cidHex: string,
+    location_ref: number,
+    size: string
+  ): Promise<any> => {
+    try {
+      const tx = await TablelandBountyRewarder.createBounty(
+        label,
+        piece_cid_bytes,
+        cidHex,
+        location_ref,
+        size
+      )
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      return receipt
+    } catch (error) {
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const claimBounty = async (dealID: number): Promise<any> => {
+    try {
+      const tx = await TablelandBountyRewarder.claim(dealID)
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      return receipt
+    } catch (error) {
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
   }
 
   // --------------------------------------------------------- ThirdWeb CreateSplitter & Interact with a Splitter  -----------------------------------------------------------------------------------------------
@@ -384,43 +520,44 @@ export const useContract = () => {
   }
 
   //TODO: there is an error here we need to find out what the problem is..
-  const distributeShares = async (splitterAddress: string, address:string): Promise<any> => {
+  const distributeShares = async (
+    splitterAddress: string,
+    address: string
+  ): Promise<any> => {
     var splitterInstance = new ethers.Contract(
       splitterAddress,
       splitterAbi,
       signer!
     )
-    
+
     console.log(splitterInstance)
     try {
       const tx = await splitterInstance.distribute()
-  
-      console.log(tx);
-      toast.update("Promise is pending", {
-        render: "Transaction sent, waiting for confirmation.",
-      });
-  
-      const receipt = await tx.wait();
-      console.log(receipt);
-      return receipt;
+
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      return receipt
     } catch (error) {
-      console.log(error);
-      throw error; 
+      console.log(error)
+      throw error
     }
   }
-  
-  const getBalance = async (address:string) => {
-    const balance = await provider.getBalance(address);
 
-    return ethers.utils.formatEther(balance);
-  };
-  
-  
+  const getBalance = async (address: string) => {
+    const balance = await provider.getBalance(address)
+
+    return ethers.utils.formatEther(balance)
+  }
 
   return {
     getCurrentTokenId,
     createOpenDataSet,
-    getBalance, 
+    getBalance,
     updateDB_NFT,
     RequestDB,
     mint,
@@ -436,5 +573,11 @@ export const useContract = () => {
     getPayeeShares,
     distributeShares,
     makeDealProposal,
+    hasRepoAccess,
+    createPrivateRepo,
+    updateRepoViewAccessControl,
+    updateRepoSubmitAccessControl,
+    claimBounty,
+    createBounty,
   }
 }
