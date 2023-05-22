@@ -52,40 +52,40 @@ module.exports = async({ deployments }) => {
     const db_NFT_Instance = await db_NFT.attach(DB_NFT.address)
 
 
-    const Accessproof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
-    const SubmitProof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
+    // const Accessproof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
+    // const SubmitProof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
 
 
-    const AccessViewleaves = Accessproof.map(x => keccak256(x))
+    // const AccessViewleaves = Accessproof.map(x => keccak256(x))
 
-    const ViewTree = new MerkleTree(AccessViewleaves, keccak256, { sortPairs: true })
-    console.log(ViewTree.toString())
-    const ViewRoot = ViewTree.getHexRoot()
-    console.log(ViewRoot)
+    // const ViewTree = new MerkleTree(AccessViewleaves, keccak256, { sortPairs: true })
+    // console.log(ViewTree.toString())
+    // const ViewRoot = ViewTree.getHexRoot()
+    // console.log(ViewRoot)
 
-    const AccessSubmitleaves = SubmitProof.map(x => keccak256(x))
-    const SubmitTree = new MerkleTree(AccessSubmitleaves, keccak256, { sortPairs: true })
-    const SubmitRoot = SubmitTree.getHexRoot()
-    const hexProof = SubmitTree.getHexProof(AccessViewleaves[0])
+    // const AccessSubmitleaves = SubmitProof.map(x => keccak256(x))
+    // const SubmitTree = new MerkleTree(AccessSubmitleaves, keccak256, { sortPairs: true })
+    // const SubmitRoot = SubmitTree.getHexRoot()
+    // const hexProof = SubmitTree.getHexProof(AccessViewleaves[0])
 
-    let ts = await db_NFT_Instance.totalSupply()
-    console.log(ts)
+    // let ts = await db_NFT_Instance.totalSupply()
+    // console.log(ts)
 
-    const tx = await db_NFT_Instance.createPrivateRepo(
-        "Repo",
-        "Repo",
-        Accessproof,
-        ViewRoot,
-        SubmitProof,
-        SubmitRoot, { gasLimit: 1000000 })
-    await tx.wait()
+    // const tx = await db_NFT_Instance.createPrivateRepo(
+    //     "Repo",
+    //     "Repo",
+    //     Accessproof,
+    //     ViewRoot,
+    //     SubmitProof,
+    //     SubmitRoot, { gasLimit: 1000000 })
+    // await tx.wait()
 
-    console.log(1)
+    // console.log(1)
 
-    const tx2 = await db_NFT_Instance.contribute(1, "dataCID", 0, hexProof, { gasLimit: 1000000 })
-    await tx2.wait()
+    // const tx2 = await db_NFT_Instance.contribute(1, "dataCID", 0, hexProof, { gasLimit: 1000000 })
+    // await tx2.wait()
 
-    console.log(2)
+    // console.log(2)
 
 
 

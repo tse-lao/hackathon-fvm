@@ -1,8 +1,8 @@
 import { ethers } from 'ethers'
 import { toast } from 'react-toastify'
 import { useSigner } from 'wagmi'
-import {MerkleTree} from 'merkletreejs'
-import {SHA256} from 'crypto-js'
+import { MerkleTree } from 'merkletreejs'
+import { SHA256 } from 'crypto-js'
 
 import {
   DBAbi,
@@ -67,8 +67,19 @@ export const useContract = () => {
     return await DB_NFT.hasAccess(address, tokenId)
   }
 
-  const hasRepoAccess = async (tokenId: number, accessProof: string[]) => {
-    return await DB_NFT.hasRepoAccess(tokenId, accessProof)
+  const hasRepoAccess = async (
+    tokenId: number,
+    accessProof: string[],
+    index: number
+  ) => {
+    const AccessSubmitleaves = accessProof.map((x) => ethers.utils.keccak256(x))
+    const SubmitTree = new MerkleTree(
+      AccessSubmitleaves,
+      ethers.utils.keccak256,
+      { sortPairs: true }
+    )
+    const hexProof = SubmitTree.getHexProof(AccessSubmitleaves[index])
+    return await DB_NFT.hasRepoAccess(tokenId, hexProof)
   }
 
   const RequestDB = async (
@@ -128,55 +139,24 @@ export const useContract = () => {
     return await tx.wait()
   }
 
-  const Accessproof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
-  const SubmitProof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
-
-
-  const AccessViewleaves = Accessproof.map(x => keccak256(x))
-
-  const ViewTree = new MerkleTree(AccessViewleaves, keccak256, { sortPairs: true })
-  console.log(ViewTree.toString())
-  const ViewRoot = ViewTree.getHexRoot()
-  console.log(ViewRoot)
-
-  const AccessSubmitleaves = SubmitProof.map(x => ethers.utils.keccak256(x))
-  const SubmitTree = new MerkleTree(AccessSubmitleaves, ethers.utils.keccak256, { sortPairs: true })
-  const SubmitRoot = SubmitTree.getHexRoot()
-  const hexProof = SubmitTree.getHexProof(AccessViewleaves[0])
-
-  let ts = await db_NFT_Instance.totalSupply()
-  console.log(ts)
-
-  const tx = await db_NFT_Instance.createPrivateRepo(
-      "Repo",
-      "Repo",
-      Accessproof,
-      ViewRoot,
-      SubmitProof,
-      SubmitRoot, { gasLimit: 1000000 })
-  await tx.wait()
-
-  console.log(1)
-
-  const tx2 = await db_NFT_Instance.contribute(1, "dataCID", 0, hexProof, { gasLimit: 1000000 })
-
   const createPrivateRepo = async (
     repoName: string,
     description: string,
     Accessproof: string[],
     SubmitProof: string[]
   ) => {
-    const AccessViewleaves = Accessproof.map(x => ethers.utils.keccak256(x))
-
-    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, { sortPairs: true })
-    console.log(ViewTree.toString())
+    const AccessViewleaves = Accessproof.map((x) => ethers.utils.keccak256(x))
+    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, {
+      sortPairs: true,
+    })
     const ViewRoot = ViewTree.getHexRoot()
-    console.log(ViewRoot)
-  
-    const AccessSubmitleaves = SubmitProof.map(x => ethers.utils.keccak256(x))
-    const SubmitTree = new MerkleTree(AccessSubmitleaves, ethers.utils.keccak256, { sortPairs: true })
+    const AccessSubmitleaves = SubmitProof.map((x) => ethers.utils.keccak256(x))
+    const SubmitTree = new MerkleTree(
+      AccessSubmitleaves,
+      ethers.utils.keccak256,
+      { sortPairs: true }
+    )
     const SubmitRoot = SubmitTree.getHexRoot()
-    
 
     const tx = await DB_NFT.createPrivateRepo(
       repoName,
@@ -194,14 +174,12 @@ export const useContract = () => {
     tokenId: number,
     Accessproof: string[]
   ) => {
-    const AccessViewleaves = Accessproof.map(x => ethers.utils.keccak256(x))
+    const AccessViewleaves = Accessproof.map((x) => ethers.utils.keccak256(x))
 
-    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, { sortPairs: true })
-    console.log(ViewTree.toString())
+    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, {
+      sortPairs: true,
+    })
     const ViewRoot = ViewTree.getHexRoot()
-    console.log(ViewRoot)
-  
-
     const tx = await DB_NFT.setRepoViewAccess(tokenId, Accessproof, ViewRoot, {
       gasLimit: 1000000,
     })
@@ -212,11 +190,14 @@ export const useContract = () => {
     tokenId: number,
     SubmitProof: string[]
   ) => {
-
-    const AccessSubmitleaves = SubmitProof.map(x => ethers.utils.keccak256(x))
-    const SubmitTree = new MerkleTree(AccessSubmitleaves, ethers.utils.keccak256, { sortPairs: true })
+    const AccessSubmitleaves = SubmitProof.map((x) => ethers.utils.keccak256(x))
+    const SubmitTree = new MerkleTree(
+      AccessSubmitleaves,
+      ethers.utils.keccak256,
+      { sortPairs: true }
+    )
     const SubmitRoot = SubmitTree.getHexRoot()
-    
+
     const tx = await DB_NFT.setRepoSubmitAccess(
       tokenId,
       SubmitProof,
@@ -237,10 +218,16 @@ export const useContract = () => {
     r: string,
     s: string
   ): Promise<any> => {
-    if(SubmitProof.length > 0){
-      const AccessSubmitleaves = SubmitProof.map(x => ethers.utils.keccak256(x))
-      const SubmitTree = new MerkleTree(AccessSubmitleaves, ethers.utils.keccak256, { sortPairs: true })
-      const hexProof = SubmitTree.getHexProof(AccessViewleaves[index])
+    if (SubmitProof.length > 0) {
+      const AccessSubmitleaves = SubmitProof.map((x) =>
+        ethers.utils.keccak256(x)
+      )
+      const SubmitTree = new MerkleTree(
+        AccessSubmitleaves,
+        ethers.utils.keccak256,
+        { sortPairs: true }
+      )
+      const hexProof = SubmitTree.getHexProof(AccessSubmitleaves[index])
       SubmitProof = hexProof
     }
     try {

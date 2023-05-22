@@ -174,10 +174,10 @@ contract DB_NFT is ERC1155, Ownable {
         uint256 tokenId,
         string memory dataCID,
         uint256 rows,
-        bytes32[] memory SubmitProof
-        // uint8 v,
-        // bytes32 r,
-        // bytes32 s
+        bytes32[] memory SubmitProof,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
     ) public {
         _exists(tokenId);
 
@@ -203,7 +203,7 @@ contract DB_NFT is ERC1155, Ownable {
             "this is an OpenDB you cannot submit"
         );
 
-        // checkSigPolicy(signedMessage, v, r, s, signerAddress);
+        checkSigPolicy(signedMessage, v, r, s, signerAddress);
 
         submissionsNumberByID[tokenId][msg.sender] += rows;
 
