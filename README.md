@@ -5,7 +5,8 @@
 <p>
 <img src="public\logo (1).webp" alt="alt text" width="40%"/>
 </p>
-##### FVM Dataverse Hackathon 2023 Submission 🚀🧑‍🚀. 
+
+## FVM Dataverse Hackathon 2023 Submission 🚀🧑‍🚀. 
 
 [Demo video](https://www.youtube.com/watch?v=1scDw7K2KPU)
 [dapp link](https://hackathon-fvm-fj45.vercel.app/)
