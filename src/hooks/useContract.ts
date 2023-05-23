@@ -68,18 +68,10 @@ export const useContract = () => {
   }
 
   const hasRepoAccess = async (
-    tokenId: number,
-    accessProof: string[],
-    index: number
+    address:string,
+    tokenId: number
   ) => {
-    const AccessSubmitleaves = accessProof.map((x) => ethers.utils.keccak256(x))
-    const SubmitTree = new MerkleTree(
-      AccessSubmitleaves,
-      ethers.utils.keccak256,
-      { sortPairs: true }
-    )
-    const hexProof = SubmitTree.getHexProof(AccessSubmitleaves[index])
-    return await DB_NFT.hasRepoAccess(tokenId, hexProof)
+    return await DB_NFT.hasRepoAccess(address, tokenId)
   }
 
   const RequestDB = async (
@@ -142,14 +134,9 @@ export const useContract = () => {
   const createPrivateRepo = async (
     repoName: string,
     description: string,
-    Accessproof: string[],
     SubmitProof: string[]
   ) => {
-    const AccessViewleaves = Accessproof.map((x) => ethers.utils.keccak256(x))
-    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, {
-      sortPairs: true,
-    })
-    const ViewRoot = ViewTree.getHexRoot()
+
     const AccessSubmitleaves = SubmitProof.map((x) => ethers.utils.keccak256(x))
     const SubmitTree = new MerkleTree(
       AccessSubmitleaves,
@@ -161,8 +148,6 @@ export const useContract = () => {
     const tx = await DB_NFT.createPrivateRepo(
       repoName,
       description,
-      Accessproof,
-      ViewRoot,
       SubmitProof,
       SubmitRoot,
       { gasLimit: 1000000 }
@@ -170,21 +155,6 @@ export const useContract = () => {
     return await tx.wait()
   }
 
-  const updateRepoViewAccessControl = async (
-    tokenId: number,
-    Accessproof: string[]
-  ) => {
-    const AccessViewleaves = Accessproof.map((x) => ethers.utils.keccak256(x))
-
-    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, {
-      sortPairs: true,
-    })
-    const ViewRoot = ViewTree.getHexRoot()
-    const tx = await DB_NFT.setRepoViewAccess(tokenId, Accessproof, ViewRoot, {
-      gasLimit: 1000000,
-    })
-    return await tx.wait()
-  }
 
   const updateRepoSubmitAccessControl = async (
     tokenId: number,
