@@ -1,15 +1,12 @@
 require("hardhat-deploy")
 require("hardhat-deploy-ethers")
-const { MerkleTree } = require('merkletreejs')
-const SHA256 = require('crypto-js/sha256')
 
 const { ethers } = require("hardhat")
 const { networkConfig } = require("../helper-hardhat-config")
-const { keccak256 } = ethers.utils
+
 
 const private_key = network.config.accounts[0]
 const wallet = new ethers.Wallet(private_key, ethers.provider)
-
 
 
 module.exports = async({ deployments }) => {
@@ -17,96 +14,166 @@ module.exports = async({ deployments }) => {
     console.log("Wallet Ethereum Address:", wallet.address)
     const chainId = network.config.chainId
 
-    //---------------------------------------------------------------MUMBAI DEPLOYMENT---------------------------------------------------------------------------------------
+    //---------------------------------------------------------------HYPERSPACE DEPLOYMENT---------------------------------------------------------------------------------------
 
-    //deploy TablelandStorage
-    const TablelandStorage = await deploy("TablelandStorage", {
+    // // deploy DealTablelandStorage Helper
+    // const dealTablelandStorage = await deploy("dealTablelandStorage", {
+    //     from: wallet.address,
+    //     args: [],
+    //     log: true,
+    // });
+
+    // // //deploy TablelandDealClient
+    // const tablelandDealClient = await deploy("tablelandDealClient", {
+    //     from: wallet.address,
+    //     args: [dealTablelandStorage.address],
+    //     log: true,
+    // });
+
+    // // Create DealTablelandStorage Contract Instance to Interact With
+
+    // const DealTablelandStorage = await ethers.getContractFactory("dealTablelandStorage", wallet)
+
+    // const dealTablelandStorageInstance = await DealTablelandStorage.attach(dealTablelandStorage.address)
+
+    // // Make the tablelandDealClient Owner by calling transferOwnership that gives him the prestige to be the only one 
+    // // to manage the tableland tables for the Deals and the Requests
+
+    // await dealTablelandStorageInstance.transferOwnership(tablelandDealClient.address)
+
+
+    // // Create TablelandDealClient Contract Instance to Interact With and create a deal Proposal
+
+    // const TablelandDealClient = await ethers.getContractFactory("tablelandDealClient", wallet)
+
+    // const TablelandDealClientInstance = await TablelandDealClient.attach(tablelandDealClient.address)
+
+    // const locationRef = "https://data-depot.lighthouse.storage/api/download/download_car?fileId=bf1a735f-132c-4c3d-9ed1-b1fd58a5c84a.car"
+    // const carSize = 55214
+    // const skipIpniAnnounce = false
+    // const removeUnsealedCopy = false
+    // const extraParamsV1 = [
+    //     locationRef,
+    //     carSize,
+    //     skipIpniAnnounce,
+    //     removeUnsealedCopy
+    // ]
+    // const latestBlock = await hre.ethers.provider.getBlock("latest")
+    //     // console.log(latestBlock)
+    // const cidHex = "0x000181e20392202082f53da28495b71ee6d7fe079ee25d9f2679db5563bc821bc0bedc915a9dc237"
+    // const pieceSize = 65536
+    // const verified = false
+    // const label = "bafybeielh4cafm7a7ku6l7qsztywovwznab5jnhehrxb2m7kvoydwhorjm"
+    // const startEpoch = latestBlock.number + 2700
+    // const endEpoch = 1050026
+    // const storagePricePerEpoch = 0
+    // const providerCollateral = 0
+    // const clientCollateral = 0
+    // const extraParamsVersion = 1
+    // const DealRequestStruct = [
+    //     cidHex,
+    //     pieceSize,
+    //     verified,
+    //     label,
+    //     startEpoch,
+    //     endEpoch,
+    //     storagePricePerEpoch,
+    //     providerCollateral,
+    //     clientCollateral,
+    //     extraParamsVersion,
+    //     extraParamsV1
+    // ]
+
+    // // Create a Deal Proposal on Filecoin using the TablelandDealClient that will enter the Request record into tableland table owned byt the 
+    // // await TablelandDealClientInstance.makeDealProposal(DealRequestStruct, { gasLimit: 100000000 })
+
+    // let requestTableName = await dealTablelandStorageInstance.tables(0)
+    // let dealTableName = await dealTablelandStorageInstance.tables(1)
+
+    // let GetAllRequestsTablelandURL = 'https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement=SELECT * FROM ' + requestTableName
+    // console.log("Check The Deal Requests made on this URL tableland endpoint   : ", GetAllRequestsTablelandURL)
+
+    // let GetAllAcceptedDealsTablelandURL = 'https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement=SELECT * FROM ' + dealTableName
+    // console.log("\nCheck The accepted deals from Storage Providers on this URL tableland endpoint   : ", GetAllAcceptedDealsTablelandURL)
+
+
+    // // let result3 = await TablelandDealClientInstance.getDealRequest("0xc1a07ef36d36d4cd07801f9243dc472ce5e4dd9da36908b6023aeeaa03016acb")
+    // // console.log(result3)
+
+
+
+    // //deploy bacalhauTablelandStorage
+    // const bacalhauTablelandStorage = await deploy("bacalhauTablelandStorage", {
+    //     from: wallet.address,
+    //     args: [],
+    //     log: true,
+    // });
+
+    // const BacalhauTablelandStorage = await ethers.getContractFactory("bacalhauTablelandStorage", wallet)
+
+    // const bacalhauTablelandStorageInstance = await BacalhauTablelandStorage.attach(bacalhauTablelandStorage.address)
+
+    // const lillyPadBridgeAddress = "0x489656E4eDDD9c88F5Fe863bDEd9Ed0Dc29B224c"
+    //     // deploy crossChainTablelandBacalhauJobs
+    // const tablelandBacalhauJobs = await deploy("tablelandBacalhauJobs", {
+    //     from: wallet.address,
+    //     args: [lillyPadBridgeAddress, bacalhauTablelandStorage.address],
+    //     log: true,
+    // });
+
+    // const TablelandBacalhauJobs = await ethers.getContractFactory("tablelandBacalhauJobs", wallet)
+
+    // const Tableland_BacalhauJobs = await TablelandBacalhauJobs.attach(tablelandBacalhauJobs.address)
+
+    // await bacalhauTablelandStorageInstance.transferOwnership(tablelandBacalhauJobs.address)
+
+    // // await Tableland_BacalhauJobs.executeJOB("specStart", "specStart", "specStart", "specStart")
+    // let execTable = await bacalhauTablelandStorageInstance.tables(0)
+    // let jobTable = await bacalhauTablelandStorageInstance.tables(1)
+
+    // console.log(execTable, "   ", jobTable)
+
+
+    // -------------------------------------------------------------------------------- Tableland Deal Rewarder ------------------------------------------------------------------------------
+
+    // deploy DealTablelandStorage Helper
+    const rewardTablelandStorage = await deploy("rewardTablelandStorage", {
         from: wallet.address,
-        args: ["https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement="],
+        args: [],
         log: true,
     });
 
-    //deploy DB_NFT
-    const DB_NFT = await deploy("DB_NFT", {
+    // //deploy TablelandDealClient
+    const tablelandDealRewarder = await deploy("tablelandDealRewarder", {
         from: wallet.address,
-        args: [TablelandStorage.address, "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"],
+        args: [rewardTablelandStorage.address],
         log: true,
     });
 
-    const tablelandStorage = await ethers.getContractFactory("TablelandStorage", wallet)
+    // Create DealTablelandStorage Contract Instance to Interact With
 
-    const tablelandStorageInstance = await tablelandStorage.attach(TablelandStorage.address)
+    const RewardTablelandStorage = await ethers.getContractFactory("rewardTablelandStorage", wallet)
 
-    await tablelandStorageInstance.transferOwnership(DB_NFT.address)
+    const RewardTablelandStorageInstance = await RewardTablelandStorage.attach(rewardTablelandStorage.address)
 
-    let contributionTable = await tablelandStorageInstance.tables(0)
-    let mainTable = await tablelandStorageInstance.tables(1)
-    let attributeTable = await tablelandStorageInstance.tables(2)
-    let proofs = await tablelandStorageInstance.tables(3)
+    const TablelandDealRewarder = await ethers.getContractFactory("tablelandDealRewarder", wallet)
 
-    console.log(mainTable, "   ", attributeTable, "   ", contributionTable, "     ", proofs)
+    const TablelandDealRewarderInstance = await TablelandDealRewarder.attach(tablelandDealRewarder.address)
 
+    // Make the tablelandDealClient Owner by calling transferOwnership that gives him the prestige to be the only one 
+    // to manage the tableland tables for the Deals and the Requests
 
-    const db_NFT = await ethers.getContractFactory("DB_NFT", wallet)
+    await RewardTablelandStorageInstance.transferOwnership(tablelandDealRewarder.address)
 
-    const db_NFT_Instance = await db_NFT.attach(DB_NFT.address)
+    let bountyTable = await RewardTablelandStorageInstance.tables(0)
+    let claimTable = await RewardTablelandStorageInstance.tables(1)
 
+    console.log(bountyTable, "   ", claimTable)
 
-    // const Accessproof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
-    // const SubmitProof = ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"]
-
-
-    // const AccessViewleaves = Accessproof.map(x => keccak256(x))
-
-    // const ViewTree = new MerkleTree(AccessViewleaves, keccak256, { sortPairs: true })
-    // console.log(ViewTree.toString())
-    // const ViewRoot = ViewTree.getHexRoot()
-    // console.log(ViewRoot)
-
-    // const AccessSubmitleaves = SubmitProof.map(x => keccak256(x))
-    // const SubmitTree = new MerkleTree(AccessSubmitleaves, keccak256, { sortPairs: true })
-    // const SubmitRoot = SubmitTree.getHexRoot()
-    // const hexProof = SubmitTree.getHexProof(AccessViewleaves[0])
-
-    // let ts = await db_NFT_Instance.totalSupply()
-    // console.log(ts)
-
-    // const tx = await db_NFT_Instance.createPrivateRepo(
-    //     "Repo",
-    //     "Repo",
-    //     Accessproof,
-    //     ViewRoot,
-    //     SubmitProof,
-    //     SubmitRoot, { gasLimit: 1000000 })
-    // await tx.wait()
-
-    // console.log(1)
-
-    // const tx2 = await db_NFT_Instance.contribute(1, "dataCID", 0, hexProof, { gasLimit: 1000000 })
-    // await tx2.wait()
-
-    // console.log(2)
-
-
-
-
-    // await db_NFT_Instance.RequestDB(
-    //     "dataFormatCID",
-    //     "dbName",
-    //     "description", ["test"],
-    //     1,
-    //     1
-    // )
-
-    // await db_NFT_Instance.createOpenDataSet(
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test",
-    //     "test", ["test"]
-    // )
-
-    // await db_NFT_Instance.updateDB_NFT1(1, "test2", ["fdsfsdf", "fdsfdsfsdfdfsdf", "sdfsdfsdfdsfsdfsdfdsfdsf", "dsfsfsdfsdfsdfsdf"],
-    //     "test3")
-
+    // await TablelandDealRewarderInstance.createBounty(label,
+    //     cidHex,
+    //     location_ref,
+    //     0,
+    //     100,
+    //     pieceSize)
 }

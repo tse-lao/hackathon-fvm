@@ -2,7 +2,7 @@
 
 import { DB_attribute, DB_main } from '@/constants';
 import { useEffect, useState } from 'react';
-import LoadingSpinner from '../application/elements/LoadingSpinner';
+import LoadingFull from '../application/elements/loading/LoadingFull';
 import Filters from '../application/overlay/Filters';
 import CreateOpenDS from './CreateOpenDS';
 import DatasetItem from './DatasetItem';
@@ -58,7 +58,7 @@ const Marketplace = () => {
 
 
 
-  if (loading) return <LoadingSpinner msg="Loading Marketplace" />;
+  if (loading) return <LoadingFull />;
   return (
     <div className="flex flex-col h-screen">
       <button

@@ -67,18 +67,10 @@ export const useContract = () => {
   }
 
   const hasRepoAccess = async (
-    tokenId: number,
-    accessProof: string[],
-    index: number
+    address:string,
+    tokenId: number
   ) => {
-    const AccessSubmitleaves = accessProof.map((x) => ethers.utils.keccak256(x))
-    const SubmitTree = new MerkleTree(
-      AccessSubmitleaves,
-      ethers.utils.keccak256,
-      { sortPairs: true }
-    )
-    const hexProof = SubmitTree.getHexProof(AccessSubmitleaves[index])
-    return await DB_NFT.hasRepoAccess(tokenId, hexProof)
+    return await DB_NFT.hasRepoAccess(address, tokenId)
   }
 
   const RequestDB = async (
@@ -141,7 +133,6 @@ export const useContract = () => {
   const createPrivateRepo = async (
     repoName: string,
     description: string,
-    Accessproof: string[],
     SubmitProof: string[]
   ) : Promise<any> =>  {
     const AccessViewleaves = Accessproof.map((x) => ethers.utils.keccak256(x))
@@ -157,49 +148,16 @@ export const useContract = () => {
     )
     const SubmitRoot = SubmitTree.getHexRoot()
 
-    
-    try {
-      const tx = await DB_NFT.createPrivateRepo(
-        repoName,
-        description,
-        Accessproof,
-        ViewRoot,
-        SubmitProof,
-        SubmitRoot,
-        { gasLimit: 1000000 }
-      )
-
-      console.log(tx)
-      toast.update('Promise is pending', {
-        render: 'Transaction sent, waiting for confirmation.',
-      })
-
-      const receipt = await tx.wait()
-      console.log(receipt)
-      toast.success('Promise resolved 👌')
-      return receipt
-    } catch (error) {
-      console.log(error)
-      toast.error('Promise rejected 🤯')
-      throw error
-    }
-  }
-
-  const updateRepoViewAccessControl = async (
-    tokenId: number,
-    Accessproof: string[]
-  ) => {
-    const AccessViewleaves = Accessproof.map((x) => ethers.utils.keccak256(x))
-
-    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, {
-      sortPairs: true,
-    })
-    const ViewRoot = ViewTree.getHexRoot()
-    const tx = await DB_NFT.setRepoViewAccess(tokenId, Accessproof, ViewRoot, {
-      gasLimit: 1000000,
-    })
+    const tx = await DB_NFT.createPrivateRepo(
+      repoName,
+      description,
+      SubmitProof,
+      SubmitRoot,
+      { gasLimit: 1000000 }
+    )
     return await tx.wait()
   }
+
 
   const updateRepoSubmitAccessControl = async (
     tokenId: number,
@@ -423,7 +381,6 @@ export const useContract = () => {
 
   const createBounty = async (
     label: string,
-    piece_cid_bytes: number,
     cidHex: string,
     location_ref: number,
     size: string
@@ -431,7 +388,6 @@ export const useContract = () => {
     try {
       const tx = await TablelandBountyRewarder.createBounty(
         label,
-        piece_cid_bytes,
         cidHex,
         location_ref,
         size
@@ -577,7 +533,6 @@ export const useContract = () => {
     makeDealProposal,
     hasRepoAccess,
     createPrivateRepo,
-    updateRepoViewAccessControl,
     updateRepoSubmitAccessControl,
     claimBounty,
     createBounty,

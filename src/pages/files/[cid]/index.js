@@ -1,6 +1,6 @@
 
-import LoadingSpinner from '@/components/application/elements/LoadingSpinner';
 import SimpleDecrypted from '@/components/application/elements/SimpleDecrypted';
+import LoadingFull from '@/components/application/elements/loading/LoadingFull';
 import FileDetailInformation from '@/components/application/files/FileDetailInformation';
 import FileSharedWith from '@/components/application/files/FileSharedWith';
 import CreateDeal from '@/components/marketplace/CreateDeal';
@@ -144,12 +144,13 @@ export default function ViewFile() {
         //check if what network the user is onn.. 
         
     }
+    
+    if(loading) return <LoadingFull />
 
     return (
         <Layout>
 
             {createCarDeal && <CreateDeal cid={cid}  onClose={closedDeal}/>}
-            {loading ? <LoadingSpinner height={64} /> : (
                 <div>
                     <div className="flex justify-between sm:flex sm:items-center mb-6">
                         <div>
@@ -196,7 +197,6 @@ export default function ViewFile() {
                         </div>
                     </div>
                 </div>
-            )}
         </Layout>
 
     )

@@ -1,3 +1,4 @@
+import LoadingFull from "@/components/application/elements/loading/LoadingFull";
 import { DB_main } from "@/constants";
 import { DB_NFT_address } from "@/constants/contractAddress";
 import { useContract } from "@/hooks/useContract";
@@ -5,12 +6,14 @@ import { readJWT } from "@/hooks/useLighthouse";
 import { shareAccessToRepo } from "@/lib/shareAccessToRepo";
 import Layout from "@/pages/Layout";
 import lighthouse from "@lighthouse-web3/sdk";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 
 export default function Repo() {
+  const [loading, setLoading] = useState(true);
   const [repo, setRepo] = useState({});
   const [files, setFiles] = useState([]);
   const [access, setAccess] = useState([]);
@@ -25,18 +28,21 @@ export default function Repo() {
       const data = await result.json();
       console.log(data.result[0]);
       setRepo(data.result[0]);
+      
+      setLoading(false);
     }
 
 
-
+    setLoading(true);
     if (id) {
+      fetchAccess();
       if (userAccess) {
         fetchData();
         fetchFiles();
       }
-      fetchAccess();
-
     }
+    
+    
 
 
   }, [id, userAccess])
@@ -152,19 +158,23 @@ export default function Repo() {
   }
 
 
+  if(loading) return <LoadingFull />
+
   if (userAccess) {
     return (
       <Layout>
         <div className="p-4">
-          <h2 className="text-2xl font-bold mb-4">{repoData?.title}</h2>
-          <p className="text-lg mb-4">{repoData?.description}</p>
+          <h2 className="text-2xl font-bold mb-4">{repo?.dbName}</h2>
+          <p className="text-lg mb-4">{repo?.description}</p>
 
           <div className="grid grid-cols-3 gap-4">
             {files?.map((file, index) => (
-              <div key={index} className="border rounded-md p-4">
+              <div key={index} className="border rounded-md p-6 bg-white gap-4">
                 <Link href={`/files/${file.dataCID}`}>
-                  <span>{file.creator}</span>
-                  <a className="text-blue-500 hover:underline">{file.dataCID}</a>
+                  <span className="text-blue-500 hover:underline block overflow-hidden whitespace-nowrap text-sm overflow-ellipsis">{file.dataCID}</span>
+                </Link>
+                <Link href={`/profile/${file.creator}`}>
+                <p className="text-gray-500 text-xs overflow-hidden whitespace-nowrap overflow-ellipsis mt-6">Created by: {file.creator}</p>
                 </Link>
               </div>
             ))}

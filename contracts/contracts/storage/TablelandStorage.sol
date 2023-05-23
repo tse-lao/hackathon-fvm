@@ -1,15 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
+import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
+import "@tableland/evm/contracts/utils/SQLHelpers.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@tableland/evm/contracts/utils/SQLHelpers.sol";
-import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
 
-/** @title DB_NFT. */
-/// @author Nick Lionis (github handle : nijoe1 )
-/// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
-/// All the data inside the tables are pointing on an IPFS CID.
+/**
+ * @title DB_NFT.
+ * @author Nick Lionis (github handle: nijoe1)
+ * @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
+ * All the data inside the tables are pointing on an IPFS CID.
+ */
+
 contract TablelandStorage is Ownable {
+
     ITablelandTables private tablelandContract;
     string main;
     string attribute;
@@ -39,9 +43,6 @@ contract TablelandStorage is Ownable {
     string private constant MERKLE_TREE_SCHEMA =
         "tokenID text, address text, addressIndex text, AccessFor text, blockTimestamp text";
 
-    // ["data_contribution_80001_6068","file_main_80001_6069","file_attribute_80001_6070"]
-    // "https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement="
-    // "0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B","0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6"
     constructor(string memory _baseURIString) {
         tablelandContract = TablelandDeployments.get();
 
@@ -68,6 +69,9 @@ contract TablelandStorage is Ownable {
         baseURIString = _baseURIString;
     }
 
+    /**
+     * @dev Internal function to set the table information (names and IDs).
+     */
     function setTableInfo(
         string memory contributionName,
         uint256 contributionId,
@@ -84,10 +88,27 @@ contract TablelandStorage is Ownable {
         attributeID = attributeId;
     }
 
+    /*
+     * @dev Internal function to perform an update on the main table.
+     * @param {stringp[]} set: Array of SET statements for the update.
+     * @param {string} filter:Filter condition for the update.
+     */
     function toUpdate(string[] memory set, string memory filter) public onlyOwner {
         mutate(mainID, SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, mainID, set[0], filter));
         mutate(mainID, SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, mainID, set[1], filter));
     }
+
+    /*
+     * @dev Inserts a new record into the main table.
+     * @param {uint256} tokenid - Token ID.
+     * @param {string} dataFormatCID - Data format CID.
+     * @param {string} dbName - Database name.
+     * @param {string} description - Description.
+     * @param {string} dbCID - Database CID.
+     * @param {uint256} minRows - Minimum number of rows.
+     * @param {uint256} requiredRows - Required number of rows.
+     * @param {string} label - Label.
+     */
 
     function insertMainStatement(
         uint256 tokenid,
@@ -128,6 +149,16 @@ contract TablelandStorage is Ownable {
         );
     }
 
+    /*
+     * @dev Inserts a new record into the main table for an OpenDB.
+     * @param {uint256} tokenid - Token ID.
+     * @param {string} dataFormatCID - Data format CID.
+     * @param {string} dbName - Database name.
+     * @param {string} description - Description.
+     * @param {string} dbCID - Database CID.
+     * @param {string} label - Label payloadCID from dataDepot.
+     */
+
     function insertMainOpenDBStatement(
         uint256 tokenid,
         string memory dataFormatCID,
@@ -165,9 +196,22 @@ contract TablelandStorage is Ownable {
         );
     }
 
+    /*
+     * @dev Internal function to execute a mutation on a table.
+     * @param {uint256} tableId - Table ID.
+     * @param {string} statement - Mutation statement.
+     */
     function mutate(uint256 tableId, string memory statement) internal {
         tablelandContract.mutate(address(this), tableId, statement);
     }
+
+    /*
+     * @dev Inserts a new record into the submission table.
+     * @param {uint256} tokenid - Token ID.
+     * @param {string} dataCID - Data CID.
+     * @param {uint256} rows - Number of rows.
+     * @param {address} creator - Creator address.
+     */
 
     function insertSubmissionStatement(
         uint256 tokenid,
@@ -195,6 +239,13 @@ contract TablelandStorage is Ownable {
             )
         );
     }
+
+    /*
+     * @dev Inserts a new record into the attribute table.
+     * @param {uint256} tokenid - Token ID.
+     * @param {string} trait_type - Trait type.
+     * @param {string} value - Value.
+     */
 
     function insertAttributeStatement(
         uint256 tokenid,
@@ -247,12 +298,20 @@ contract TablelandStorage is Ownable {
             );
     }
 
-    /// @notice Setting the tableland gateway prefix
-    /// @dev only for tableland updates
+    /*
+     * @dev Sets the tableland gateway prefix for tableland updates.
+     * @param {string} baseURI - The new baseURI.
+     */
     function setTableURI(string memory baseURI) public onlyOwner {
         baseURIString = baseURI;
     }
 
+    /*
+     * @dev Inserts token proofs into the tokenProofs mapping.
+     * @param {uint256} tokenId - Token ID.
+     * @param {string} proof - Proof data.
+     * @param {string} accessFor - accessFor data.
+     */
     function insertTokenProof(
         uint256 tokenId,
         string[] memory addresses,
@@ -283,7 +342,15 @@ contract TablelandStorage is Ownable {
         tablelandContract.mutate(address(this), statements);
     }
 
-    // Returns the address that signed a given string message
+    /*
+     * @dev Returns the address that signed a given string message.
+     * @param {string} message - The message that was signed.
+     * @param {uint8} v - Recovery byte of the signature.
+     * @param {bytes32} r - R component of the signature.
+     * @param {bytes32} s - S component of the signature.
+     * @param {address} pkp - Public key of the signer.
+     * @return {bool} res - True if the signature is valid, false otherwise.
+     */
     function verifyString(
         string memory message,
         uint8 v,

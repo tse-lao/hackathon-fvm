@@ -46,8 +46,7 @@ export default function ListRequest() {
 
 
 
-
-    if (loading) return <LoadingIcon />
+    if (loading) return <LoadingIcon msg="Loading Requests" height={124} />;
     return (
         <div className="flex flex-col">
             <Filters name="Data Requests" selectChange={selectChange} currentFilters={filters} />
