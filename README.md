@@ -3,7 +3,7 @@
 </h1>
 
 <p>
-<img src="public\logo.webp" alt="alt text" width="40%"/>
+<img src="public\logo (1).webp" alt="alt text" width="40%"/>
 </p>
 ##### FVM Dataverse Hackathon 2023 Submission 🚀🧑‍🚀. 
 
