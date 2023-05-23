@@ -17,7 +17,7 @@ module.exports = {
             },
         },
     },
-    // defaultNetwork: "mumbai",
+    defaultNetwork: "mumbai",
     // defaultNetwork: "hyperspace",
 
     networks: {
