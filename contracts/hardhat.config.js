@@ -17,7 +17,7 @@ module.exports = {
             },
         },
     },
-    defaultNetwork: "mumbai",
+    // defaultNetwork: "mumbai",
     // defaultNetwork: "hyperspace",
 
     networks: {
@@ -41,6 +41,9 @@ module.exports = {
             url: `https://polygon-mumbai.g.alchemy.com/v2/ZiPX0JtXnVqQ56RGdvdy8mvCOs4ZDchO`,
             accounts: [PRIVATE_KEY],
         },
+    },
+    etherscan: {
+        apiKey: "XAP64G9KV63W7FDW6V7IXGF4E1KMD7E2KK",
     },
     paths: {
         sources: "./contracts",
