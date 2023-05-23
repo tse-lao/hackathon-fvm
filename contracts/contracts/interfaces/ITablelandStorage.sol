@@ -73,6 +73,6 @@ interface ITablelandStorage {
 
     function sendViaCall(address payable _to) external payable;
 
-   function insertTokenProof(uint256 tokenId,string[] memory proof,string memory accessFor) external;
+   function insertTokenProof(uint256 tokenId,address[] memory proof,string memory accessFor) external;
 
 }

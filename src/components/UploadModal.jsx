@@ -1,6 +1,6 @@
 
 import MatchRecord from '@/hooks/useBlockchain';
-import { readJWT, uploadCarFile } from '@/hooks/useLighthouse';
+import { fetchWithRetry, readJWT, uploadCarFile } from '@/hooks/useLighthouse';
 import { getLighthouse, uploadMetaData } from '@/lib/createLighthouseApi';
 import { getMetadataFromFile } from '@/lib/dataHelper';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
@@ -159,12 +159,17 @@ export default function UploadModal({ onClose }) {
         let dataDepo = []
         
         console.log(dataDepo)
+        
+        console.log(list);
         for(let i = 0; i < list.length; i++){
         //change the blob of each file element with the blob of the encrypted file.
             let cid = list[i].cid;
+            
+            //get the blob of the encrypted file
+            
             let endpoint = `https://gateway.lighthouse.storage/ipfs/${cid}`;
-            let blob = await fetch(endpoint).then(r => r.blob());
-        
+            let blob = await fetchWithRetry(endpoint, 1000, 5);
+
             const file = new File([blob], cid, { type: list[i].type });
             dataDepo.push(file)
         }    

@@ -49,12 +49,15 @@ export default function Repo() {
   }, [id, userAccess])
 
   const fetchAccess = async () => {
-    const result = await fetch(`/api/tableland/merkle/access?where= WHERE tokenID=${id} AND AccessFor='SUBMIT'`)
+    const result = await fetch(`/api/tableland/merkle/access?where= WHERE tokenID=${id} `)
     const data = await result.json();
     console.log(data.result)
+    
+    if(data.result.length < 1){
+      return;
+    }
     //check if user eists
-    console.log(address);
-    const usersFound = data.result.filter((item) => item.address == address);
+    const usersFound = data.result.filter((item) => item.address.toLocaleLowerCase() == address.toLocaleLowerCase());
     console.log(usersFound)
     if (usersFound.length > 0) {
       setUserAccess(true);
@@ -88,7 +91,7 @@ export default function Repo() {
     }
     let proof = [...addresses, ...newAddresses]; 
     console.log(proof);
-
+    
     toast.promise(updateRepoSubmitAccessControl(
       id, 
       proof
@@ -129,7 +132,7 @@ export default function Repo() {
                     {
                       access.map((item, index) => (
                         <li key={index} className="border rounded-md p-6 bg-white gap-4 m-2">
-                          <p className="text-gray-500 text-xs overflow-hidden whitespace-nowrap overflow-ellipsis ">Address: {item.address}</p>
+                          <p className="text-gray-500 text-xs overflow-hidden whitespace-nowrap overflow-ellipsis ">{item.address}</p>
                         </li>
                         ))}
                   </ul>

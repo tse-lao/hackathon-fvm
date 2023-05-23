@@ -6,8 +6,8 @@ import lighthouse from "@lighthouse-web3/sdk";
 export async function shareAccessToRepo(token, cid, address){
     const access = await fetchAccess(token); 
     //change array to array of addresses.
-    const myIndex = access.findIndex((item) => item.address === address);
-    const addressArray = access.map((item) => item.address);
+    const myIndex = access.findIndex((item) => item.address.toLowerCase() === address.toLowerCase());
+    const addressArray = access.map((item) => item.address.toLowerCase());
     const count = addressArray.length;
     
     const signedString = token.concat("", cid).concat("", count);

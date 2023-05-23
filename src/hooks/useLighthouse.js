@@ -336,7 +336,7 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function fetchWithRetry(endpoint, delay = 1000, maxRetries = 3) {
+export async function fetchWithRetry(endpoint, delay = 1000, maxRetries = 3) {
   let retries = 0;
   let blob = null;
 

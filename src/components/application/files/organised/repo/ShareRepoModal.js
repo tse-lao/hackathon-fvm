@@ -1,12 +1,11 @@
 import ModalLayout from '@/components/ModalLayout';
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
-import { DB_attribute, DB_main } from '@/constants';
+import { MerkleHelper } from '@/constants/tableland';
 import { useContract } from '@/hooks/useContract';
 import { shareAccessToRepo } from '@/lib/shareAccessToRepo';
 import { useEffect, useState } from "react";
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
-
 export default function ShareRepoModal({ cid, changeOpenModal }) {
     const { submitData } = useContract();
     const { address } = useAccount();
@@ -15,8 +14,8 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
     
     useEffect(() => {
         const fetchData = async (id) => {
-          const result = await fetch(`/api/tableland/token/all?where= WHERE ${DB_attribute}.trait_type='creator' AND (${DB_attribute}.value='${address.toLocaleLowerCase()}') AND ${DB_main}.dbCID='repo'`);
-          const data = await result.json();
+            const result = await fetch(`/api/tableland/merkle/all?where= WHERE ${MerkleHelper}.address='${address }'`);
+            const data = await result.json();
           console.log(data);
           setRepos(data.result);
       

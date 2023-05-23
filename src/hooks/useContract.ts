@@ -183,13 +183,13 @@ export const useContract = () => {
     )
     const SubmitRoot = SubmitTree.getHexRoot()
     try {
-      const tx = await DB_NFT.setRepoSubmitAccess(
+      const tx = await DB_NFT.setRepoSubmitAccessMerkleRoot(
         tokenId,
         SubmitProof,
         SubmitRoot,
         { gasLimit: 1000000 }
       )
-
+      
       console.log(tx)
       toast.update('Promise is pending', {
         render: 'Transaction sent, waiting for confirmation.',
@@ -205,6 +205,7 @@ export const useContract = () => {
       throw error
     }
    
+
   }
 
   // ================================ SUBMITTING DATA AND NFT CREATION ======================================== //

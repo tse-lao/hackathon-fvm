@@ -314,7 +314,7 @@ contract TablelandStorage is Ownable {
      */
     function insertTokenProof(
         uint256 tokenId,
-        string[] memory addresses,
+        address[] memory addresses,
         string memory accessFor
     ) public onlyOwner {
         ITablelandTables.Statement[] memory statements = new ITablelandTables.Statement[](
@@ -329,7 +329,7 @@ contract TablelandStorage is Ownable {
                 string.concat(
                     SQLHelpers.quote((Strings.toString(tokenId))),
                     ",",
-                    SQLHelpers.quote(addresses[i]),
+                    SQLHelpers.quote(Strings.toHexString(addresses[i])),
                     ",",
                     SQLHelpers.quote(Strings.toString(i)),
                     ",",

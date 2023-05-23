@@ -20,7 +20,7 @@ const Marketplace = () => {
     const fetchData = async () => {
       setLoading(true)
       
-      let query = `WHERE ${DB_main}.piece_cid!='piece_cid'`;
+      let query = `WHERE ${DB_main}.label!='label' AND ${DB_main}.label!='repo'`;
 
       if (filters.categories.length > 0) {
         filters.categories.forEach((category, index) => {
@@ -34,10 +34,10 @@ const Marketplace = () => {
         query += ')';
       }
       if (filters.open) {
-        query += `AND ${DB_main}.minimumRowsOnSubmission=0`;
+        query += `AND ${DB_main}.minRows=0`;
       }
       if(!filters.open){
-        query += `AND ${DB_main}.minimumRowsOnSubmission > 0`;
+        query += `AND ${DB_main}.minRows > 0`;
       }
       
       
