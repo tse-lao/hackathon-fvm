@@ -31,6 +31,7 @@ contract DB_NFT is ERC1155, Ownable {
 
     using Counters for Counters.Counter;
     using EnumerableSet for EnumerableSet.UintSet;
+    using EnumerableSet for EnumerableSet.AddressSet;
     
     // Structure to store information about a DB
     struct DBInfo {
@@ -61,8 +62,8 @@ contract DB_NFT is ERC1155, Ownable {
     // Mapping to track signed messages
     mapping(string => bool) private signedMessages;
 
-    // Mapping to store contributors of private repos
-    mapping(address => EnumerableSet.UintSet) private privateRepoContributor;
+    // Mapping to store contributors
+    mapping(uint256 => EnumerableSet.AddressSet) private contributors;
 
     // Address of the signer
     address public signerAddress;
@@ -125,7 +126,7 @@ contract DB_NFT is ERC1155, Ownable {
     function createPrivateRepo(
         string memory repoName,
         string memory description,
-        string[] memory SubmitProof,
+        address[] memory SubmitProof,
         bytes32 SubmitRoot
     ) public {
         require(SubmitProof.length > 0, "wrong input whitelisted address array must be greater than 0");
@@ -198,35 +199,41 @@ contract DB_NFT is ERC1155, Ownable {
         uint256 tokenId,
         string memory dataCID,
         uint256 rows,
-        bytes32[] memory SubmitProof,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
+        bytes32[] memory SubmitProof
+        // uint8 v,
+        // bytes32 r,
+        // bytes32 s
     ) public {
         _exists(tokenId);
 
         string memory signedMessage = string.concat(Strings.toString(tokenId),dataCID,Strings.toString(rows));
+
+        bool policyOK;
         // If there is access control for submissions check if sender
         // is elligible to participate in that DB submission!!!
         if (dbInfoMap[tokenId].submitRoot != bytes32(0)) {
+            // checkSigPolicy(signedMessage, v, r, s);
+            policyOK = true;
             bytes32 Root = dbInfoMap[tokenId].submitRoot;
             require(verifyProof(SubmitProof, Root, msg.sender), "not in submit allowlist");
-            if (!privateRepoContributor[msg.sender].contains(tokenId)) {
-                string[] memory proof = new string[](1);
-                proof[0] = Strings.toHexString(msg.sender);
+            if (!contributors[tokenId].contains(msg.sender)) {
+                address[] memory proof = new address[](1);
+                proof[0] = msg.sender;
                 tablelandStorage.insertTokenProof(tokenId, proof, "VIEW");
             }
         }
 
         require(dbInfoMap[tokenId].minSubRows <= rows, "sumbit more data");
         require(dbInfoMap[tokenId].dbState != DBState.OpenDataset,"this is an OpenDB you cannot submit");
-        checkSigPolicy(signedMessage, v, r, s);
 
-        privateRepoContributor[msg.sender].add(tokenId);
+        // if(!policyOK){
+        //     checkSigPolicy(signedMessage, v, r, s);
+        // }
+        contributors[tokenId].add(msg.sender);
 
         dbInfoMap[tokenId].requiredRows -= int256(rows);
 
-        if (dbInfoMap[tokenId].requiredRows <= 0 && dbInfoMap[tokenId].dbState != DBState.Mintable) {
+        if (dbInfoMap[tokenId].requiredRows <= 0 && dbInfoMap[tokenId].dbState != DBState.Mintable && dbInfoMap[tokenId].dbState != DBState.OpenDataset && dbInfoMap[tokenId].dbState != DBState.Repo) {
             dbInfoMap[tokenId].dbState = DBState.ReadyToBeMintable;
         }
 
@@ -259,10 +266,10 @@ contract DB_NFT is ERC1155, Ownable {
         string memory dbCID,
         uint256 mintPrice,
         address splitterContractAddress,
-        string memory label,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
+        string memory label
+        // uint8 v,
+        // bytes32 r,
+        // bytes32 s
     ) public {
         _exists(tokenId);
 
@@ -275,7 +282,7 @@ contract DB_NFT is ERC1155, Ownable {
 
         require(dbInfoMap[tokenId].dbState == DBState.ReadyToBeMintable);
         onlyTokenCreator(tokenId, msg.sender);
-        checkSigPolicy(signedMessage, v, r, s);
+        // checkSigPolicy(signedMessage, v, r, s);
 
         dbInfoMap[tokenId].dbState = DBState.Mintable;
         dbInfoMap[tokenId].splitterContract = splitterContractAddress;
@@ -372,7 +379,7 @@ contract DB_NFT is ERC1155, Ownable {
     */
 
     function hasAccess(address sender, uint256 tokenid) public view returns (bool) {
-        return privateRepoContributor[sender].contains(tokenid) || dbInfoMap[tokenid].creator == sender || balanceOf(sender, tokenid) > 0;
+        return contributors[tokenid].contains(sender) || dbInfoMap[tokenid].creator == sender || balanceOf(sender, tokenid) > 0;
     }
 
 
@@ -384,7 +391,7 @@ contract DB_NFT is ERC1155, Ownable {
     */
 
     function hasRepoAccess(address sender, uint256 tokenid) public view returns (bool) {
-        return privateRepoContributor[sender].contains(tokenid);
+        return contributors[tokenid].contains(sender);
     }
 
 
@@ -400,7 +407,7 @@ contract DB_NFT is ERC1155, Ownable {
 
     function setRepoSubmitAccessMerkleRoot(
         uint256 tokenId,
-        string[] memory SubmitProof,
+        address[] memory SubmitProof,
         bytes32 SubmitRoot
     ) public {
         onlyTokenCreator(tokenId, msg.sender);

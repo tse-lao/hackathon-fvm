@@ -168,7 +168,7 @@ export const useContract = () => {
     )
     const SubmitRoot = SubmitTree.getHexRoot()
 
-    const tx = await DB_NFT.setRepoSubmitAccess(
+    const tx = await DB_NFT.setRepoSubmitAccessMerkleRoot(
       tokenId,
       SubmitProof,
       SubmitRoot,
