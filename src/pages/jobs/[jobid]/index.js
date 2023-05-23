@@ -17,9 +17,11 @@ export default function Jobs({ }) {
     useEffect(() => {
         const fetchData = async () => {
             const { data } = await polybase.collection('Jobs').where('id', '==', jobid).get()
-            const where = `WHERE ${DB_main}.dataFormatCID = '${data[0].data.dataFormat}' AND ${DB_main}.minimumRowsOnSubmission = 0`
+            console.log(data)
+            const where = `WHERE ${DB_main}.dataFormatCID = '${data[0].data.dataFormat}'`
             const result = await fetch(`/api/tableland/token/all?where=${where}`)
             const datasets = await result.json()
+            console.log(datasets)
             setDatasets(datasets.result)
 
 
@@ -43,7 +45,7 @@ export default function Jobs({ }) {
         if (selectedOption === 'datasets') {
             // return <DatasetsView />; Uncomment this line and define DatasetsView component accordingly
             return <div className='grid sm:grid-cols-1 md: grid-cols-1 lg:grid-cols-1 gap-4'>
-                {datasets && datasets.map((dataset, index) => (
+                {datasets.length > 0 && datasets.map((dataset, index) => (
                     <div key={index} className={`grid sm:grid-cols-1 md:grid-cols-1 bg-white items-center px-4 py-4 ${selected.includes(dataset.dbCID) && 'outline'}`} onClick={() => addSelected(dataset.dbCID)} >
                         <span className='text-sm text-gray-600'>{dataset.tokenID} </span>
                         <span>  {dataset.dbCID}</span>

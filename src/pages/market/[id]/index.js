@@ -105,7 +105,7 @@ export default function TokenID() {
             <p className="mt-6 text-gray-500">{detail.description}</p>
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 content-center">
-              {detail.minimumRowsOnSubmission != 0 && (
+              {detail.minRows != 0 && (
                 owned ? (
                   <DownloadButton onClick={startDownload} />
                 ) : (

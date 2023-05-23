@@ -74,7 +74,6 @@ export default function CreateDeal({ cid, onClose, getOpen }) {
         }).then((result) => {
             console.log(result)
             setMakingDeal(false);
-            setRecord(result)
             onClose()
         })
     }

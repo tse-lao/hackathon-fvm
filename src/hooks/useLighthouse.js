@@ -304,6 +304,8 @@ export async function uploadCarFileFromCid(cid, address, metadata, fileName) {
   const file = new File([blob], cid, {type: "text/plain"});
 
   const result = await uploadCarFile([file], setUploadedProgress, access);
+  
+  console.log(result);
   //now if its success we can go and match it 
   
   let open = true

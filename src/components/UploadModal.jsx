@@ -112,14 +112,14 @@ export default function UploadModal({ onClose }) {
 
     const uploadFileEncrypted = async () => {
         setLoading(true)
-        
+
         setUploadStatus("Gathering Authentication");
-        
+
         let api = await getLighthouse(address);
         const jwt = await readJWT(address);
 
         setUploadStatus("Uploading files to lighthouse drive.");
-        
+
         let list = [];
         for (let i = 0; i < files.length; i++) {
 
@@ -223,7 +223,7 @@ export default function UploadModal({ onClose }) {
                         </span>
                     </div>
                 </div>
-                ) : (
+            ) : (
                 <div>
                     <div className="py-4 sm:gap-4 sm:py-5">
                         <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -267,7 +267,7 @@ export default function UploadModal({ onClose }) {
 
                     <Toggle text="Encrypt file" status={encryption} changeStatus={changeStatus} />
                     <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-4">
-                        <ActionButton text={`Upload [${files.length}] files`}  onClick={startUpload}
+                        <ActionButton text={`Upload [${files.length}] files`} onClick={startUpload}
                         />
                     </div>
                 </div>

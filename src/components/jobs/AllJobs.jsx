@@ -1,5 +1,6 @@
 import { useCollection, usePolybase } from "@polybase/react";
 import { useEffect, useState } from "react";
+import LoadingEmpty from "../application/elements/loading/LoadingEmpty";
 import DataNotFound from "../application/elements/message/DataNotFound";
 import JobItem from "./JobItem";
 
@@ -26,8 +27,8 @@ export default function AllJobs({ dataFormat, performed }) {
     
 
 
-  if (loading) { return <p>Loading...</p> }
-  if (error) { return <p>Error: {error}</p> }
+  if (loading) { return <LoadingEmpty /> }
+  if (error) { return <DataNotFound message={error.message} /> }
   
   if(performed){
     return (

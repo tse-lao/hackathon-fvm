@@ -1,7 +1,6 @@
 import Contributions from "@/components/application/data/Contributions";
-import LoadingSpinner from "@/components/application/elements/LoadingSpinner";
+import LoadingFull from "@/components/application/elements/loading/LoadingFull";
 import GrantAccess from "@/components/application/request/GrantAccess";
-import DataFormatPreview from "@/components/marketplace/DataFormatPreview";
 import GenerateDataset from "@/components/marketplace/GenerateDataset";
 import { DB_main } from '@/constants';
 import { useContract } from "@/hooks/useContract";
@@ -111,9 +110,7 @@ export default function GetRequestDetails() {
 
 
   if (loading) return (
-    <Layout title="Request">
-      <LoadingSpinner loadingText="loading the page..." />
-    </Layout>
+   <LoadingFull />
   );
 
   return (
@@ -156,9 +153,6 @@ export default function GetRequestDetails() {
          
               <section aria-labelledby="applicant-information-title">
                 <div className="bg-white shadow sm:rounded-lg flex">
-                  <div className="bg-gray-100 w-1/3 flex flex-col items-center justify-center">
-                    <DataFormatPreview cid={data.result.dataFormatCID} />
-                  </div>
                   <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
                     <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                       <div className="sm:col-span-2">
