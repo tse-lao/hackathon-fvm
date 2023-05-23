@@ -1,3 +1,4 @@
+import { computation, DB_main } from "@/constants/tableland";
 export default async (req, res) => {
 
     var whereStatement = ""
@@ -16,17 +17,17 @@ export default async (req, res) => {
         const url = 'https://testnets.tableland.network/api/v1/query';
         const params = new URLSearchParams({
           statement: `SELECT json_object(
-            'specStart', computation_3141_122.specStart,
-            'specEnd', computation_3141_122.specEnd,
-            'bridgeJobId', computation_3141_122.bridgeJobId,
-            'jobId',  computation_3141_122.jobId,
-            'result', computation_3141_122.result,
-            'creator', computation_3141_122.creator
+            'specStart', ${computation}.specStart,
+            'specEnd', ${computation}.specEnd,
+            'bridgeJobId', ${computation}.bridgeJobId,
+            'jobId',  ${computation}.jobId,
+            'result', ${computation}.result,
+            'creator', ${computation}.creator
             )
-            FROM file_main_80001_6135 JOIN computation_3141_122
-                ON file_main_80001_6135.dbCID = computation_3141_122.input
-            WHERE computation_3141_122.input = file_main_80001_6135.dbCID
-            GROUP BY computation_3141_122.bridgeJobId`,
+            FROM ${DB_main} JOIN ${computation}
+                ON ${DB_main}.dbCID = ${computation}.input
+            WHERE ${computation}.input = ${DB_main}.dbCID
+            GROUP BY ${computation}.bridgeJobId`,
           format: 'objects',
           extract: true,
           unwrap: true,

@@ -16,7 +16,7 @@ export default async (req, res) => {
         const url = 'https://testnets.tableland.network/api/v1/query';
         const params = new URLSearchParams({
           statement: `SELECT json_object(
-                  'tokenID', ${DB_main}.tokenID, 'dbName', dbName,'requiredRows', requiredRows, 'dataFormatCID', dataFormatCID, 'description', description, 'dbCID', dbCID, 'minimumRowsOnSubmission', minimumRowsOnSubmission,
+                  'tokenID', ${DB_main}.tokenID, 'dbName', dbName,'requiredRows', requiredRows, 'dataFormatCID', dataFormatCID, 'description', description, 'dbCID', dbCID, 'minRows', minRows,
                   'attributes', json_group_array(json_object('trait_type',trait_type,'value', value)))
                   FROM ${DB_main} JOIN ${DB_attribute} ON ${DB_main}.tokenID = ${DB_attribute}.tokenID ${whereStatement}`,
             extract: true, format: "objects", unwrap: true

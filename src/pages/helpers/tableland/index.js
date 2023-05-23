@@ -5,6 +5,7 @@ import {
     DB_main,
     DealClientDeals,
     DealRequests,
+    MerkleHelper,
     computation,
     data_contribution
 } from '@/constants/tableland';
@@ -22,6 +23,7 @@ exportsList.push(DB_main);
 exportsList.push(DB_attribute);
 exportsList.push(DealRequests);
 exportsList.push(DealClientDeals);
+exportsList.push(MerkleHelper);
 
 export default function TableLand() {
     const [loading, setLoading] = useState(true);

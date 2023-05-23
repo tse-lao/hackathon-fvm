@@ -3,9 +3,11 @@ import { useIsMounted } from '@/hooks/useIsMounted'
 import { Disclosure, Menu } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { watchAccount } from '@wagmi/core'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
 import { Logo } from './Logo'
+ 
 
 
 function classNames(...classes) {
@@ -15,6 +17,13 @@ function classNames(...classes) {
 export default function Navigation({ active }) {
   const { address } = useAccount();
   const mounted = useIsMounted();
+  
+  const unwatch = watchAccount((account) => {
+    if(account.address != address){
+      window.location.reload();
+    }
+  })
+
   
 
   return (

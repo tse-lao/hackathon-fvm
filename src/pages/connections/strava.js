@@ -1,5 +1,7 @@
 import StravaActivity from "@/components/application/connections/StravaActivity";
 import Connected from "@/components/application/elements/Connected";
+import { OpenButton } from "@/components/application/elements/buttons/OpenButton";
+import DataNotFound from "@/components/application/elements/message/DataNotFound";
 import { getLighthouse, readJWT, uploadCarFileFromCid } from "@/hooks/useLighthouse";
 import { analyzeJSONStructure, getMetadataCID } from "@/lib/dataHelper";
 import lighthouse from '@lighthouse-web3/sdk';
@@ -121,7 +123,7 @@ export default function Strava() {
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center mb-6">
                         <div className="flex items-center">
-                            <Connected handleConnect={authStrava} connected={apiConnected} />
+                          
                             <h1 className="text-2xl font-semibold text-gray-900 ">{name} </h1>
                         </div>
                         <button
@@ -132,12 +134,11 @@ export default function Strava() {
                         </button>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {/* Left column: profile */}
                         <div className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
-                            <h2 className="text-lg font-medium mb-2 text-gray-700">Strava Profile</h2>
+                            <h2 className="text-lg font-medium mb-2 text-gray-700">Connected Profile</h2>
+                            <Connected handleConnect={authStrava} connected={false} />
                             <button
                                 onClick={getProfile}
-
                             >
                                 Get Profile
                             </button>
@@ -152,7 +153,7 @@ export default function Strava() {
                         <div className="space-y-4">
                             <div className="p-4 bg-white rounded-lg shadow-md border border-gray-200 ">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-lg font-medium text-gray-700">Activities</h2>
+                                    <h2 className="text-lg font-medium text-gray-700">Activities [{activities.length}]</h2>
                                     <div>
                                         <button
                                             className="mr-2 py-1 px-3 bg-blue-500 text-white rounded-md"
@@ -174,24 +175,23 @@ export default function Strava() {
                                         <StravaActivity key={activity.id} activity={activity} />
                                     ))
                                 ) : (
-                                    <p className="text-gray-600">No data available. Please load the data.</p>
+                                    <div>
+                                    <DataNotFound message="Please load your activities" />
+                                    <OpenButton onClick={getActivities} text="Get Activities"/>
+                                    </div>
                                 )}
                                 </div>
                             </div>
                             <div className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
                                 <h2 className="text-lg font-medium mb-2 text-gray-700">Ads Preferences</h2>
                                 <ul className="list-disc list-inside text-gray-600">
-                                    {adsPreferences.map((pref, index) => (
-                                        <li key={index}>{pref}</li>
-                                    ))}
+                                   <DataNotFound message="Not yet implemented" />
                                 </ul>
                             </div>
                             <div className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
                                 <h2 className="text-lg font-medium mb-2 text-gray-700">Data Profiles</h2>
                                 <ul className="list-disc list-inside text-gray-600">
-                                    {dataProfiles.map((profile, index) => (
-                                        <li key={index}>{profile}</li>
-                                    ))}
+                                    <DataNotFound message="Not yet implemented" />
                                 </ul>
                             </div>
                         </div>

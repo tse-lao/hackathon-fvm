@@ -155,6 +155,5 @@ export async function getSignature(message){
         
       return null;
     }
-    
-  
+
 }

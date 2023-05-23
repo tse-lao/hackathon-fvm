@@ -5,6 +5,7 @@ import Contributions from '@/components/application/profile/Contributions'
 import ProfileDataSets from '@/components/application/profile/ProfileDataSets'
 import ProfileStats from '@/components/application/profile/ProfileStats'
 import Recommendations from '@/components/application/profile/Recommendations'
+import Repository from '@/components/application/profile/Repository'
 import { useIsMounted } from '@/hooks/useIsMounted'
 import Layout from '@/pages/Layout'
 import { useEffect, useState } from 'react'
@@ -55,6 +56,7 @@ export default function Profile() {
           {select === "DataSets" && <ProfileDataSets creator={address} />}
           {select === "Recommendation" && <Recommendations address={address} />}
           {select === "Files" && <Drive address={address} />}
+          {select === "Groups" && <Repository adress={address} />}
         </div>
       </div>
     

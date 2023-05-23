@@ -86,7 +86,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
 
       setStatus(RECORD_CONTRIBUTION)
       
-      toast.promise(submitData(tokenID, selectedOptions[i], count.toString(), getData.v, getData.r, getData.s), {
+      toast.promise(submitData(tokenID, selectedOptions[i], count.toString(), [], 0,  getData.v, getData.r, getData.s), {
         pending: "Waiting for transaction to confirm 🕐",
         success: "Successfully contributing to the dataset. Thank you for your support.  👌",
         error: "Something went wrong, please try again.. 🤯",
@@ -118,7 +118,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
           <div className="divide-y divide-gray-200 max-h-[400px] overflow-auto outline outline-cf-300 rounded-md ring-cf-200">
             {data.data.length > 0 ? data.data.map((item, index) => (
               
-              <label key={index} className="flex items-center py-4 px-4 hover:bg-gray-100 transition-colors duration-150 cursor-pointer">
+              <label key={index} className={`flex items-center py-4 px-4 hover:bg-gray-100 transition-colors duration-150 cursor-pointer ${options.includes(item.data.cid) && 'bg-cf-200 hover:none'} `}>
                 <input
                   type="checkbox"
                   value={item.data.cid}

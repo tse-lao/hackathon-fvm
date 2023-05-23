@@ -1,11 +1,16 @@
 // components/FileItem.js
 
-import Link from 'next/link';
+import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
+import { OpenButton } from '@/components/application/elements/buttons/OpenButton';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
+import ShareRepoModal from '../repo/ShareRepoModal';
 
 
 export default function DriveItem({ file }) {
   const [showModal, setShowModal] = useState(false);
+  const [shareModal, setShareModal] = useState(false);
+  const router = useRouter();
 
   const handleClick = () => {
     setShowModal(!showModal);
@@ -39,14 +44,12 @@ export default function DriveItem({ file }) {
               <DetailItem label="Metadata" value={file.metadata} />
             </div>
             <div className='flex items-center justify-center py-2'>
-              <Link
-                className='px-4 py-2 text-lg font-bold text-indigo-600 rounded-md z-index-5'
-                href={`/files/${file.cid}`}
-              >
-                View File
-              </Link>
-            </div>
+              <ActionButton onClick={() => router.push(`/files/${file.cid}`)} text="View File" /> 
 
+              <OpenButton onClick={() => setShareModal(!shareModal)} text="Share to Repo" />
+            </div>
+          
+            {shareModal &&  <ShareRepoModal changeOpenModal={setShareModal} cid={file.cid} /> }
 
 
 

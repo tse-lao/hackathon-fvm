@@ -4,6 +4,7 @@ import { getSignature, retrieveMergeCID } from '@/hooks/useLitProtocol';
 import { getContributionSplit } from '@/hooks/useTableland';
 import { ethers } from 'ethers';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
@@ -16,6 +17,7 @@ export default function GenerateDataset({ tokenId, onClose }) {
     const [mergedCID, setMergedCID] = useState(null);
     const [mintPrice, setMintPrice] = useState(0.001);
     const [loading, setLoading] = useState(false);
+
     const router = useRouter();
     const { CreateSpitter, createDB_NFT } = useContract();
     const [payload, setPayload] = useState(null);

@@ -12,8 +12,8 @@ export default async (req, res) => {
                 'dbName', dbName,
                 'description', description,
                 'dbCID', dbCID,
-              'minimumRowsOnSubmission', minimumRowsOnSubmission,
-              'piece_cid', piece_cid,
+                'minRows', minRows,
+                'label', label,
                 'attributes', json_group_array(
                   json_object(
                     'trait_type',trait_type,
