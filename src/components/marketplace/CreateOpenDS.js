@@ -105,6 +105,10 @@ export default function CreateOpenDS({ tokenId, onClose }) {
     };
 
     const submitOpen = async () => {
+        
+        if(formData.description.length < 10 || formData.description.length > 1000){ 
+            toast.error("Your description needs to be between 10 and 1000 characters")
+        }
         setLoading(true)
         console.log(file);
         const contract = await createOpenDataSet(

@@ -1,7 +1,8 @@
 import { ethers } from 'ethers'
-import { MerkleTree } from 'merkletreejs'
 import { toast } from 'react-toastify'
 import { useSigner } from 'wagmi'
+import { MerkleTree } from 'merkletreejs'
+import { SHA256 } from 'crypto-js'
 
 import {
   DBAbi,
@@ -12,10 +13,10 @@ import {
   crossChainBacalhauJobs_address,
   crossChainTablelandDealClientAbi,
   crossChainTablelandDealClientAddress,
-  crossChainTablelandDealRewarderAbi,
-  crossChainTablelandDealRewarderAddress,
   crossChainTablelandStorageAbi,
   crossChainTablelandStorageAddress,
+  crossChainTablelandDealRewarderAbi,
+  crossChainTablelandDealRewarderAddress,
   helper,
   helperAbi,
   splitImplementation,
@@ -134,12 +135,8 @@ export const useContract = () => {
     repoName: string,
     description: string,
     SubmitProof: string[]
-  ) : Promise<any> =>  {
-    const AccessViewleaves = Accessproof.map((x) => ethers.utils.keccak256(x))
-    const ViewTree = new MerkleTree(AccessViewleaves, ethers.utils.keccak256, {
-      sortPairs: true,
-    })
-    const ViewRoot = ViewTree.getHexRoot()
+  ) => {
+
     const AccessSubmitleaves = SubmitProof.map((x) => ethers.utils.keccak256(x))
     const SubmitTree = new MerkleTree(
       AccessSubmitleaves,

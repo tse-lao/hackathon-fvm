@@ -98,7 +98,7 @@ export default function Connections() {
                       (
                           <div>
                           <h2 className="text-lg font-medium mb-2 text-gray-700 overflow-hidden overflow-ellipsis whitespace-nowrap">{connection.name}</h2>
-                          <p className={`text-gray-600 ${connection.status != 'coming soon' && 'text-cf-500'}`}>Status: {connection.status.replace("_", " ")}</p>
+                          <p className={`text-gray-600 ${connection.status == 'ready' && 'text-cf-600'}`}>Status: {connection.status.replace("_", " ")}</p>
                           <p className="text-sm text-gray-400 mt-2">
                               Category: {categories.find((category) => category.value === connection.category).label}
                           </p>

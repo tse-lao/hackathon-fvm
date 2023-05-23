@@ -384,6 +384,10 @@ export async function getAllCategories() {
 
       const data = await response.json();
       // const newArr = data.map(item => {label: item.value},{ value: item.value});
+      
+    if(data.message == "Row not found"){
+      resolve([]);
+    }
 
       let newData = data.map(item => {
         return {
