@@ -14,8 +14,7 @@ const {address} = useAccount();
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        contributors: [],
-        viewers: [],
+        owners: [],
     });
 
 
@@ -24,12 +23,9 @@ const {address} = useAccount();
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleContributors = (tags) => {
-        setFormData({ ...formData, contributors: tags });
-    };
     
     const handleViewers = (tags) => {
-        setFormData({ ...formData, viewers: tags });
+        setFormData({ ...formData, owners: tags });
     };
     
 
@@ -38,28 +34,30 @@ const {address} = useAccount();
         // Process the form data and send it to the server or API endpoint.
         console.log(formData);
         
-        if(formData.name.length > 3 || formData.name.length < 50 ){
-            toast.error("Repository name must be between.")
+        if(formData.name.length < 3 || formData.name.length > 250 ){
+            toast.error("Repository name must be between 3 and 250 characters.")
+            return;
         }
-        if(formData.description.length > 10 || formData.name.length < 1000 ){
+        if(formData.description.length < 10 || formData.description.length > 1000 ){
             toast.error("Description should be between 1000.");
+            return;
         }
         
-        formData.viewers.push(address);
-        formData.contributors.push(address);
-        console.log(formData.viewers)
-        console.log(formData.contributors)
+        formData.owners.push(address);
         
         toast.promise(createPrivateRepo(
             formData.name,
             formData.description,
-            formData.viewers,
-            formData.contributors
+            formData.owners
           ), 
           {
             pending: "Creating Repository...",
             success: "Repository Created.",
             error: "Error creating repository."
+          }).then((result) => {
+            if(result){
+                window.location.reload();
+            }
           });
        
     };
@@ -82,17 +80,10 @@ const {address} = useAccount();
                     onChange={handleChange}
                 />
                 <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-700">Viewers</label>
+                    <label className="text-sm font-medium text-gray-700">Owners</label>
                     <TagsInput
-                        value={formData.viewers}
+                        value={formData.owners}
                         onChange={handleViewers}
-                    />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-700">Contributors</label>
-                    <TagsInput
-                        value={formData.contributors}
-                        onChange={handleContributors}
                     />
                 </div>
                 <ActionButton text

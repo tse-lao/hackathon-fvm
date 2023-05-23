@@ -94,8 +94,8 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
 
     return (
         <ModalLayout title="Share to Repo" onClose={changeOpenModal}>
-            <div className="flex flex-col gap-4">
-                <div className="divide-y divide-gray-200 max-h-[400px] overflow-auto outline outline-cf-300 rounded-md ring-cf-200">
+            <div className="flex flex-col gap-4 mt-8">
+                <div className="divide-y divide-gray-200 max-h-[400px] overflow-auto outline outline-cf-300 rounded-md ring-cf-200 mb-8">
                     {repos.length > 0 ? repos.map((item, index) => (
 
                         <label key={index} className={`flex items-center py-4 px-4 hover:bg-gray-100 transition-colors duration-150 cursor-pointer `}>

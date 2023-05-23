@@ -177,7 +177,7 @@ export default function ViewFile() {
 
                     <div className="flex flex-col md:flex-row mt-4 space-y-4 md:space-y-0 md:space-x-4">
                         {/* File content */}
-                        <div className="flex-grow p-4 bg-white shadow-sm rounded-lg mr-4">
+                        <div className="flex-grow p-4 bg-white shadow-sm rounded-lg mr-4 border w-full overflow-scroll">
                             {fileInfo.encryption && fileURL == null ? (
                                 <SimpleDecrypted startDecrypt={decrypt} />
                             ) : (

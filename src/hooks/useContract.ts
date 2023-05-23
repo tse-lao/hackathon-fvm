@@ -1,8 +1,7 @@
 import { ethers } from 'ethers'
+import { MerkleTree } from 'merkletreejs'
 import { toast } from 'react-toastify'
 import { useSigner } from 'wagmi'
-import { MerkleTree } from 'merkletreejs'
-import { SHA256 } from 'crypto-js'
 
 import {
   DBAbi,
@@ -13,10 +12,10 @@ import {
   crossChainBacalhauJobs_address,
   crossChainTablelandDealClientAbi,
   crossChainTablelandDealClientAddress,
-  crossChainTablelandStorageAbi,
-  crossChainTablelandStorageAddress,
   crossChainTablelandDealRewarderAbi,
   crossChainTablelandDealRewarderAddress,
+  crossChainTablelandStorageAbi,
+  crossChainTablelandStorageAddress,
   helper,
   helperAbi,
   splitImplementation,
@@ -145,21 +144,37 @@ export const useContract = () => {
     )
     const SubmitRoot = SubmitTree.getHexRoot()
 
-    const tx = await DB_NFT.createPrivateRepo(
-      repoName,
-      description,
-      SubmitProof,
-      SubmitRoot,
-      { gasLimit: 1000000 }
-    )
-    return await tx.wait()
+    
+    try {
+      const tx = await DB_NFT.createPrivateRepo(
+        repoName,
+        description,
+        SubmitProof,
+        SubmitRoot,
+        { gasLimit: 1000000 }
+      )
+
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
   }
 
 
   const updateRepoSubmitAccessControl = async (
     tokenId: number,
     SubmitProof: string[]
-  ) => {
+  ): Promise<any> => {
     const AccessSubmitleaves = SubmitProof.map((x) => ethers.utils.keccak256(x))
     const SubmitTree = new MerkleTree(
       AccessSubmitleaves,
@@ -167,14 +182,29 @@ export const useContract = () => {
       { sortPairs: true }
     )
     const SubmitRoot = SubmitTree.getHexRoot()
+    try {
+      const tx = await DB_NFT.setRepoSubmitAccess(
+        tokenId,
+        SubmitProof,
+        SubmitRoot,
+        { gasLimit: 1000000 }
+      )
 
-    const tx = await DB_NFT.setRepoSubmitAccess(
-      tokenId,
-      SubmitProof,
-      SubmitRoot,
-      { gasLimit: 1000000 }
-    )
-    return await tx.wait()
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+   
   }
 
   // ================================ SUBMITTING DATA AND NFT CREATION ======================================== //

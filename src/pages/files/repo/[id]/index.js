@@ -1,14 +1,13 @@
+import { ActionButton } from "@/components/application/elements/buttons/ActionButton";
 import LoadingFull from "@/components/application/elements/loading/LoadingFull";
+import DataNotFound from "@/components/application/elements/message/DataNotFound";
 import { DB_main } from "@/constants";
-import { DB_NFT_address } from "@/constants/contractAddress";
 import { useContract } from "@/hooks/useContract";
-import { readJWT } from "@/hooks/useLighthouse";
-import { shareAccessToRepo } from "@/lib/shareAccessToRepo";
 import Layout from "@/pages/Layout";
-import lighthouse from "@lighthouse-web3/sdk";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import TagsInput from "react-tagsinput";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 
@@ -17,11 +16,13 @@ export default function Repo() {
   const [repo, setRepo] = useState({});
   const [files, setFiles] = useState([]);
   const [access, setAccess] = useState([]);
-  const { submitData, hasAccess } = useContract();
+  const { updateRepoSubmitAccessControl } = useContract();
   const [userAccess, setUserAccess] = useState(false);
+  const [newAddresses, setNewAddresses] = useState([]);
   const router = useRouter();
   const { address } = useAccount();
   const { id } = router.query;
+  
   useEffect(() => {
     const fetchData = async () => {
       const result = await fetch(`/api/tableland/token/all?where= WHERE  ${DB_main}.tokenID=${id}`);
@@ -73,88 +74,30 @@ export default function Repo() {
   }
 
 
-  const provideData = async () => {
+  const provideAccess = async () => {
 
-    const result = await shareAccessToRepo(id, madrid, address)
+    
 
-    toast.promise(submitData(
-      result.token,
-      result.cid,
-      result.count,
-      result.array,
-      result.index,
-      result.v,
-      result.r,
-      result.s
+    const addresses = access.map((item) => item.address);
+
+    console.log(addresses);
+    
+    if (addresses.length < 1) {
+      toast.error("Could not find the access controls.");
+      return;
+    }
+    let proof = [...addresses, ...newAddresses]; 
+    console.log(proof);
+
+    toast.promise(updateRepoSubmitAccessControl(
+      id, 
+      proof
     ), {
       pending: "Submitting Data...",
       success: "Data Submitted.",
       error: "Error submitting data."
 
     })
-
-  }
-
-  const applyAccessConditions = async (cid) => {
-
-    const result = await getHexProof();
-
-    console.log(result);
-    const conditions = [
-      {
-        id: 1,
-        chain: "Mumbai",
-        method: "hasRepoAccess",
-        standardContractType: "Custom",
-        contractAddress: DB_NFT_address,
-        returnValueTest: {
-          comparator: "==",
-          value: "true"
-        },
-        parameters: [id, result, ":userAddress"],
-        inputArrayType: ["uint256", "bytes32[]", "address"],
-        outputType: "bool"
-      }
-    ];
-
-
-
-    // Aggregator is what kind of operation to apply to access conditions
-    // Suppose there are two conditions then you can apply ([1] and [2]), ([1] or [2]), !([1] and [2]).
-    const aggregator = "([1])";
-    const jwt = await readJWT(address);
-
-
-    /*
-      accessCondition(publicKey, cid, signedMessage, conditions, aggregator)
-        Parameters:
-          publicKey: owners public key
-          CID: CID of the file to decrypt
-          signedMessage: message signed by the owner of publicKey
-          conditions: should be in a format like above
-          aggregator: aggregator to apply conditions
-    */
-
-    console.log(cid);
-    const response = await lighthouse.applyAccessCondition(
-      address,
-      cid,
-      jwt,
-      conditions,
-      aggregator
-    );
-
-    console.log(response)
-
-    return response;
-    /*
-      {
-        data: {
-          cid: "QmZkEMF5y5Pq3n291fG45oyrmX8bwRh319MYvj7V4W4tNh",
-          status: "Success"
-        }
-      }
-    */
   }
 
 
@@ -164,11 +107,12 @@ export default function Repo() {
     return (
       <Layout>
         <div className="p-4">
-          <h2 className="text-2xl font-bold mb-4">{repo?.dbName}</h2>
-          <p className="text-lg mb-4">{repo?.description}</p>
+          <h2 className="text-2xl font-bold mb-4">{repo.dbName}</h2>
+          <p className="text-lg mb-4">{repo.description}</p>
 
-          <div className="grid grid-cols-3 gap-4">
-            {files?.map((file, index) => (
+          <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-3">
+            {files.length ? files.map((file, index) => (
               <div key={index} className="border rounded-md p-6 bg-white gap-4">
                 <Link href={`/files/${file.dataCID}`}>
                   <span className="text-blue-500 hover:underline block overflow-hidden whitespace-nowrap text-sm overflow-ellipsis">{file.dataCID}</span>
@@ -177,7 +121,29 @@ export default function Repo() {
                 <p className="text-gray-500 text-xs overflow-hidden whitespace-nowrap overflow-ellipsis mt-6">Created by: {file.creator}</p>
                 </Link>
               </div>
-            ))}
+            )): <DataNotFound message="No files found." />}
+            </div>
+            <div>
+                <div className="">
+                  <ul className="">
+                    {
+                      access.map((item, index) => (
+                        <li key={index} className="border rounded-md p-6 bg-white gap-4 m-2">
+                          <p className="text-gray-500 text-xs overflow-hidden whitespace-nowrap overflow-ellipsis ">Address: {item.address}</p>
+                        </li>
+                        ))}
+                  </ul>
+                        <TagsInput
+                          value={newAddresses}
+                          onChange={(e) => setNewAddresses(e)}
+                        />
+                        
+                        <ActionButton 
+                          onClick={provideAccess}
+                          text="Provide Access"
+                          />
+                </div>
+            </div>
           </div>
           </div>
       </Layout>
