@@ -1,6 +1,3 @@
-
-4. Open your browser and visit `http://localhost:3000` to view the app.
-
 ## 🛠️ Built With
 
 - [Next.js](https://nextjs.org/)
@@ -8,7 +5,11 @@
 - [Tailwind CSS](https://tailwindcss.com/)
 - [ethers.js](https://web3js.readthedocs.io/en/v1.3.4/)
 
-## 🙋‍♂️ Contributing
+## 🧑‍💻Technologies Used 🤖
+# Tableland
+
+# Lighthouse
+# Polybase
 
 We built this for the FVM Dataverse Hackathon 2023 . 
 
@@ -26,3 +27,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 - [Polybase](https://polybase.xyz/)
 - [IPFS](https://ipfs.io/)
 - All contributors and supporters
+
+ Open your browser and visit `http://localhost:3000` to view the app.
