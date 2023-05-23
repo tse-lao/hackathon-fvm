@@ -31,9 +31,9 @@ export default function Layout({children, active}) {
   return (
     <div className="min-h-full">
       <Head>
-        <title>Connect Fast - {active}</title>
+        <title>DataBridge </title>
         <link rel="icon" href="/favicon.ico" />
-        <meta name="description" content="Connect Fast, collect and store your private data in a secure way!" />
+        <meta name="description" content="Bridging your data securely, fast and with full control." />
       </Head>
       <Navigation active={active}/>
         <main className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8 p-12 rounded-md">
