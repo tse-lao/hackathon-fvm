@@ -17,9 +17,9 @@ Authors
 
 ## Description
 DataBridge empowers decentralized data management. Collaborate to create valuable datasets, conduct verifiable computations, and seamlessly store on Filecoin. Experience the future of data curation
-## What it does?
 ## Inspiration
 Our inspiration for the DataBridge platform came from the need to revolutionize data management, collaboration, user empowerment, and low-cost permanent files in a decentralized manner. We recognized the growing demand for a secure and efficient solution to curate, collaborate, and create decentralized valuable datasets. Additionally, we saw the opportunity to bridge the gap between centralized data pools and the decentralized Filecoin network, allowing users to seamlessly onboard valuable data onto a secure and transparent platform.
+## What it does?
 
  DataBridge is a decentralized application (DApp) designed to fulfill these needs it functions as a database aggregator. DataBridge empowers users to create decentralized databases (DBs) and request contributions from others. Once a DB reaches a predetermined threshold, the requestor can create a DB NFT. To ensure fair distribution of token minting revenues to DB contributors, our platform utilizes a splitter contract created using the thirdWeb splitter contract factory. 
  
@@ -37,16 +37,16 @@ Tableland is the backbone of DataBridge, serving as the primary decentralized da
 - [db nft attributes table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20attribute_table_80001_6376)
 - [db nfts contributoins table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20contribution_table_80001_6374)
 - [merkle tree helper table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20merkleHelper_table_80001_6377)
-- [Bacalhau jobs table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20computation_3141_169)
+- [Bacalhau jobs table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20computation_3141_122)
 - [deal client deal requests](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20request_3141_93)
 - [deal client deals table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20deal_3141_94)
-- [bounties table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20BountiesTable)
+- [bounties table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20bounty_3141_165)
 - [Bounty claims table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20claim_3141_166)
 
 # Polybase
 DataBridge utilizes Polybase to store and manage file metadata, allowing users to view and replicate their files within their profiles. This integration ensures that users can easily access and manage their valuable data. By leveraging Polybase, DataBridge creates a user-friendly environment, promoting efficient data exploration and collaboration among users.
 
-#Smart Contracts
+# Smart Contracts
 
 
 CONTRACT CODE  | EXPLORER
