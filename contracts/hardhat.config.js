@@ -17,8 +17,8 @@ module.exports = {
             },
         },
     },
-    defaultNetwork: "mumbai",
-    // defaultNetwork: "hyperspace",
+    // defaultNetwork: "mumbai",
+    defaultNetwork: "hyperspace",
 
     networks: {
         localnet: {

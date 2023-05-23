@@ -378,7 +378,6 @@ export const useContract = () => {
 
   const createBounty = async (
     label: string,
-    piece_cid_bytes: number,
     cidHex: string,
     location_ref: number,
     size: string
@@ -386,7 +385,6 @@ export const useContract = () => {
     try {
       const tx = await TablelandBountyRewarder.createBounty(
         label,
-        piece_cid_bytes,
         cidHex,
         location_ref,
         size
@@ -532,7 +530,6 @@ export const useContract = () => {
     makeDealProposal,
     hasRepoAccess,
     createPrivateRepo,
-    updateRepoViewAccessControl,
     updateRepoSubmitAccessControl,
     claimBounty,
     createBounty,

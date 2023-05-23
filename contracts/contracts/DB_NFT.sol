@@ -128,6 +128,7 @@ contract DB_NFT is ERC1155, Ownable {
         string[] memory SubmitProof,
         bytes32 SubmitRoot
     ) public {
+        require(SubmitProof.length > 0, "wrong input whitelisted address array must be greater than 0");
         tokenID.increment();
         uint256 tokenId = tokenID.current();
         dbInfoMap[tokenId].creator = msg.sender;
