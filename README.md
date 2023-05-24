@@ -30,8 +30,15 @@ Our inspiration for the DataBridge platform came from the need to revolutionize 
 
 ## Lighthouse
 Lighthouse plays a pivotal role in DataBridge as a robust encryption and decryption tool. It empowers users by providing a secure environment to encrypt and decrypt files using Lighthouse JWT tokens. With Lighthouse, users can onboard easily files and DBs into the platform. The backend utilizes Lighthouse to encrypt the file contents with sharing and custom access control teqniques and securely uploads the encrypted version to IPFS. DataBridge leverages Lighthouse's data depot service in the backend to retrieve all necessary file information for creating deals on Filecoin using the dealClient or dealRewarder contracts. Lighthouse ensures data confidentiality and integrity, enabling seamless file onboarding and secure storage within DataBridge.
+
+- [useLighthouse](https://github.com/tse-lao/hackathon-fvm/blob/master/src/hooks/useLighthouse.js)
+- [Lighthouse user on-boarding](https://github.com/tse-lao/hackathon-fvm/blob/master/src/pages/profile/onboarding/index.js)
 ## Tableland
 Tableland is the backbone of DataBridge, serving as the primary decentralized database and enabling efficient data management and access control. It seamlessly connects files, DB filecoin deals, computations, and private repositories through cross-chain table queries. With Tableland, we establish a decentralized Merkle tree-based access control mechanism, by adding the storing into the tables the allowlisted addresses. This integration streamlines access control management, providing a secure and reliable environment for storing and managing DB files, deals, computations, and private repos.
+
+ - [useTableland](https://github.com/tse-lao/hackathon-fvm/blob/master/src/hooks/useTableland.js)
+ - [Tableland api](https://github.com/tse-lao/hackathon-fvm/tree/master/src/pages/api/tableland)
+
 ####Tables:
 
 - [db nft main table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20main_table_80001_6375)
@@ -45,7 +52,10 @@ Tableland is the backbone of DataBridge, serving as the primary decentralized da
 - [Bounty claims table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20claim_3141_166)
 
 # Polybase
-DataBridge utilizes Polybase to store and manage file metadata, allowing users to view and replicate their files within their profiles. This integration ensures that users can easily access and manage their valuable data. By leveraging Polybase, DataBridge creates a user-friendly environment, promoting efficient data exploration and collaboration among users.
+DataBridge utilizes Polybase to store and manage file metadata, allowing users to view and replicate their files within their profiles. This integration ensures that users can easily access and manage their valuable data. By leveraging Polybase, DataBridge creates a user-friendly environment, promoting efficient data exploration and collaboration among users. We also plan to add likes and comments to each database and other features that will help the end users.
+
+- [usePolybase](https://github.com/tse-lao/hackathon-fvm/blob/master/src/hooks/usePolybase.js)
+- [polybase api](https://github.com/tse-lao/hackathon-fvm/tree/master/src/pages/api/polybase)
 
 # Smart Contracts
 
@@ -56,6 +66,16 @@ CONTRACT CODE  | EXPLORER
 [tableland.Bacalhau.Jobs code](https://github.com/tse-lao/hackathon-fvm/blob/master/contracts/contracts/tablelandBacalhauJobs.sol) | [filfoxBacalhauJobs](https://hyperspace.filfox.info/en/address/0x86D9F60d0eaCD6004a123a4F67B67d26B569Fd9C)
 [tableland.Deal.Client code](https://github.com/tse-lao/hackathon-fvm/blob/master/contracts/contracts/tablelandDealClient.sol) | [filfoxDealClient](https://hyperspace.filfox.info/en/address/0xa8B737d368e46Cd98AcCa537691115C767016CC5)
 [tableland.Deal.Rewarder code](https://github.com/tse-lao/hackathon-fvm/blob/master/contracts/contracts/tablelandDealRewarder.sol) | [filfoxDealRewarder](https://hyperspace.filfox.info/en/address/0xB34133c7F97Bc3B66dD41ac9e5BFB3358A587490)
+
+- [useContract](https://github.com/tse-lao/hackathon-fvm/blob/master/src/hooks/useContract.ts)
+
+# DataBridge Files Utilities
+
+- [Files utilities](https://github.com/tse-lao/hackathon-fvm/tree/master/src/pages/api/files)
+
+# WEB2 to WEB3 data bridge
+
+- [WEB2 Connections](https://github.com/tse-lao/hackathon-fvm/tree/master/src/pages/connections)
 
 ## 🥳 UseCase Diagrams 👀
 
