@@ -44,6 +44,7 @@ module.exports = {
     },
     etherscan: {
         apiKey: "XAP64G9KV63W7FDW6V7IXGF4E1KMD7E2KK",
+        customChains: [],
     },
     paths: {
         sources: "./contracts",

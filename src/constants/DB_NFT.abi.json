@@ -373,9 +373,9 @@
                 "type": "string"
             },
             {
-                "internalType": "string[]",
+                "internalType": "address[]",
                 "name": "SubmitProof",
-                "type": "string[]"
+                "type": "address[]"
             },
             {
                 "internalType": "bytes32",
@@ -590,9 +590,9 @@
                 "type": "uint256"
             },
             {
-                "internalType": "string[]",
+                "internalType": "address[]",
                 "name": "SubmitProof",
-                "type": "string[]"
+                "type": "address[]"
             },
             {
                 "internalType": "bytes32",
