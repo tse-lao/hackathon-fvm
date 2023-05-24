@@ -50,13 +50,13 @@ Tableland is the backbone of DataBridge, serving as the primary decentralized da
 - [bounties table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20bounty_3141_165)
 - [Bounty claims table](https://testnets.tableland.network/api/v1/query?statement=SELECT%20*%20FROM%20claim_3141_166)
 
-# Polybase
+## Polybase
 DataBridge utilizes Polybase to store and manage file metadata, allowing users to view and replicate their files within their profiles. This integration ensures that users can easily access and manage their valuable data. By leveraging Polybase, DataBridge creates a user-friendly environment, promoting efficient data exploration and collaboration among users. We also plan to add likes and comments to each database and other features that will help the end users.
 
 - [usePolybase](https://github.com/tse-lao/hackathon-fvm/blob/master/src/hooks/usePolybase.js)
 - [polybase api](https://github.com/tse-lao/hackathon-fvm/tree/master/src/pages/api/polybase)
 
-# Smart Contracts
+## Smart Contracts
 
 
 CONTRACT CODE  | EXPLORER
@@ -68,11 +68,11 @@ CONTRACT CODE  | EXPLORER
 
 - [useContract](https://github.com/tse-lao/hackathon-fvm/blob/master/src/hooks/useContract.ts)
 
-# DataBridge Files Utilities
+## DataBridge Files Utilities
 
 - [Files utilities](https://github.com/tse-lao/hackathon-fvm/tree/master/src/pages/api/files)
 
-# WEB2 to WEB3 data bridge
+## WEB2 to WEB3 data bridge
 
 - [WEB2 Connections](https://github.com/tse-lao/hackathon-fvm/tree/master/src/pages/connections)
 
