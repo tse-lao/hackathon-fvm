@@ -52,7 +52,7 @@ DataBridge utilizes Polybase to store and manage file metadata, allowing users t
 
 CONTRACT CODE  | EXPLORER
 ------------- | -------------
-[DB.NFTs code](https://github.com/tse-lao/hackathon-fvm/blob/master/contracts/contracts/DB_NFT.sol)  | [Mumba DB NFTs](https://mumbai.polygonscan.com/address/0x764F56e1953e4dAC1d4c02fAaa5dF3c0DE9b77a2)
+[DB.NFTs code](https://github.com/tse-lao/hackathon-fvm/blob/master/contracts/contracts/DB_NFT.sol)  | [Mumbai DB NFTs](https://mumbai.polygonscan.com/address/0x764F56e1953e4dAC1d4c02fAaa5dF3c0DE9b77a2)
 [tableland.Bacalhau.Jobs code](https://github.com/tse-lao/hackathon-fvm/blob/master/contracts/contracts/tablelandBacalhauJobs.sol) | [filfoxBacalhauJobs](https://hyperspace.filfox.info/en/address/0x86D9F60d0eaCD6004a123a4F67B67d26B569Fd9C)
 [tableland.Deal.Client code](https://github.com/tse-lao/hackathon-fvm/blob/master/contracts/contracts/tablelandDealClient.sol) | [filfoxDealClient](https://hyperspace.filfox.info/en/address/0xa8B737d368e46Cd98AcCa537691115C767016CC5)
 [tableland.Deal.Rewarder code](https://github.com/tse-lao/hackathon-fvm/blob/master/contracts/contracts/tablelandDealRewarder.sol) | [filfoxDealRewarder](https://hyperspace.filfox.info/en/address/0xB34133c7F97Bc3B66dD41ac9e5BFB3358A587490)
