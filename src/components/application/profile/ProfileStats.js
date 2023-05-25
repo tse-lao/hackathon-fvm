@@ -37,13 +37,15 @@ export default function ProfileStats({ address }) {
 
         });
 
-
-      newStats.push(
+console.log(userBalance)
+        if(userBalance){
+          newStats.push(
         {
           name: 'Balance',
           current: userBalance.formatted,
+        })
         }
-      )
+      
       //get current ETH balance
       setStats(newStats)
     }
