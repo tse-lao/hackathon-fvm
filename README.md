@@ -8,11 +8,16 @@
 
 ## FVM Dataverse Hackathon 2023 Submission 🚀🧑‍🚀. 
 
-[Demo video](https://www.youtube.com/watch?v=1scDw7K2KPU)
-[dapp link](https://hackathon-fvm-fj45.vercel.app/)
+- [Demo video](https://www.youtube.com/watch?v=1scDw7K2KPU)
+- [dapp link](https://hackathon-fvm-fj45.vercel.app/)
+
+#### New updates from the post-hack branch
+Web2 authentication has been successfully implemented <br>
+to create a seamless onboarding experience for the masses! 🌐✨
+- [post-hack-dapp-link](https://datahub-three.vercel.app/)
 
 
-Authors
+**Authors**
  * [nijoe1](https://github.com/nijoe1)
  * [tse-lao](https://github.com/tse-lao)
 
@@ -55,6 +60,8 @@ DataBridge utilizes Polybase to store and manage file metadata, allowing users t
 
 - [usePolybase](https://github.com/tse-lao/hackathon-fvm/blob/master/src/hooks/usePolybase.js)
 - [polybase api](https://github.com/tse-lao/hackathon-fvm/tree/master/src/pages/api/polybase)
+- [FilesColection](https://explorer.testnet.polybase.xyz/studio/pk%2F0xd89cd07b2a59a0059a9001225dc6f2e27c207cc2e8df89c9f4dfcb1673f1c25b201619d55d529a0c016ea157b79abbfd26b9e57405a1de29682df4c215e32dd2%2FHACK/collections/File)
+- [BacalhauJobsCollection](https://explorer.testnet.polybase.xyz/studio/pk%2F0xd89cd07b2a59a0059a9001225dc6f2e27c207cc2e8df89c9f4dfcb1673f1c25b201619d55d529a0c016ea157b79abbfd26b9e57405a1de29682df4c215e32dd2%2FHACK/collections/Jobs)
 
 ## Smart Contracts
 
