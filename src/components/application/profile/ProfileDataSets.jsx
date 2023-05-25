@@ -2,7 +2,7 @@ import { getNfts } from '@/hooks/useBlockchain';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Toggle from '../Toggle';
-import LoadingSpinner from '../elements/LoadingSpinner';
+import LoadingEmpty from '../elements/loading/LoadingEmpty';
 
 export default function ProfileDataSets({ creator }) {
   const [data, setData] = useState([])
@@ -31,7 +31,7 @@ export default function ProfileDataSets({ creator }) {
     }
   }, [creator, created])
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingEmpty />;
   return (
     <div className="w-full flex flex-col gap-8">
     <div className='flex justify-end'>

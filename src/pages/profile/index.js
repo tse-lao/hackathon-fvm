@@ -1,7 +1,6 @@
-import Avatar from '@/components/application/elements/Avatar'
-import Tabs from '@/components/application/elements/Tabs'
-import ProfileStats from '@/components/application/profile/ProfileStats'
-import Layout from '@/pages/Layout'
+
+import Avatar from "@/components/application/elements/Avatar"
+import Layout from "@/components/application/profile/ProfileStats"
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
 

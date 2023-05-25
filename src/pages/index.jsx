@@ -1,5 +1,5 @@
 import Tabs from '@/components/application/elements/Tabs'
-import LoadingIcon from '@/components/application/elements/loading/LoadingIcon'
+import LoadingFull from '@/components/application/elements/loading/LoadingFull'
 import Drive from '@/components/application/files/organised/Drive'
 import Contributions from '@/components/application/profile/Contributions'
 import ProfileDataSets from '@/components/application/profile/ProfileDataSets'
@@ -21,7 +21,7 @@ const tabs = [
 
 
 export default function Profile() {
-  const { address } = useAccount()
+  const { address, isConnected, status } = useAccount()
   const [select, setSelect] = useState("Contributions")
   const [loading, setLoading] = useState(true)
   const mounted = useIsMounted()
@@ -33,19 +33,19 @@ export default function Profile() {
       setLoading(false)
     }
     
-  }, [address, mounted])
+  }, [])
 
 
   const setSelected = (tab) => {
     setSelect(tab)
     mounted && setLoading(false)
   }
+  console.log(status)
 
 
-  if (loading) { return <LoadingIcon height={64} /> }
 
+  if(isConnected) { 
   return (
-
     <Layout active="Dashboard">
       <ProfileStats address={address} />
 
@@ -61,8 +61,13 @@ export default function Profile() {
       </div>
     
     </Layout>
-
-
   )
-}
+  }
+
+    return <LoadingFull />
+  
+  }
+
+
+    
 

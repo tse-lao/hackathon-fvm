@@ -1,10 +1,9 @@
 "use client"
 import { formatBytes } from '@/lib/helpers';
 import lighthouse from '@lighthouse-web3/sdk';
-import { ethers } from 'ethers';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
 
 export default function ProfileStats({ address }) {
   const {address: ownAddress} = useAccount()
@@ -13,10 +12,12 @@ export default function ProfileStats({ address }) {
     { name: 'Contributions', current: 'loading...' },
     { name: 'Balance', current: 'loading...', total: 'loading...' },
   ])
-
+  const {data: userBalance} = useBalance({address})
+  
   useEffect(() => {
     const newStats = []
     const getBalance = async () => {
+      console.log(address)
       const balance = await lighthouse.getBalance(address);
       newStats.push(
         {
@@ -37,19 +38,20 @@ export default function ProfileStats({ address }) {
         });
 
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const userBalance = await provider.getBalance(address)
       newStats.push(
         {
           name: 'Balance',
-          current: parseFloat(ethers.utils.formatEther(userBalance, 'ether')).toFixed(6),
+          current: userBalance.formatted,
         }
       )
       //get current ETH balance
       setStats(newStats)
     }
     
+    if(address){
       getBalance()
+      
+    }
     
   }, [address])
 

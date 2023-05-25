@@ -3,13 +3,15 @@ import { readBlobAsJson } from '@/lib/dataHelper';
 import { getCurrentDateAsString } from '@/lib/helpers';
 import { getJWT } from '@lighthouse-web3/kavach';
 import lighthouse from '@lighthouse-web3/sdk';
-import { ethers } from 'ethers';
+import { fetchSigner } from '@wagmi/core';
 import MatchRecord from './useBlockchain';
 
-export async function signAuthMessage() {
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
+
+export async function signAuthMessage() {
+  const signer = await fetchSigner();
+  
+  console.log(signer);
   const address = await signer.getAddress();
   const messageRequested = (await lighthouse.getAuthMessage(address)).data.message;
   const signedMessage = await signer.signMessage(messageRequested);
@@ -72,9 +74,14 @@ export async function grantSmartAccess(cid, tokenID, minRows) {
 
 export async function readJWT(address) {
   
+  
   const jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
   
-  if(jwt) { return jwt }
+  
+if(jwt && jwt !== null) { 
+  console.log(jwt);
+  return jwt 
+  }
   
   const { signedMessage, publicKey } = await signAuthMessage();
   const response = await getJWT(publicKey, signedMessage);
@@ -94,17 +101,8 @@ export async function uploadCarFile(
       form.append("file", item);
     });
 
-    const config = {
-      onUploadProgress: (progressEvent) => {
-        let percentageUploaded =
-          (progressEvent?.loaded / progressEvent?.total) * 100;
-
-        setUploadedProgress(percentageUploaded.toFixed(2));
-      },
-    };
-
-    const sec = "https://data-depot.lighthouse.storage/api"
-    const endpoint = `${sec}/upload/upload_files`
+    const url = "https://data-depot.lighthouse.storage/api"
+    const endpoint = `${url}/upload/upload_files`
 
     console.log(endpoint)
     let check = await fetch(endpoint, {
@@ -115,14 +113,12 @@ export async function uploadCarFile(
       body: form
     })
 
-    console.log(check)
-
     const result = await check.json()
-    console.log(result)
-
+    
+    resolve(result)
 
   } catch (error) {
-    console.log(`Something Went Wrong : ${error}`, "error");
+    console.log(error)
   }
 };
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import LoadingSpinner from "../elements/LoadingSpinner";
+import LoadingEmpty from "../elements/loading/LoadingEmpty";
 import ContributionItem from "./ContributionItem";
 
 
@@ -24,7 +24,7 @@ export default function Contributions({creator}) {
 
     }, [creator])
     
-    if(loading) return (<LoadingSpinner msg="Loading Contributions" />);
+    if(loading) return (<LoadingEmpty />);
   return (
     <div className="grid md:grid-cols-2 flex-wrap gap-4 mt-8">
         {data.length > 0 ? data.map((item, index) => (

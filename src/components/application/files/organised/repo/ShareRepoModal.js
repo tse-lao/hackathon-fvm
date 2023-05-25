@@ -14,7 +14,7 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
     
     useEffect(() => {
         const fetchData = async (id) => {
-            const result = await fetch(`/api/tableland/merkle/all?where= WHERE ${MerkleHelper}.address='${address }'`);
+            const result = await fetch(`/api/tableland/merkle/all?where= WHERE ${MerkleHelper}.address='${address.toLowerCase()}'`);
             const data = await result.json();
           console.log(data);
           setRepos(data.result);

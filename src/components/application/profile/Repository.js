@@ -16,7 +16,7 @@ export default function Repository() {
     
     useEffect(() => {
       const fetchData = async (id) => {
-        const result = await fetch(`/api/tableland/merkle/all?where= WHERE ${MerkleHelper}.address='${address }'`);
+        const result = await fetch(`/api/tableland/merkle/all?where= WHERE ${MerkleHelper}.address='${address.toLowerCase()}'`);
         const data = await result.json();
         console.log(data.result);
         setRepos(data.result);

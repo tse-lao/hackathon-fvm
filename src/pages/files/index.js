@@ -1,4 +1,5 @@
 import UploadModal from '@/components/UploadModal';
+import LoadingFull from '@/components/application/elements/loading/LoadingFull';
 import Drive from '@/components/application/files/organised/Drive';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import Layout from '../Layout';
 
 export default function Files() {
     const mounted = useIsMounted();
-    const { address } = useAccount();
+    const { address, isConnected } = useAccount();
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     
@@ -15,8 +16,8 @@ export default function Files() {
         setIsModalOpen(!isModalOpen);
     };
 
+    if(isConnected) {
     return (
-        mounted &&(
             <Layout title='Files' active="Files">
 
                 <div className="px-4 sm:px-6 lg:px-8">
@@ -43,6 +44,6 @@ export default function Files() {
                 {isModalOpen && <UploadModal onClose={() => setIsModalOpen(false)} />}
             </Layout>
         )
-
-    )
+    }
+    return <LoadingFull />
 }

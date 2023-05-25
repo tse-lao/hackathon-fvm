@@ -1,12 +1,10 @@
 /* 交流QQ群:七5457三七7八 */
-import { useIsMounted } from '@/hooks/useIsMounted'
 import { Disclosure, Menu } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { watchAccount } from '@wagmi/core'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
 import { Logo } from './Logo'
+import LoginButton from './application/elements/buttons/LoginButton'
  
 
 
@@ -16,13 +14,7 @@ function classNames(...classes) {
 
 export default function Navigation({ active }) {
   const { address } = useAccount();
-  const mounted = useIsMounted();
-  
-  const unwatch = watchAccount((account) => {
-    if(account.address != address){
-      window.location.reload();
-    }
-  })
+
 
   
 
@@ -96,12 +88,7 @@ export default function Navigation({ active }) {
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-4 flex-shrink-0 flex gap-6">
                 <div>
-                    <ConnectButton
-                      accountStatus="address"
-                      showBalance={false}
-                      border="none"
-                      
-                    />
+                  <LoginButton />
 
                   </div>
                 </Menu>

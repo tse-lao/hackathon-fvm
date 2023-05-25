@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { MerkleTree } from 'merkletreejs'
 import { toast } from 'react-toastify'
-import { useSigner } from 'wagmi'
+import { useProvider, useSigner } from 'wagmi'
 
 import {
   DBAbi,
@@ -24,10 +24,9 @@ import {
 
 export const useContract = () => {
   const { data: signer } = useSigner()
-
-  const provider = new ethers.providers.JsonRpcProvider(
-    'https://matic-mumbai.chainstacklabs.com	'
-  )
+  
+  console.log(signer)
+  const provider = useProvider();
   const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
 
   const TablelandStorage = new ethers.Contract(

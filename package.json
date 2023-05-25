@@ -22,9 +22,12 @@
     "@polybase/client": "^0.5.0",
     "@polybase/eth": "^0.5.0",
     "@polybase/react": "^0.5.0",
-    "@rainbow-me/rainbowkit": "^0.12.12",
     "@tailwindcss/forms": "^0.5.3",
-    "@walletconnect/web3wallet": "^1.7.0",
+    "@web3auth/base": "^5.2.0",
+    "@web3auth/modal": "^5.2.0",
+    "@web3auth/openlogin-adapter": "^5.2.0",
+    "@web3auth/torus-wallet-connector-plugin": "^5.2.0",
+    "@web3auth/web3auth-wagmi-connector": "^3.0.2",
     "alchemy-sdk": "^2.8.3",
     "autoprefixer": "^10.4.8",
     "axios": "^1.4.0",
@@ -37,6 +40,7 @@
     "form-data": "^4.0.0",
     "framer-motion": "^6.5.1",
     "ipfs-http-client": "^60.0.0",
+    "magic-sdk": "^17.2.0",
     "merkletreejs": "^0.3.10",
     "multer": "^1.4.5-lts.1",
     "next": "^13.4.2",
@@ -57,12 +61,15 @@
     "twitter-lite": "^1.1.0",
     "use-debounce": "^8.0.4",
     "uuid": "^9.0.0",
-    "wagmi": "^0.12.12"
+    "wagmi": "^0.10.15",
+    "web3": "^1.10.0"
   },
   "devDependencies": {
+    "@types/react": "18.2.7",
     "eslint": "8.15.0",
     "eslint-config-next": "12.2.5",
     "prettier": "^2.7.1",
-    "prettier-plugin-tailwindcss": "^0.1.13"
+    "prettier-plugin-tailwindcss": "^0.1.13",
+    "typescript": "5.0.4"
   }
 }

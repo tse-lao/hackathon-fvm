@@ -1,31 +1,35 @@
 
 import Navigation from '@/components/Navigation'
-import { watchAccount } from '@wagmi/core'
 import Head from 'next/head'
 import { useEffect } from 'react'
 import { useAccount } from 'wagmi'
 
 
-export default function Layout({children, active}) {
-  const {address} = useAccount()
 
-  const unwatch = watchAccount((account) => {
-    if(account.address != address){
-      window.location.reload();
-    }
-  })
+export default function Layout({children, active}) {
+  const {address, isDisconnected, isConnecting} = useAccount()
+
+
   useEffect(() => {
+  
+
+    if (!isDisconnected) return;
+    const wagmiConnected = localStorage.getItem('wagmi.connected');
+    const isWagmiConnected = wagmiConnected ? JSON.parse(wagmiConnected) : false;
+
+    if (!isWagmiConnected) return;
+
+    //wait for address to be loadded
+    if(address){
     const api = localStorage.getItem(`lighthouse-${address}`)
     const jwt = localStorage.getItem(`lighthouse-jwt-${address}`)
 
-    if(address){
       if(!api || !jwt){
         window.location.href = '/profile/onboarding'
       }
-    }else {
-      window.location.href = '/profile/onboarding'
     }
-  }, [address])
+
+  }, [])
   
   
   return (
