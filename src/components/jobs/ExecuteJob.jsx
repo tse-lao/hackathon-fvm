@@ -55,7 +55,7 @@ export default function ExecuteJob({ data, input, jobID,  onClose, openModal, ch
                     <span>{input[0]}</span>
                 </div>
 
-                {chain.id == HYPERSPACE_ID ? <ActionButton loading={loading} onClick={startComputing} text="Make Deal" /> :
+                {chain.id == HYPERSPACE_ID ? <ActionButton loading={loading} onClick={startComputing} text="Start Computation" /> :
                     <OpenButton text="Change to HyperSpace"
                         onClick={() => switchNetwork?.(HYPERSPACE_ID)}
                     />
