@@ -38,6 +38,8 @@ Lighthouse plays a pivotal role in DataBridge as a robust encryption and decrypt
 
 - [useLighthouse](https://github.com/tse-lao/hackathon-fvm/blob/master/src/hooks/useLighthouse.js)
 - [Lighthouse user on-boarding](https://github.com/tse-lao/hackathon-fvm/blob/master/src/pages/profile/onboarding/index.js)
+- [Uploading encrypted car files](https://github.com/tse-lao/hackathon-fvm/blob/master/src/components/UploadModal.jsx)
+
 ## Tableland
 Tableland is the backbone of DataBridge, serving as the primary decentralized database and enabling efficient data management and access control. It seamlessly connects files, DB filecoin deals, computations, and private repositories through cross-chain table queries. With Tableland, we establish a decentralized Merkle tree-based access control mechanism, by adding the storing into the tables the allowlisted addresses. This integration streamlines access control management, providing a secure and reliable environment for storing and managing DB files, deals, computations, and private repos.
 
