@@ -1,5 +1,6 @@
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
 import LoginButton from '@/components/application/elements/buttons/LoginButton';
+import { OpenButton } from '@/components/application/elements/buttons/OpenButton';
 import { useIsMounted } from '@/hooks/useIsMounted';
 import { readJWT } from '@/hooks/useLighthouse';
 import lighthouse from "@lighthouse-web3/sdk";
@@ -88,7 +89,10 @@ export default function Index() {
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-700">Lighthouse Credentials</h2>
           <p className="mt-2 text-gray-500">Next, set up your Lighthouse API Key and JWT.</p>
-          <div className="space-y-8 mt-4">
+        
+          
+          {data ? (
+            <div className="space-y-8 mt-4">
             <div>
               <span>{data}</span>
               <span className="text-gray-700 font-bold mt-4">API Key </span>
@@ -107,6 +111,11 @@ export default function Index() {
               Connect to lighthouse
             </button>
           </div>
+          ) : (
+            <div className="space-y-8 mt-4">
+              <OpenButton onClick={getApiKey} text="Copy API Key" />
+            </div>
+          )}
         </div>
       </div>
     </div>

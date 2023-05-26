@@ -13,11 +13,9 @@ export default function Layout({children, active}) {
   useEffect(() => {
   
 
-    if (!isDisconnected) return;
     const wagmiConnected = localStorage.getItem('wagmi.connected');
     const isWagmiConnected = wagmiConnected ? JSON.parse(wagmiConnected) : false;
 
-    if (!isWagmiConnected) return;
 
     //wait for address to be loadded
     if(address){

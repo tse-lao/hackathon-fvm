@@ -34,10 +34,8 @@ const web3AuthInstance = typeof window !== 'undefined' ? new Web3Auth({
   clientId: "BIAXgpC0-jqizRK_mHoz1PjjIsDLuBhTfJjlHniMOa6IEyEQmyosZXK5_z9Xhg_FJiu6tilRgJxz1mEZfMJRY04",
   chainConfig: {
     chainNamespace: "eip155",
-    chainId: "0x13881", // hex of 80001, polygon testnet
+    chainId: "0x13881", 
     rpcTarget: "https://rpc.ankr.com/polygon_mumbai",
-    // Avoid using public rpcTarget in production.
-    // Use services like Infura, Quicknode etc
     displayName: "Polygon Mumbai Testnet",
     blockExplorer: "https://mumbai.polygonscan.com/",
     ticker: "MATIC",
