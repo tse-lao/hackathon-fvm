@@ -31,7 +31,7 @@ const { chains, provider, webSocketProvider } = configureChains(
 )
 
 const web3AuthInstance = typeof window !== 'undefined' ? new Web3Auth({
-  clientId: "BDlUlpSomDUSEzG9ZfwlbTUuhSnNPHqQuciI7suaSc4xMwQV_B3xHwXEFmDml2Rh96GnXuNFw4pfQ5CPX6B0A7o",
+  clientId: "BIAXgpC0-jqizRK_mHoz1PjjIsDLuBhTfJjlHniMOa6IEyEQmyosZXK5_z9Xhg_FJiu6tilRgJxz1mEZfMJRY04",
   chainConfig: {
     chainNamespace: "eip155",
     chainId: "0x13881", // hex of 80001, polygon testnet
