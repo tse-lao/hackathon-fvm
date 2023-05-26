@@ -20,31 +20,27 @@ module.exports = async({ deployments }) => {
     //---------------------------------------------------------------MUMBAI DEPLOYMENT---------------------------------------------------------------------------------------
 
     //deploy TablelandStorage
-    const TablelandStorage = await deploy("TablelandStorage", {
+    const TablelandStorage = await deploy("escrow", {
         from: wallet.address,
-        args: ["https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement="],
+        args: [],
         log: true,
     });
 
-    //deploy DB_NFT
-    const DB_NFT = await deploy("DB_NFT", {
-        from: wallet.address,
-        args: [TablelandStorage.address, "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"],
-        log: true,
-    });
-
-    const tablelandStorage = await ethers.getContractFactory("TablelandStorage", wallet)
+    const tablelandStorage = await ethers.getContractFactory("escrow", wallet)
 
     const tablelandStorageInstance = await tablelandStorage.attach(TablelandStorage.address)
 
-    await tablelandStorageInstance.transferOwnership(DB_NFT.address)
+    await tablelandStorageInstance.transferOwnership("0xf129b0D559CFFc195a3C225cdBaDB44c26660B60")
+        // let tx = await tablelandStorageInstance.fund({ value: ethers.utils.parseEther("0.1") })
+        // tx.wait()
+        // tx = await tablelandStorageInstance.withdraw("0x464e3F471628E162FA34F130F4C3bCC41fF7635d")
+        // tx.wait()
+        // let contributionTable = await tablelandStorageInstance.tables(0)
+        // let mainTable = await tablelandStorageInstance.tables(1)
+        // let attributeTable = await tablelandStorageInstance.tables(2)
+        // let proofs = await tablelandStorageInstance.tables(3)
 
-    let contributionTable = await tablelandStorageInstance.tables(0)
-    let mainTable = await tablelandStorageInstance.tables(1)
-    let attributeTable = await tablelandStorageInstance.tables(2)
-    let proofs = await tablelandStorageInstance.tables(3)
-
-    console.log(mainTable, "   ", attributeTable, "   ", contributionTable, "     ", proofs)
+    // console.log(mainTable, "   ", attributeTable, "   ", contributionTable, "     ", proofs)
 
 
     // const db_NFT = await ethers.getContractFactory("DB_NFT", wallet)
