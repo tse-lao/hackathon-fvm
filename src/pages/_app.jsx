@@ -31,7 +31,7 @@ const { chains, provider, webSocketProvider } = configureChains(
 )
 
 const web3AuthInstance = typeof window !== 'undefined' ? new Web3Auth({
-  clientId: "BGC4Yh42dheaBvUy1APhmPARYG5KGjdk576tf272EVRpLsYGj2jGHlVHve0gWOSAXCtmHTcUh33Zf_OFlQmbZr8",
+  clientId: "BDlUlpSomDUSEzG9ZfwlbTUuhSnNPHqQuciI7suaSc4xMwQV_B3xHwXEFmDml2Rh96GnXuNFw4pfQ5CPX6B0A7o",
   web3AuthNetwork: "testnet",
   chainConfig: {
     chainNamespace: "eip155",
