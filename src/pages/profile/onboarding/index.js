@@ -47,7 +47,6 @@ export default function Index() {
     console.log(jwt)
     localStorage.setItem(`lighthouse-jwt-${address}`, jwt)
 
-    window.location.reload()
   }
 
   const getApiKey = async () => {

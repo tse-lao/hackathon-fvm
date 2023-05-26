@@ -17,7 +17,7 @@ export default function ProfileStats({ address }) {
   useEffect(() => {
     const newStats = []
     const getBalance = async () => {
-      console.log(address)
+
       const balance = await lighthouse.getBalance(address);
       newStats.push(
         {
@@ -28,7 +28,7 @@ export default function ProfileStats({ address }) {
 
       const res = await fetch(`/api/tableland/contributions/count?creator=${address.toLowerCase()}`);
       const data = await res.json();
-      console.log(data.result)
+
 
       newStats.push(
         {
@@ -37,7 +37,6 @@ export default function ProfileStats({ address }) {
 
         });
 
-console.log(userBalance)
         if(userBalance){
           newStats.push(
         {

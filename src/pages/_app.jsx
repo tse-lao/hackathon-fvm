@@ -54,13 +54,14 @@ const client = createClient({
       chains,
       options: {
         web3AuthInstance,
+        name: "Google", 
         shimDisconnect: true,
       },
     }),
     new InjectedConnector({
       chains,
       options: {
-        name: 'Injected',
+        name: 'Browser',
         shimDisconnect: true,
       },
     }),
