@@ -65,7 +65,7 @@ export default function ViewFile() {
                 const dealData = await deal.json();
                 console.log(dealData);
             }
-            
+
             setLoading(false)
         }
 
@@ -97,6 +97,7 @@ export default function ViewFile() {
 
 
 
+
         //setFileData(decrypted);
 
 
@@ -104,36 +105,41 @@ export default function ViewFile() {
 
 
     async function readContent(fileType, content) {
-        switch (fileType) {
-            case MIMETYPE_IMAGE_JPEG:
-                let jpg = URL.createObjectURL(content);
-                setFileURL(jpg);
-            case MIMETYPE_IMAGE_PNG:
-                const url = URL.createObjectURL(content);
-                setFileURL(url);
-            case MIMETYPE_APP_JSON:
-                await readBlobAsJson(content).then((json) => {
-                    setFileURL(json)
-                });
-            case MIMETYPE_TEXT_PLAIN:
-                await readTextAsJson(content, (error, json) => {
-                    if (error) {
-                        toast.error('Failed to read the Blob as JSON:', error);
-                    } else {
+        console.log(fileType);
 
-                        setFileURL(json)
-                    }
-                });
-            default:
-                await readBlobAsJson(content, (error, json) => {
-                    if (error) {
-                        toast.error('Failed to read the Blob as JSON:', error);
-                    } else {
-
-                        setFileURL(json)
-                    }
-                });
+        if (fileType === MIMETYPE_APP_JSON) {
+            await readBlobAsJson(content).then((json) => {
+                setFileURL(json)
+            });
+            return;
         }
+
+        if (fileType === MIMETYPE_TEXT_PLAIN) {
+            await readTextAsJson(content, (error, json) => {
+                if (error) {
+                    toast.error('Failed to read the Blob as JSON:', error);
+                } else {
+
+                    setFileURL(json)
+                }
+            });
+            
+            return;
+
+        }
+        if (fileType === MIMETYPE_APP_CSV) {
+            await readBlobAsJson(content).then((json) => {
+                setFileURL(json)
+            });
+            return;
+        }
+        if (fileType === MIMETYPE_IMAGE_PNG) {
+            const url = URL.createObjectURL(content);
+            setFileURL(url);
+            return;
+        }
+
+
     }
 
     //TODO: need to fix the download function for the file. 
@@ -193,10 +199,10 @@ export default function ViewFile() {
                 <div className="flex flex-col md:flex-row mt-4 space-y-4 md:space-y-0 md:space-x-4">
                     {/* File content */}
                     <div className="flex-grow p-4 bg-white shadow-sm rounded-lg mr-4 border w-full overflow-scroll">
-                        {loading ? <LoadingIcon height={100} width={100} /> 
-                        : (
-                            accessDenied ? <AccessDenied message="No Acces to this File" /> :
-                            (
+                        {loading ? <LoadingIcon height={100} width={100} />
+                            : (
+                                accessDenied ? <AccessDenied message="No Acces to this File" /> :
+                                    (
                                         <div className="prose prose-sm max-w-none max-h-[600px] overflow-auto">
                                             {fileInfo.mimeType == "image/jpeg" && <img src={fileURL} />}
                                             {fileInfo.mimeType == "image/png" && <img src={fileURL} />}
@@ -204,7 +210,7 @@ export default function ViewFile() {
                                             {fileInfo.mimeType == "text/plain" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
                                         </div>
 
-                                ))}
+                                    ))}
                     </div>
 
                     {/* Sidebar */}

@@ -15,7 +15,7 @@ export async function readBlobAsJson(blob) {
   // Define the onload event handler
   reader.addEventListener('load', async () => {
     try {
-      const json = JSON.parse(event.target.result);
+       json = JSON.parse(event.target.result);
       resolve(json);
     } catch (error) {
       reject(error);

@@ -170,12 +170,14 @@ export async function downloadCid(cid, address, tokenId) {
   downloadBlob(decrypted, fileName);
 }
 
-function downloadBlob(blob, fileName) {
+async function downloadBlob(blob, fileName, mimeType) {
+  const fileType = await getMimeType(blob);
+
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement('a');
   link.href = url;
-  link.download = fileName;
+  link.download = fileName + '.' + fileType;
 
   // Make the link invisible, but append it to the document
   link.style.display = 'none';
@@ -203,6 +205,38 @@ function getFirstArray(obj) {
   }
   return null;
 }
+function getMimeType(blob) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      var arr = (new Uint8Array(reader.result)).subarray(0, 4);
+      var header = '';
+      for (var i = 0; i < arr.length; i++) {
+        header += arr[i].toString(16);
+      }
+      var mimeType = '';
+      switch (header) {
+        case '89504e47':
+          mimeType = 'image/png';
+          break;
+        case '47494638':
+          mimeType = 'image/gif';
+          break;
+        case 'ffd8ffe0':
+        case 'ffd8ffe1':
+        case 'ffd8ffe2':
+          mimeType = 'image/jpeg';
+          break;
+        default:
+          mimeType = 'unknown';
+          break;
+      }
+      resolve(mimeType);
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(blob);
+  });
+}
 
 export async function countRows(cid, address){
   let jwt = await readJWT(address);
@@ -214,6 +248,7 @@ export async function countRows(cid, address){
 
   const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
   console.log(decrypted)
+  
   const jsonData = await readBlobAsJson(decrypted);
   
   //check if hte jsonData is an array 
