@@ -47,6 +47,8 @@ export default function Index() {
     const jwt = await readJWT(address)
     console.log(jwt)
     localStorage.setItem(`lighthouse-jwt-${address}`, jwt)
+    
+    setJwt(jwt)
 
   }
 
@@ -83,7 +85,6 @@ export default function Index() {
           <h2 className="text-lg font-semibold text-gray-700">Connect Your Web3 Account</h2>
           <p className="mt-2 text-gray-500 mb-4">Click the button below to link your Web3 account.</p>
           <LoginButton />
-          {mounted && address}
         </div>
 
         <div className="mb-12">
@@ -94,14 +95,13 @@ export default function Index() {
           {data ? (
             <div className="space-y-8 mt-4">
             <div>
-              <span>{data}</span>
               <span className="text-gray-700 font-bold mt-4">API Key </span>
               <span className="text-gray-700 m-4">{api}</span>
               <ActionButton onClick={storeAPI} disabled={address ? false : true} text="Get API " />
             </div>
             <div>
               <span className="text-gray-700 font-bold mt-4">JWT </span>
-              <span className="text-gray-700 overflow-scroll truncate">{jwt}</span>
+              <span className="text-gray-700 truncate overflow-auto w-full">{jwt}</span>
             </div>
             <button
               onClick={setupLighthouse}
@@ -113,7 +113,7 @@ export default function Index() {
           </div>
           ) : (
             <div className="space-y-8 mt-4">
-              <OpenButton onClick={getApiKey} text="Copy API Key" />
+              <OpenButton onClick={getApiKey} text="Create verified message." />
             </div>
           )}
         </div>

@@ -1,7 +1,7 @@
 import { useCollection, usePolybase } from "@polybase/react";
 import { useEffect } from "react";
 import LoadingSpinner from "../../elements/LoadingSpinner";
-import LoadingIcon from "../../elements/loading/LoadingIcon";
+import LoadingEmpty from "../../elements/loading/LoadingEmpty";
 import DataNotFound from "../../elements/message/DataNotFound";
 import DriveItem from "./data/DriveItem";
 
@@ -14,7 +14,7 @@ export default function Drive({address}) {
         console.log(address);
     }, [address])
     
-  if(loading) return <LoadingIcon height={124}/>
+  if(loading) return <LoadingEmpty />
    
   if(error) return <p>Error: {error.message}</p>
     
