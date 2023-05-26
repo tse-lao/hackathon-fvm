@@ -33,7 +33,7 @@ export default function Jobs({ children }) {
             </div>
             <Toggle text="Show performed jobs" changeStatus={changeStatus} />
             <div className='flex flex-row gap-12 flex-wrap'>
-                <div className='grid grid-cols-2 py-4 px-8 max-h-full overflow-auto gap-2'>
+                <div className='grid grid-cols-2 py-4 px-8 max-h-full overflow-auto gap-6'>
                     <AllJobs performed={performed} />
                 </div>
             </div>

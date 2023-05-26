@@ -2,7 +2,7 @@
 
 import { DB_attribute, DB_main } from '@/constants';
 import { useEffect, useState } from 'react';
-import LoadingFull from '../application/elements/loading/LoadingFull';
+import LoadingEmpty from '../application/elements/loading/LoadingEmpty';
 import Filters from '../application/overlay/Filters';
 import CreateOpenDS from './CreateOpenDS';
 import DatasetItem from './DatasetItem';
@@ -58,7 +58,7 @@ const Marketplace = () => {
 
 
 
-  if (loading) return <LoadingFull />;
+  if (loading) return <LoadingEmpty />;
   return (
     <div className="flex flex-col h-screen">
       <button

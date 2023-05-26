@@ -3,9 +3,8 @@ import Category from '../application/elements/Category'
 
 export default function JobItem({ details }) {
     return (
+        <Link href={`/jobs/${details.id}`}  className='p-8 outline-top hover:bg-gray-100 bg-white shadow rounded-md '>
 
-        <div className='px-2 py-6 outline-top hover:bg-gray-100 bg-white'>
-            <Link href={`/jobs/${details.id}`}>
                 <h1
                     className='text-lg font-bold leading-7 text-gray-700'
                 >{details.name}</h1>
@@ -17,8 +16,8 @@ export default function JobItem({ details }) {
                         <Category key={index} category={category} />
                     ))}
                 </div>
-            </Link>
-        </div>
+
+        </Link>
 
     )
 }

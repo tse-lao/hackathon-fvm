@@ -16,7 +16,7 @@ import InputField from "../application/elements/input/InputField";
 import TextArea from '../application/elements/input/TextArea';
 
 
-export default function CreateOpenDS({ tokenId, onClose }) {
+export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
     const { address } = useAccount();
     const { createOpenDataSet } = useContract();
     const [formData, setFormData] = useState({
@@ -128,7 +128,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
         return <LoadingSpinner />
     }
     return (
-        <ModalLayout title="Create Open Dataset" onClose={onClose}>
+        <ModalLayout title="Create Open Dataset" open={openModal} onClose={onClose}>
             <div className="space-y-4 w-full">
                 <InputField
                     label="Name"

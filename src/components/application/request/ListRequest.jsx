@@ -1,6 +1,6 @@
 import { DB_attribute, DB_main } from "@/constants";
 import { useEffect, useState } from "react";
-import LoadingIcon from "../elements/loading/LoadingIcon";
+import LoadingEmpty from "../elements/loading/LoadingEmpty";
 import Filters from "../overlay/Filters";
 import RequestElement from "./RequestElement";
 export default function ListRequest() {
@@ -46,7 +46,7 @@ export default function ListRequest() {
 
 
 
-    if (loading) return <LoadingIcon msg="Loading Requests" height={124} />;
+    if (loading) return <LoadingEmpty />;
     return (
         <div className="flex flex-col">
             <Filters name="Data Requests" selectChange={selectChange} currentFilters={filters} />

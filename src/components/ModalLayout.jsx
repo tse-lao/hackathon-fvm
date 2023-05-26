@@ -3,7 +3,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Fragment, useEffect, useState } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
-export default function ModalLayout({ title, children,showModal,  onClose}) {
+export default function ModalLayout({ title, children, showModal}) {
   const [open, setOpen] = useState(true)
   const HYPERSPACE_ID = 3141;
   const POLYGON = 80001;
@@ -11,12 +11,12 @@ export default function ModalLayout({ title, children,showModal,  onClose}) {
   const {switchNetwork} = useSwitchNetwork();
 
   useEffect(() => {
-    setOpen(showModal)
+    if(showModal) setOpen(showModal)
   }, [showModal])
   
   const changeOverlay = (e) => {
     setOpen(e)
-    onClose()
+
     
     if (chain?.id != POLYGON ){
       switchNetwork?.(POLYGON)
