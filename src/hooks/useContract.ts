@@ -18,22 +18,27 @@ import {
   crossChainTablelandStorageAddress,
   helper,
   helperAbi,
+  escrowAbi,
+  MumbaiEscrow,
+  HyperspaceEscrow,
   splitImplementation,
   splitterAbi,
 } from '../constants'
 
 export const useContract = () => {
   const { data: signer } = useSigner()
-  
+
   console.log(signer)
-  const provider = useProvider();
+  const provider = useProvider()
   const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
 
-  const TablelandStorage = new ethers.Contract(
-    crossChainTablelandStorageAddress,
-    crossChainTablelandStorageAbi,
+  const Hyperspaceescrow = new ethers.Contract(
+    HyperspaceEscrow,
+    escrowAbi,
     signer!
   )
+
+  const Mumbaiescrow = new ethers.Contract(MumbaiEscrow, escrowAbi, signer!)
 
   const TablelandBountyRewarder = new ethers.Contract(
     crossChainTablelandDealRewarderAddress,
@@ -55,6 +60,85 @@ export const useContract = () => {
   const TWFactory = new ethers.Contract(TWFactoryAddress, TWFactoryAbi, signer!)
   const helperContract = new ethers.Contract(helper, helperAbi, signer!)
 
+  // ----------------------------------------------------------- Escrows -------------------------------------------------------------------------------------------------------------
+
+  const fundUserMumbai = async (address: string) => {
+    try {
+      let tx = await Mumbaiescrow.withdraw(address)
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const fundEscrowMumbai = async (valueToFund:number) => {
+    try {
+      let tx = await Mumbaiescrow.fund({value:ethers.utils.parseEther(valueToFund.toString())})
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+
+  const fundUserHyperspace = async (address: string) => {
+    try {
+      let tx = await Hyperspaceescrow.withdraw(address)
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+
+  const fundEscrowHyperspace = async (valueToFund:number) => {
+    try {
+      let tx = await Hyperspaceescrow.fund({value:ethers.utils.parseEther(valueToFund.toString())})
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
   // --------------------------------------------------------- DB_NFT_CONTRACT INTERACTIONS -----------------------------------------------------------------------------------------------
   const getCurrentTokenId = async () => {
     return await DB_NFT.totalSupply()
@@ -65,10 +149,7 @@ export const useContract = () => {
     return await DB_NFT.hasAccess(address, tokenId)
   }
 
-  const hasRepoAccess = async (
-    address:string,
-    tokenId: number
-  ) => {
+  const hasRepoAccess = async (address: string, tokenId: number) => {
     return await DB_NFT.hasRepoAccess(address, tokenId)
   }
 
@@ -134,7 +215,6 @@ export const useContract = () => {
     description: string,
     SubmitProof: string[]
   ) => {
-
     const AccessSubmitleaves = SubmitProof.map((x) => ethers.utils.keccak256(x))
     const SubmitTree = new MerkleTree(
       AccessSubmitleaves,
@@ -143,7 +223,6 @@ export const useContract = () => {
     )
     const SubmitRoot = SubmitTree.getHexRoot()
 
-    
     try {
       const tx = await DB_NFT.createPrivateRepo(
         repoName,
@@ -169,7 +248,6 @@ export const useContract = () => {
     }
   }
 
-
   const updateRepoSubmitAccessControl = async (
     tokenId: number,
     SubmitProof: string[]
@@ -188,7 +266,7 @@ export const useContract = () => {
         SubmitRoot,
         { gasLimit: 1000000 }
       )
-      
+
       console.log(tx)
       toast.update('Promise is pending', {
         render: 'Transaction sent, waiting for confirmation.',
@@ -203,8 +281,6 @@ export const useContract = () => {
       toast.error('Promise rejected 🤯')
       throw error
     }
-   
-
   }
 
   // ================================ SUBMITTING DATA AND NFT CREATION ======================================== //
@@ -563,5 +639,9 @@ export const useContract = () => {
     updateRepoSubmitAccessControl,
     claimBounty,
     createBounty,
+    fundUserMumbai,
+    fundEscrowMumbai,
+    fundUserHyperspace,
+    fundEscrowHyperspace
   }
 }
