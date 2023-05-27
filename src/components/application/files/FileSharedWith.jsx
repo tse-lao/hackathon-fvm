@@ -49,7 +49,7 @@ export default function FileSharedWith({ cid }) {
     const sharePrivateFile = async () => {
         // Then get auth message and sign
         // Note: the owner of the file should sign the message.
-        
+
         const jwt = await readJWT(address)
         console.log(cid);
 
@@ -63,7 +63,7 @@ export default function FileSharedWith({ cid }) {
                 cid,
                 jwt
             );
-            
+
             setRefresh(!refresh);
         } catch (e) {
             setErrorMessage(e)
@@ -82,13 +82,13 @@ export default function FileSharedWith({ cid }) {
                 standardContractType: "Custom",
                 contractAddress: "0x780077307BE090E24Eb2Ed0d70393711Cc986540",
                 returnValueTest: {
-                comparator: "==",
-                value: "true"
+                    comparator: "==",
+                    value: "true"
                 },
                 parameters: [":userAddress", 1],
                 inputArrayType: ["address", "uint256"],
                 outputType: "bool"
-            } 
+            }
         ];
 
 
@@ -153,26 +153,22 @@ export default function FileSharedWith({ cid }) {
                     ))}
 
                 </ul>
-                
-                <div className="flex items-center justify-between py-2">
-                <input type="text"
-                    onChange={e => setPublicShareKey(e.target.value)}
-                    className="border-1 border-gray-300 bg-white rounded-lg text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-200 focus:ring-opacity-50 px-3 py-2 w-full m-2"
-                />
 
-                <button
-                    type="button"
-                    className="group -ml-1 flex items-center rounded-md bg-white p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    onClick={e => sharePrivateFile()}
-                >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-gray-300 text-gray-400">
-                        <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                    <span className="ml-4 text-sm font-medium text-indigo-600 group-hover:text-indigo-500">
-                        Share
-                    </span>
-                </button>
-            </div>
+                <div className="flex items-center justify-between py-2">
+                    <input type="text"
+                        onChange={e => setPublicShareKey(e.target.value)}
+                        className="border-1 border-gray-300 bg-white rounded-lg text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-200 focus:ring-opacity-50 px-3 py-2 w-full m-2"
+                    />
+                    <button
+                        type="button"
+                        className="group -ml-1 flex items-center rounded-md bg-white p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        onClick={e => sharePrivateFile()}
+                    >
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-gray-300 text-gray-400">
+                            <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                    </button>
+                </div>
             </div>
 
             {accessControl.conditions.length > 0 && (
@@ -188,13 +184,13 @@ export default function FileSharedWith({ cid }) {
                         ))}
                     </ul>
                     <button onClick={e => applyAccessConditions()}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-    >Apply Access Conditions</button>
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                    >Apply Access Conditions</button>
                 </div>
 
             )}
-            
-           
+
+
 
 
 

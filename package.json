@@ -10,6 +10,7 @@
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
+    "@cyntler/react-doc-viewer": "^1.13.0",
     "@headlessui/react": "^1.7.0",
     "@heroicons/react": "^2.0.17",
     "@ipld/car": "^5.1.1",

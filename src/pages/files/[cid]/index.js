@@ -8,6 +8,7 @@ import CreateDeal from '@/components/marketplace/CreateDeal';
 import { downloadCid, readJWT } from '@/hooks/useLighthouse';
 import { readBlobAsJson, readTextAsJson } from '@/lib/dataHelper';
 import Layout from '@/pages/Layout';
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import lighthouse from '@lighthouse-web3/sdk';
 import { useDocument, usePolybase } from '@polybase/react';
 import { useRouter } from 'next/router';
@@ -39,6 +40,7 @@ export default function ViewFile() {
     const [fileInfo, setFileInfo] = useState(fileDefault);
     const [fileURL, setFileURL] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [fileContent, setFileContent] = useState(null);
     const [accessDenied, setAccessDenied] = useState(false);
     const polybase = usePolybase();
     const [createCarDeal, setCreateCarDeal] = useState(false);
@@ -55,6 +57,8 @@ export default function ViewFile() {
             if (!status.data.encryption) {
                 const file = cid.toString();
                 readContent(status.data.mimeType, file);
+                setFileContent(file)
+                
             }
 
 
@@ -137,6 +141,11 @@ export default function ViewFile() {
             const url = URL.createObjectURL(content);
             setFileURL(url);
             return;
+        }        
+        if (fileType === MIMETYPE_IMAGE_JPEG) {
+            const url = URL.createObjectURL(content);
+            setFileURL(url);
+            return;
         }
 
 
@@ -176,10 +185,39 @@ export default function ViewFile() {
                 <div className="flex justify-between sm:flex sm:items-center mb-6">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{fileInfo.fileName}</h1>
-                        <p className="mt-1 text-sm md:text-base text-gray-600">
-                            {fileInfo.cid}
-                        </p>
                     </div>
+                    
+                </div>
+
+                <div className="flex flex-col md:flex-row mt-4 space-y-4 md:space-y-0 md:space-x-4">
+                    {/* File content */}
+                    <div className="flex-grow p-4 bg-white shadow-sm rounded-lg mr-4 border w-full overflow-scroll">
+                    
+                        {loading ? <LoadingIcon height={100} width={100} />
+                            : (
+                                accessDenied ? <AccessDenied message="No Acces to this File" /> :
+                                    (
+                                        <div className="prose prose-sm max-w-none max-h-[600px] overflow-auto">
+                                            {fileInfo.mimeType == "image/jpeg" && <img src={fileURL} />}
+                                            <DocViewer
+                                            documents={{
+                                              uri: fileURL,
+                                              fileName: fileInfo.name,
+                                            }}
+                                            pluginRenderers={DocViewerRenderers}
+                                          />
+
+                                            {fileInfo.mimeType == "image/png" && <img src={fileURL} />}
+                                            {fileInfo.mimeType == "application/json" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
+                                            {fileInfo.mimeType == "text/plain" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
+                                        </div>
+
+                                    ))}
+                    </div>
+
+                    {/* Sidebar */}
+
+                    <div className="w-120 p-4 w-[350px] bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">
                     <div className="space-x-4">
                         <button
                             onClick={() => setCreateCarDeal(!createCarDeal)}
@@ -194,28 +232,6 @@ export default function ViewFile() {
                             Download
                         </button>
                     </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row mt-4 space-y-4 md:space-y-0 md:space-x-4">
-                    {/* File content */}
-                    <div className="flex-grow p-4 bg-white shadow-sm rounded-lg mr-4 border w-full overflow-scroll">
-                        {loading ? <LoadingIcon height={100} width={100} />
-                            : (
-                                accessDenied ? <AccessDenied message="No Acces to this File" /> :
-                                    (
-                                        <div className="prose prose-sm max-w-none max-h-[600px] overflow-auto">
-                                            {fileInfo.mimeType == "image/jpeg" && <img src={fileURL} />}
-                                            {fileInfo.mimeType == "image/png" && <img src={fileURL} />}
-                                            {fileInfo.mimeType == "application/json" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
-                                            {fileInfo.mimeType == "text/plain" && <pre>{JSON.stringify(fileURL, null, 2)}</pre>}
-                                        </div>
-
-                                    ))}
-                    </div>
-
-                    {/* Sidebar */}
-
-                    <div className="w-120 p-4 w-[350px] bg-white shadow-sm rounded-lg flex flex-col gap-8 h-full">
                         <FileDetailInformation detail={fileInfo} className="mt-4 mb-4" cid={cid} address={address} />
                         <FileSharedWith detail={fileInfo} cid={cid} />
                     </div>

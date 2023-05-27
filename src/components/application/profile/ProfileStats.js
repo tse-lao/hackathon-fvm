@@ -66,6 +66,7 @@ export default function ProfileStats({ address }) {
             <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
             <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.current}  {item.total && <span className="text-sm font-md text-gray-500">/ {item.total}</span>}</dd>
             {index == 0 && address == ownAddress && <Link href="/files"><dd className="mt-1  font-semibold tracking-tight text-cf-600">Show Files</dd></Link>}
+            {index == 2 && item.current < 0.001 && <Link href="/collect/more"><dd className="mt-1  font-semibold tracking-tight text-red-600">Not enough balance</dd></Link>}
           </div>
         ))}
       </dl>

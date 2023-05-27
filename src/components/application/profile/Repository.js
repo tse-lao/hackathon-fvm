@@ -33,10 +33,11 @@ export default function Repository() {
     <div className='flex flex-col w-full'>
         {openModal && <CreateRepository setOpenModal={setOpenModal} /> }
         <div className='content-end mb-10 flex justify-between items-center'>
-          <h1 className='text-lg font-bold text-gray-700'>Private Repositories</h1>
+          <h1 className='text-lg font-bold text-gray-700'>Private Groups</h1>
+          <span>Share your data, files or photos only with your registered users. </span>
           
           <div className="w-[250px]">
-            <ActionButton  onClick={() => setOpenModal(true)} text="Create Repository" />
+            <ActionButton  onClick={() => setOpenModal(true)} text="Create Group" />
           </div>
         </div>
         <div>
