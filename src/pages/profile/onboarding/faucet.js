@@ -1,10 +1,29 @@
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton'
+import { useContract } from '@/hooks/useContract'
 import Layout from '@/pages/Layout'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
 
 export default function Faucet() {
+    const [address, setAddress] = useState("")
+    const {fundEscrowMumbai, fundUserHyperspace} = useContract()
+
     async function getTokens() {
-        toast.info("Getting tokens, please wait...")
+        
+        
+        toast.promise(fundEscrowMumbai(address), {
+            pending: 'Funding Mumbai...',
+            success: `${address} succesfully funded!`,
+            error: 'Error sending tokens',
+        })
+        
+        toast.promise(fundUserHyperspace(address), {
+            pending: 'Funding hyperspace...',
+            success: `${address} succesfully funded!`,
+            error: 'Error sending tokens',
+        })
+
+        
     }
     
     
@@ -28,9 +47,11 @@ export default function Faucet() {
             We are only able to give a small amount of tokens per day, so please be patient if you don't receive tokens immediately.
             Also if you already own enough tokens to fulfill are actions you don't need to get more tokens.
         </span>
-        
-        <ActionButton text="Get Free Tokens" onClick={getTokens}/>
+            <input className='border border-gray-300 rounded-md p-2' value={address} onChange={(e) => setAddress(e.target.value)} placeholder='Enter your address' />        
+        <ActionButton text="Send Tokens" onClick={getTokens}/>
         </div>
+        
+
             
             
         </Layout>

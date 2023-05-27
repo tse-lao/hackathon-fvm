@@ -77,7 +77,7 @@ export default function Example() {
                     <div>
                       <h2 className="text-lg font-medium leading-6 text-gray-900">Privacy</h2>
                       <p className="mt-1 text-sm text-gray-500">
-                        Ornare eu a volutpat eget vulputate. Fringilla commodo amet.
+                        Here you can set some privacy related settings. Including the option to create your own profile name, and select the settings on how you want to be found. 
                       </p>
                     </div>
                     <ul role="list" className="mt-2 divide-y divide-gray-200">
