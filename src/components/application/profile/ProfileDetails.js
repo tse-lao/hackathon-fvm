@@ -1,6 +1,7 @@
 import ModalLayout from '@/components/ModalLayout';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAccount, useConnect, useDisconnect, useNetwork } from 'wagmi';
 export default function ProfileDetails({showModal,open, setShowModal}) {
   const { connect, connectors } = useConnect();
@@ -27,11 +28,13 @@ const {chain} = useNetwork();
       console.log(balance)
       setLoading(false)
     });
-    
-
-    
-    
   }, [address]);
+  
+  
+  async function copyAddress(){
+    navigator.clipboard.writeText(address)
+    toast.success("Copied to clipboard")
+  }
   
   return (
     <ModalLayout title="Profile" showModal={showModal} onClose={setShowModal}>    
@@ -39,7 +42,7 @@ const {chain} = useNetwork();
         
           <div className="my-8">
             <div className='bg-gray-100 outline outline-gray-300 text-center py-3 rounded hover:bg-gray-300 cursor-context-menu	'
-            onClick={() => navigator.clipboard.writeText(address)}
+            onClick={() => copyAddress()}
             >
                 {address}
               </div>

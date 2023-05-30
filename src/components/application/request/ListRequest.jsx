@@ -31,6 +31,8 @@ export default function ListRequest() {
 
             const marketplace = await fetch(`/api/tableland/token/all?where=${query}`);
             const data = await marketplace.json();
+            
+            console.log(data)
             setData(data.result)
 
             setLoading(false)

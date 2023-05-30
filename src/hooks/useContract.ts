@@ -6,6 +6,8 @@ import { useProvider, useSigner } from 'wagmi'
 import {
   DBAbi,
   DB_NFT_address,
+  HyperspaceEscrow,
+  MumbaiEscrow,
   TWFactoryAbi,
   TWFactoryAddress,
   crossChainBacalhauJobsAbi,
@@ -14,21 +16,16 @@ import {
   crossChainTablelandDealClientAddress,
   crossChainTablelandDealRewarderAbi,
   crossChainTablelandDealRewarderAddress,
-  crossChainTablelandStorageAbi,
-  crossChainTablelandStorageAddress,
+  escrowAbi,
   helper,
   helperAbi,
-  escrowAbi,
-  MumbaiEscrow,
-  HyperspaceEscrow,
   splitImplementation,
-  splitterAbi,
+  splitterAbi
 } from '../constants'
 
 export const useContract = () => {
   const { data: signer } = useSigner()
 
-  console.log(signer)
   const provider = useProvider()
   const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
 

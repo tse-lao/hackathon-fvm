@@ -40,7 +40,6 @@ export default function Profile() {
     setSelect(tab)
     mounted && setLoading(false)
   }
-  console.log(status)
 
 
 

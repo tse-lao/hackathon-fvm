@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 import Category from '../application/elements/Category';
 import { OpenButton } from '../application/elements/buttons/OpenButton';
+import LoadingEmpty from '../application/elements/loading/LoadingEmpty';
 import DataFormatPreview from '../marketplace/DataFormatPreview';
 import ExecuteJob from './ExecuteJob';
 
@@ -45,7 +46,7 @@ export default function PerformJob({ jobID, input }) {
 
     }
 
-    if (details === null) { return "something" }
+    if (details === null) { return <LoadingEmpty /> }
 
     return (
 

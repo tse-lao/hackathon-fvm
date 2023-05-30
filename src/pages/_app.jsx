@@ -18,12 +18,6 @@ const db = new Polybase({
   defaultNamespace: process.env.POLYBASE || "pk/0xd89cd07b2a59a0059a9001225dc6f2e27c207cc2e8df89c9f4dfcb1673f1c25b201619d55d529a0c016ea157b79abbfd26b9e57405a1de29682df4c215e32dd2/HACK"
 });
 
-const clientid = process.env.NEXT_PUBLIC_WEB3AUTH;
-
-
-// WAGMI Libraries
-
-
 // Configure chains & providers with the Public provider.
 const { chains, provider, webSocketProvider } = configureChains(
   [polygonMumbai, arbitrum, polygon, filecoinHyperspace],
@@ -85,9 +79,7 @@ export default function App({ Component, pageProps }) {
             <Component {...pageProps} />
             <ToastContainer
               position="bottom-center"
-
             />
-
           </AddressWrapper>
         </WagmiConfig>
 

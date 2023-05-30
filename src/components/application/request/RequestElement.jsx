@@ -2,7 +2,6 @@ import Link from "next/link";
 import Category from "../elements/Category";
 export default function RequestElement({ index, request }) {
   
-  const creator = request.attributes.find((item) => item.trait_type == "creator");
   return (
     <Link
       key={index}
@@ -29,7 +28,7 @@ export default function RequestElement({ index, request }) {
           <div className="flex justify-between items-center">
             <div>
             <p className="text-sm text-gray-700">
-            <strong>Creator:</strong> {creator.value}
+            <strong>Creator:</strong> {request.creator}
           </p>
               <p className="text-sm text-gray-700">
                 <strong>Totals Rows:</strong> {request.minimumRowsOnSubmission}
