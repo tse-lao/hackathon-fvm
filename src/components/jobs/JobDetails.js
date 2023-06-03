@@ -3,12 +3,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 import Category from '../application/elements/Category';
-import { OpenButton } from '../application/elements/buttons/OpenButton';
-import LoadingEmpty from '../application/elements/loading/LoadingEmpty';
+import DataNotFound from '../application/elements/message/DataNotFound';
 import DataFormatPreview from '../marketplace/DataFormatPreview';
 import ExecuteJob from './ExecuteJob';
 
-export default function PerformJob({ jobID, input }) {
+export default function JobDetails({ jobID, input }) {
     const polybase = usePolybase();
     const [details, setDetails] = useState(null)
     const [showMetadata, setShowMetadata] = useState(false)
@@ -46,13 +45,15 @@ export default function PerformJob({ jobID, input }) {
 
     }
 
-    if (details === null) { return <LoadingEmpty /> }
+    
+    if(details == undefined) {
+        return  <DataNotFound message="We cannot find any data for this jobID" />
+      
+    }
+
 
     return (
-
-
-        <div className='max-w-[700px] flex flex-col gap-3 text-sm overflow-auto w-fit bg-white p-6'>
-
+        <div className='max-w-[600px] flex flex-col gap-3 text-sm overflow-auto w-fit bg-white p-6'>
                     <h1 className='text-lg font-bold'>{details.name}</h1>
                     <span>
                         {details.description} <br />
@@ -82,11 +83,12 @@ export default function PerformJob({ jobID, input }) {
                         Start computing
                     </button>
                     
-                    <OpenButton text="Show Metadata" onClick={() => setShowMetadata(!showMetadata)}  />
-                    
-                    {showMetadata && <DataFormatPreview cid={details.dataFormat} />}
-                {openModal && <ExecuteJob data={details} input={input} openModal={openModal} changeOpen={changeOpen}/> }
+                    <a className='text-cf-500 text-center cursor:pointer'  onClick={() => setShowMetadata(!showMetadata)}>Show metadata</a>
+
                 
+                    {showMetadata && <DataFormatPreview cid={details.dataFormat} />}
+                    {openModal && <ExecuteJob data={details} input={input} openModal={openModal} changeOpen={changeOpen}/> }
+    
         </div>
 
     )

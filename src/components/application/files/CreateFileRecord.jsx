@@ -2,8 +2,8 @@ import { usePolybase } from '@polybase/react';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useAccount } from 'wagmi';
-import Button from '../elements/Button';
 import CheckboxSelect from '../elements/Checkbox';
+import Button from '../elements/buttons/Button';
 
 export default function CreateFileRecord({ record }) {
     const polybase = usePolybase();

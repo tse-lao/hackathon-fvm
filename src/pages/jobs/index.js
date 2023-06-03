@@ -1,40 +1,61 @@
 
-import Toggle from '@/components/application/Toggle'
-import AllJobs from '@/components/jobs/AllJobs'
+import LoadingFull from '@/components/application/elements/loading/LoadingFull'
+import PageTitle from '@/components/application/elements/text/PageTitle'
 import CreateJob from '@/components/jobs/CreateJob'
+import AllJobs from '@/components/jobs/JobList'
+import { computation } from '@/constants'
 import Layout from '@/pages/Layout'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Jobs({ children }) {
     const [openModal, setOpenModal] = useState(false)
     const [performed, setPerformed] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [jobs, setJobs] = useState([])
 
-    const changeOpen = (e) => {
-        setOpenModal(e)
-    }
+    //call tableland to retrieve this data. 
+    useEffect(() => {
+        //getting all the computations stored in there. 
+        const getData = async () => {
+            setLoading(false)
+
+            let query = `WHERE ${computation}.verified='true'`;
+
+            //TODO: add filters later or maybe one search bar. 
+
+            const marketplace = await fetch(`/api/tableland/copmutations/all?where=${query}`);
+            const data = await marketplace.json();
+
+            console.log(data)
+            setJobs(data.result)
+
+            setLoading(false)
+        }
+
+        getData();
+    }, [])
+
+
 
     const changeStatus = (e) => {
         setPerformed(e)
     }
 
+    if (loading) return <LoadingFull />
     return (
         <Layout title="Jobs" active="Jobs">
             <div className="flex justify-between mb-12">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-                    Jobs
-                </h1>
+                <PageTitle title='Jobs' />
                 <button
-                    onClick={() => setOpenModal(true)}
-                    className="bg-cf-500 hover:bg-cf-700 self-end text-white font-bold py-2 px-4 rounded-full"
-                >
-                    <CreateJob changeOpen={changeOpen} getOpen={openModal} />
-                    Create a JOB
+                    onClick={() => setOpenModal(!openModal)}
+                    className="bg-cf-500 hover:bg-cf-700 self-end text-white font-bold py-2 px-4 rounded-full">
+                        Create Job
                 </button>
+                {openModal && <CreateJob onClose={() => setOpenModal(false)} />}
             </div>
-            <Toggle text="Show performed jobs" changeStatus={changeStatus} />
             <div className='flex flex-row gap-12 flex-wrap'>
-                <div className='grid grid-cols-2 py-4 px-8 max-h-full overflow-auto gap-6'>
-                    <AllJobs performed={performed} />
+                <div className='grid grid-cols-2 py-4 px-8 max-h-full overflow-auto gap-6 items-center'>
+                    <AllJobs jobs={jobs}  />
                 </div>
             </div>
         </Layout>

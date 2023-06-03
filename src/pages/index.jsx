@@ -38,7 +38,6 @@ export default function Profile() {
 
   const setSelected = (tab) => {
     setSelect(tab)
-    mounted && setLoading(false)
   }
 
 

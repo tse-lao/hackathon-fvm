@@ -1,25 +1,26 @@
+import { useContract } from "@/hooks/useContract";
 import useNftStorage from "@/hooks/useNftStorage";
 import { analyzeJSONStructure, readJSONFromFileInput } from "@/lib/dataHelper";
 import { usePolybase } from "@polybase/react";
 import { useState } from "react";
-import TagsInput from "react-tagsinput";
 import 'react-tagsinput/react-tagsinput.css';
 import { toast } from "react-toastify";
-import { v4 as uuidv4 } from 'uuid';
 import { useAccount } from "wagmi";
+import ModalLayout from "../ModalLayout";
 import LoadingSpinner from "../application/elements/LoadingSpinner";
 import InputField from "../application/elements/input/InputField";
 import TextArea from "../application/elements/input/TextArea";
-import CreateOverlay from "../application/overlay/CreateOverlay";
 
 
 export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) {
     const { address } = useAccount();
+    const {createJob} = useContract();
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        spec_start: "", 
+        spec_start: "",
         spec_end: "",
+        numOfInputs: 0,
         categories: [],
         metadata: dataFormat,
     });
@@ -65,27 +66,28 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Process the form data and send it to the server or API endpoint.
-        console.log(formData);
-
-        if (!metadata) {
-            toast.error("No metadata uploaded");
-            return;
+        
+        if(formData.description.length > 1024){
+            toast.error("Cannot exceed the 1024 characters")
         }
 
-        console.log(formData);
-        
-        
+        toast.promise(createJob(formData.name, formData.description, formData.spec_start, formData.spec_end, formData.numOfInputs), {
+            pending: `We are uploading your submission ${formData.name} to the contract. `, 
+            success: `Succesfully added the following job ${formData.name}`, 
+            error: `Failed to create the job ${formData.name}`
+        })
 
-        const result = await createJob(formData.name, formData.description, formData.spec_start, formData.spec_end, metadata, formData.categories, address);
 
-        console.log(result);
+        //const result = await createJob(formData.name, formData.description, formData.spec_start, formData.spec_end, metadata, formData.categories, address);
     };
 
-    async function createJob(name, description, spec_start, spec_end, dataformat, categories, owner) {
+    async function createNewJob(name, description, spec_start, spec_end, dataformat, categories, owner) {
+
+        //TODO: change this to only select one job title and add just the spec_start and spec_end
         const updatedAt = new Date().toISOString();
         const newId = uuidv4();
-
+        
+       
         return new Promise(async (resolve, reject) => {
             try {
                 const collection = await polybase.collection("Jobs").create([
@@ -105,14 +107,14 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                 reject(error)
             }
 
-        });
+        }); 
 
         //id, name, description, jobCid, datafromat, categories, createdAt, owner
     }
 
 
     return (
-        <CreateOverlay title="Create Job" onClose={onClose} getOpen={getOpen} changeOpen={changeOpen}>
+        <ModalLayout title="Create Job" onClose={onClose} getOpen={getOpen} changeOpen={changeOpen}>
             <div className="space-y-4">
                 <InputField
                     label="Name"
@@ -133,27 +135,30 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                 <TextArea
                     label="Spec Start"
                     name="spec_start"
-                    rows={3}
+                    rows={2}
                     value={formData.spec_start}
                     onChange={handleChange}
+                    code={true}
                     required
                 />
                 <TextArea
                     label="Spec End"
                     name="spec_end"
-                    rows={3}
+                    rows={2}
+                    code={true}
                     value={formData.spec_end}
                     onChange={handleChange}
                     required
                 />
-                <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                        Category
-                    </label>
-                    <TagsInput value={formData.categories} onChange={handleTagChange} />
-                </div>
 
-
+                <InputField
+                    label="Number of Inputs"
+                    name="numOfInputs"
+                    type="number"
+                    value={formData.numOfInputs}
+                    onChange={handleChange}
+                    required
+                />
 
 
                 {metadata ? (
@@ -185,6 +190,6 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                     Submit
                 </button>
             </div>
-        </CreateOverlay>
+        </ModalLayout>
     );
 };
