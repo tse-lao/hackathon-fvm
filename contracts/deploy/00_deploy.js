@@ -85,11 +85,11 @@ module.exports = async({ deployments }) => {
 
 
 
-    // let flatSig = await multisigAccountInstance.getMessageHash("message");
-    // let msg = ethers.utils.solidityPack(["address", "uint256", "bytes", "string"], ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", ethers.BigNumber.from("1"), "0x00", "nikos"])
-    // console.log(msg)
+    let flatSig = await multisigAccountInstance.getMessageHash("message");
+    let msg = ethers.utils.solidityPack(["address", "uint256", "bytes", "string"], ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", ethers.BigNumber.from("1"), "0x00", "nikos"])
+    console.log(msg)
 
-    // let flatSig = await wallet.signMessage(ethers.utils.arrayify(ethers.utils.id("nikos")));
+    let flatSig = await wallet.signMessage(ethers.utils.arrayify(ethers.utils.id("nikos")));
 
     // // // print the raw transaction hash
     // console.log('Raw txhash string ' + flatSig);
