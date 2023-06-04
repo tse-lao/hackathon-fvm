@@ -20,7 +20,12 @@ import {
   helper,
   helperAbi,
   splitImplementation,
-  splitterAbi
+  splitterAbi,
+  encodeHelperAbi,
+  MultisigFactoryAbi,
+  EncodeHelper,
+  MultisigFactory,
+  MultisigAbi
 } from '../constants'
 
 export const useContract = () => {
@@ -28,6 +33,19 @@ export const useContract = () => {
 
   const provider = useProvider()
   const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
+
+
+  const Helper = new ethers.Contract(
+    EncodeHelper,
+    encodeHelperAbi,
+    signer!
+  )
+
+  const multisigFactory = new ethers.Contract(
+    MultisigFactory,
+    MultisigFactoryAbi,
+    signer!
+  )
 
   const Hyperspaceescrow = new ethers.Contract(
     HyperspaceEscrow,
@@ -402,19 +420,237 @@ export const useContract = () => {
 
   // --------------------------------------------------- HyperSpace Compute Over Data x Tableland ------------------------------------------------------------------------------------------------------
 
-  const callLillypadJob = async (
-    input: string,
-    _specStart: string,
-    _specEnd: string,
-    jobId: string
+  const createMultisig = async (
+    owners: string[],
+    minimumSignatures: number,
+  ): Promise<any> => {
+    try {
+      const bytes = await Helper.getBytecodeTokenInfoPasser(owners,minimumSignatures)
+      const tx = await multisigFactory.createAccount(
+        owners[0],
+        bytes,
+        {
+          gasLimit: 100000000,
+        }
+      )
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const multisigAssignBounty = async (
+    address: string,
+    to: string,
+    value:string,
+    bountyID: number,
+    startCommand: string,
+    endCommand: string,
+    numberOfInputs: number,
+    winnerAddress:string,
+    message: string,
+    signatures: string[]
+  ): Promise<any> => {
+    try {
+
+    let ABI = [
+        "assignBountyResult(uint256 ,string, string , uint256, address payable)"
+        // "assignBountyResult(uint256 ,string, string , uint256, address)"
+
+    ];
+
+    let iface = new ethers.utils.Interface(ABI);
+    let data = iface.encodeFunctionData("assignBountyResult", [bountyID,startCommand,endCommand,numberOfInputs,winnerAddress])
+
+      const multisig = new ethers.Contract(
+        address,
+        MultisigAbi,
+        signer!
+      )
+      const tx = await multisig.execute(to,value,data,message,signatures)
+      
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const multisigCreateBounty = async (
+    address: string,
+    to: string,
+    value:string,
+    name: string,
+    description: string,
+    dataFormat:string,
+    message: string,
+    signatures: string[]
+  ): Promise<any> => {
+    try {
+
+        let ABI = [
+        "createBounty(string, string, string)"
+    ];
+    let iface = new ethers.utils.Interface(ABI);
+    let data = iface.encodeFunctionData("createBounty", [name,description,dataFormat])
+
+      const multisig = new ethers.Contract(
+        address,
+        MultisigAbi,
+        signer!
+      )
+      const tx = await multisig.execute(to,value,data,message,signatures)
+      
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const createJob = async (
+    name:string,
+    description: string,
+    dataFormat: string,
+    startCommand:string,
+    endCommand:string,
+    numberOfInputs:number,
+    creator:string
+  ): Promise<any> => {
+    try {
+      const tx = await tablelandBacalhau.createJOB(
+        name,
+        description,
+        dataFormat,
+        startCommand,
+        endCommand,
+        numberOfInputs,
+        creator,
+        {
+          gasLimit: 100000000,
+        }
+      )
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const bountyCreation = async (
+    name:string,
+    description: string,
+    dataFormat: string,
+    value:number
+  ): Promise<any> => {
+    try {
+      const tx = await tablelandBacalhau.createBounty(
+        name,
+        description,
+        dataFormat,
+        {
+          value: ethers.utils.parseEther(value.toString()),
+          gasLimit: 100000000,
+        }
+      )
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const assignBountyResult = async (
+    bountyID:number,
+    startCommand:string,
+    endCommand:string,
+    numberOfInputs:number,
+    winner:string
+  ): Promise<any> => {
+    try {
+      const tx = await tablelandBacalhau.assignBountyResult(
+        bountyID,
+        startCommand,
+        endCommand,
+        numberOfInputs,
+        winner,
+        {
+          gasLimit: 100000000,
+        }
+      )
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const ExecuteJob = async (
+    jobID:number,
+    input: string[],
+    value: number
   ): Promise<any> => {
     try {
       const tx = await tablelandBacalhau.executeJOB(
+        jobID,
         input,
-        _specStart,
-        _specEnd,
-        jobId,
         {
+          value: ethers.utils.parseEther(value.toString()),
           gasLimit: 100000000,
         }
       )
@@ -621,7 +857,10 @@ export const useContract = () => {
     mint,
     submitData,
     createDB_NFT,
-    callLillypadJob,
+    ExecuteJob,
+    assignBountyResult,
+    bountyCreation,
+    createJob,
     submitFunds,
     balanceOf,
     hasAccess,
@@ -639,6 +878,10 @@ export const useContract = () => {
     fundUserMumbai,
     fundEscrowMumbai,
     fundUserHyperspace,
-    fundEscrowHyperspace
+    fundEscrowHyperspace,
+    multisigCreateBounty,
+    multisigAssignBounty,
+    createMultisig
+
   }
 }

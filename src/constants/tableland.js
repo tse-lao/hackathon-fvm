@@ -1,4 +1,6 @@
-export const computation = "computation_3141_169"
+export const computation = "compute_over_data_80001_6652"
+export const job = "job_80001_6653"
+export const job_bounty = "job_bounty_80001_6654"
 export const data_contribution = "contribution_table_80001_6434"
 export const DB_main = "main_table_80001_6435"
 export const DB_attribute = "attribute_table_80001_6436"

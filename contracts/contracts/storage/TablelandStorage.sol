@@ -149,52 +149,7 @@ contract TablelandStorage is Ownable {
         );
     }
 
-    /*
-     * @dev Inserts a new record into the main table for an OpenDB.
-     * @param {uint256} tokenid - Token ID.
-     * @param {string} dataFormatCID - Data format CID.
-     * @param {string} dbName - Database name.
-     * @param {string} description - Description.
-     * @param {string} dbCID - Database CID.
-     * @param {string} label - Label payloadCID from dataDepot.
-     */
 
-    function insertMainOpenDBStatement(
-        uint256 tokenid,
-        string memory dataFormatCID,
-        string memory dbName,
-        string memory description,
-        string memory dbCID,
-        string memory label
-    ) public onlyOwner {
-        mutate(
-            mainID,
-            SQLHelpers.toInsert(
-                MAIN_TABLE_PREFIX,
-                mainID,
-                "tokenID, dataFormatCID, dbName, description, dbCID, minRows, requiredRows, label, blockTimestamp",
-                string.concat(
-                    SQLHelpers.quote(Strings.toString(tokenid)),
-                    ",",
-                    SQLHelpers.quote(dataFormatCID),
-                    ",",
-                    SQLHelpers.quote(dbName),
-                    ",",
-                    SQLHelpers.quote(description),
-                    ",",
-                    SQLHelpers.quote(dbCID),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(0)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(0)),
-                    ",",
-                    SQLHelpers.quote(label),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(block.timestamp))
-                )
-            )
-        );
-    }
 
     /*
      * @dev Internal function to execute a mutation on a table.
