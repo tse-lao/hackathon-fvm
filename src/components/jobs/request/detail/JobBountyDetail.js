@@ -1,6 +1,4 @@
-import CategoryList from "@/components/application/elements/CategoryList"
-import { computation } from "@/constants"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 //TODO: iplement later
 const item = {
@@ -14,7 +12,7 @@ contributors: 10,
 endDate: new Date(), 
 status: 1,
 }
-export default function JobBountyDetail({jobId}) {
+export default function JobBountyDetail({jobId, details}) {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState({
     id: 1,
@@ -29,35 +27,13 @@ export default function JobBountyDetail({jobId}) {
   })
   
   
-  useEffect(() => {
-      console.alert("not yet implemented")
-  }, [jobId])
-  
-  
-  const fetchData = async() => {
-    setLoading(true)
-
-      let query = `WHERE ${computation}.jobID!='jobID'`;
-      
-      
-      const result = await fetch(`/api/tableland/computation/all?where=${query}`);
-      const data = await result.json();
-      setData(data.result);
-      setLoading(false);
-  }
   
   
   
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-        <span className="text-xl font-bold mb-2 ">{item.name}</span>
-        <span>{item.description}</span>
-        <div>
-            <CategoryList categories={item.categories} />
-        </div>
-        <time className="text-gray-600 text-sm">
-             {item.endDate.toString()}
-        </time>
+        <span className="text-xl font-bold mb-2 ">{details.name}</span>
+        <span>{details.description}</span>
             
     </div>
   )

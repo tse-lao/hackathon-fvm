@@ -54,17 +54,22 @@ export default function JobBounties() {
   const [loading, setLoading] = useState(false)
   
   useEffect(() => {
-      //get all the bounties here.. 
-      window.alert("not yet implemented")
+
+      fetchJobBounties();
   }, [])
   
   const fetchJobBounties = async() => {
     setLoading(true);
     
     //TODO: this needs to be implemented
-    const result = await fetch(`/api/tableland/jobs/all`);
-    const res = result.json();
-    setData(res.data);
+    const result = await fetch(`/api/tableland/bounty/all`);
+    const res = await  result.json();
+    console.log(res.result)
+    
+    if(res.result.length > 0) {
+      setData(res.result);
+    }
+    //setData(res.data);
     setLoading(false)
     
   }
@@ -73,7 +78,7 @@ export default function JobBounties() {
   if(loading) return <LoadingEmpty />
   return (
     <div>
-        {requests.length > 0 && requests.map((item, key ) => (
+        {data.length > 0 && data.map((item, key ) => (
           <JobBountyItem details={item} key={key} />
         ))}
     </div>

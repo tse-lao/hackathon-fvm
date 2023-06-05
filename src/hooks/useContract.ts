@@ -6,7 +6,11 @@ import { useProvider, useSigner } from 'wagmi'
 import {
   DBAbi,
   DB_NFT_address,
+  EncodeHelper,
   HyperspaceEscrow,
+  MultisigAbi,
+  MultisigFactory,
+  MultisigFactoryAbi,
   MumbaiEscrow,
   TWFactoryAbi,
   TWFactoryAddress,
@@ -16,16 +20,12 @@ import {
   crossChainTablelandDealClientAddress,
   crossChainTablelandDealRewarderAbi,
   crossChainTablelandDealRewarderAddress,
+  encodeHelperAbi,
   escrowAbi,
   helper,
   helperAbi,
   splitImplementation,
-  splitterAbi,
-  encodeHelperAbi,
-  MultisigFactoryAbi,
-  EncodeHelper,
-  MultisigFactory,
-  MultisigAbi
+  splitterAbi
 } from '../constants'
 
 export const useContract = () => {
@@ -449,121 +449,76 @@ export const useContract = () => {
     }
   }
 
+  const multisigAssignBounty = async (
+    address: string,
+    to: string,
+    value:string,
+    bountyID: number,
+    startCommand: string,
+    endCommand: string,
+    numberOfInputs: number,
+    winnerAddress:string,
+    message: string,
+    signatures: string[]
+  ): Promise<any> => {
+    try {
 
+    let ABI = [
+        "assignBountyResult(uint256 ,string, string , uint256, address payable)"
+        // "assignBountyResult(uint256 ,string, string , uint256, address)"
 
-  const multisigCreateBountyProposal = async (
-    Multisigaddress: string,
+    ];
+
+    let iface = new ethers.utils.Interface(ABI);
+    let data = iface.encodeFunctionData("assignBountyResult", [bountyID,startCommand,endCommand,numberOfInputs,winnerAddress])
+
+      const multisig = new ethers.Contract(
+        address,
+        MultisigAbi,
+        signer!
+      )
+      const tx = await multisig.execute(to,value,data,message,signatures)
+      
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const multisigCreateBounty = async (
+    address: string,
+    to: string,
     value:string,
     name: string,
     description: string,
     dataFormat:string,
+    message: string,
+    signatures: string[]
   ): Promise<any> => {
     try {
 
-    let iface = new ethers.utils.Interface(crossChainBacalhauJobsAbi);
+        let ABI = [
+        "createBounty(string, string, string)"
+    ];
+    let iface = new ethers.utils.Interface(ABI);
     let data = iface.encodeFunctionData("createBounty", [name,description,dataFormat])
 
       const multisig = new ethers.Contract(
-        Multisigaddress,
+        address,
         MultisigAbi,
         signer!
       )
-      const tx = await multisig.submitTransaction(crossChainBacalhauJobs_address,value,data)
-      
-      console.log(tx)
-      toast.update('Promise is pending', {
-        render: 'Transaction sent, waiting for confirmation.',
-      })
-
-      const receipt = await tx.wait()
-      console.log(receipt)
-      toast.success('Promise resolved 👌')
-      return receipt
-    } catch (error) {
-      console.log(error)
-      toast.error('Promise rejected 🤯')
-      throw error
-    }
-  }
-
-  const multisigAssignBountyWinnerProposal = async (
-    Multisigaddress: string,
-    bountyID:number,
-    name:string,
-    description:string,
-    dataFormat:string,
-    startCommand:string,
-    endCommand:string,
-    numberOfInputs:number,
-    winner:string
-  ): Promise<any> => {
-    try {
-
-    let iface = new ethers.utils.Interface(crossChainBacalhauJobsAbi);
-    let data = iface.encodeFunctionData("assignBountyResult", [bountyID,name,description,dataFormat,startCommand,endCommand,numberOfInputs,winner])
-
-      const multisig = new ethers.Contract(
-        Multisigaddress,
-        MultisigAbi,
-        signer!
-      )
-      const tx = await multisig.submitTransaction(crossChainBacalhauJobs_address,0,data)
-      
-      console.log(tx)
-      toast.update('Promise is pending', {
-        render: 'Transaction sent, waiting for confirmation.',
-      })
-
-      const receipt = await tx.wait()
-      console.log(receipt)
-      toast.success('Promise resolved 👌')
-      return receipt
-    } catch (error) {
-      console.log(error)
-      toast.error('Promise rejected 🤯')
-      throw error
-    }
-  }
-
-  const multisigConfirmTransaction = async (
-    Multisigaddress: string,
-    transactionIndex: number,
-  ): Promise<any> => {
-    try {
-      const multisig = new ethers.Contract(
-        Multisigaddress,
-        MultisigAbi,
-        signer!
-      )
-      const tx = await multisig.confirmTransaction(transactionIndex)
-      
-      console.log(tx)
-      toast.update('Promise is pending', {
-        render: 'Transaction sent, waiting for confirmation.',
-      })
-
-      const receipt = await tx.wait()
-      console.log(receipt)
-      toast.success('Promise resolved 👌')
-      return receipt
-    } catch (error) {
-      console.log(error)
-      toast.error('Promise rejected 🤯')
-      throw error
-    }
-  }
-
-  const multisigExecuteTransaction = async (
-    Multisigaddress: string,
-    transactionIndex: number,
-  ): Promise<any> => {
-    try {
-      const multisig = new ethers.Contract(
-        Multisigaddress,
-        MultisigAbi,
-        signer!
-      )
-      const tx = await multisig.executeTransaction(transactionIndex)
+      const tx = await multisig.execute(to,value,data,message,signatures)
       
       console.log(tx)
       toast.update('Promise is pending', {
@@ -598,10 +553,7 @@ export const useContract = () => {
         startCommand,
         endCommand,
         numberOfInputs,
-        creator,
-        {
-          gasLimit: 100000000,
-        }
+        creator
       )
       console.log(tx)
       toast.update('Promise is pending', {
@@ -632,7 +584,6 @@ export const useContract = () => {
         dataFormat,
         {
           value: ethers.utils.parseEther(value.toString()),
-          gasLimit: 100000000,
         }
       )
       console.log(tx)
@@ -651,13 +602,8 @@ export const useContract = () => {
     }
   }
 
-
-
   const assignBountyResult = async (
     bountyID:number,
-    name:string,
-    description:string,
-    dataFormat:string,
     startCommand:string,
     endCommand:string,
     numberOfInputs:number,
@@ -666,9 +612,6 @@ export const useContract = () => {
     try {
       const tx = await tablelandBacalhau.assignBountyResult(
         bountyID,
-        name,
-        description,
-        dataFormat,
         startCommand,
         endCommand,
         numberOfInputs,
@@ -693,59 +636,6 @@ export const useContract = () => {
     }
   }
 
-
-  const ExecutionFulfilled = async (
-      requestID:number,
-      result: string,
-    ): Promise<any> => {
-      try {
-        const tx = await tablelandBacalhau.ExecutionFulfilled(
-          requestID,
-          result,
-          {
-            gasLimit: 100000000,
-          }
-        )
-        console.log(tx)
-        toast.update('Promise is pending', {
-          render: 'Transaction sent, waiting for confirmation.',
-        })
-    
-        const receipt = await tx.wait()
-        console.log(receipt)
-        toast.success('Promise resolved 👌')
-        return receipt
-      } catch (error) {
-        console.log(error)
-        toast.error('Promise rejected 🤯')
-        throw error
-      }
-    }
-
-  const ExecutionStarted = async (
-    requestID:number,
-    bacalhauJobID: string,
-    ): Promise<any> => {
-      try {
-      const tx = await tablelandBacalhau.ExecutionStarted(
-        requestID,
-        bacalhauJobID
-      )
-      console.log(tx)
-      toast.update('Promise is pending', {
-        render: 'Transaction sent, waiting for confirmation.',
-      })
-
-      const receipt = await tx.wait()
-      console.log(receipt)
-      toast.success('Promise resolved 👌')
-      return receipt
-    } catch (error) {
-      console.log(error)
-      toast.error('Promise rejected 🤯')
-      throw error
-    }
-  }
   const ExecuteJob = async (
     jobID:number,
     input: string[],
@@ -756,7 +646,7 @@ export const useContract = () => {
         jobID,
         input,
         {
-          value: ethers.utils.parseEther(value.toString())
+          value: ethers.utils.parseEther(value.toString()),
         }
       )
       console.log(tx)
@@ -984,12 +874,8 @@ export const useContract = () => {
     fundEscrowMumbai,
     fundUserHyperspace,
     fundEscrowHyperspace,
-    ExecutionStarted,
-    ExecutionFulfilled,
-    multisigExecuteTransaction,
-    multisigConfirmTransaction,
-    multisigAssignBountyWinnerProposal,
-    multisigCreateBountyProposal,
+    multisigCreateBounty,
+    multisigAssignBounty,
     createMultisig
 
   }

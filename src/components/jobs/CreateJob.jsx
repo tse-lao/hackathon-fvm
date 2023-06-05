@@ -22,7 +22,7 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
         spec_end: "",
         numOfInputs: 0,
         categories: [],
-        metadata: dataFormat,
+        metadata: "no_metadatA",
     });
     const [loadingFile, setLoadingFile] = useState(false);
     const [loadingMeta, setLoadingMeta] = useState(false);
@@ -32,7 +32,6 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
     const polybase = usePolybase();
     const { uploadMetadata } = useNftStorage();
 
-    console.log("METADATa", dataFormat)
 
     const handleTagChange = (tags) => {
         setFormData({ ...formData, categories: tags });
@@ -69,12 +68,29 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
         
         if(formData.description.length > 1024){
             toast.error("Cannot exceed the 1024 characters")
+            return;
         }
-
-        toast.promise(createJob(formData.name, formData.description, formData.spec_start, formData.spec_end, formData.numOfInputs), {
+        
+        
+        //(name: string, description: string, dataFormat: string, startCommand: string, endCommand: string, numberOfInputs: number, creator: string)
+        toast.promise(createJob(
+            formData.name, 
+            formData.description, 
+            formData.metadata,
+            formData.spec_start, 
+            formData.spec_end, 
+            formData.numOfInputs, 
+            address
+            ), {
             pending: `We are uploading your submission ${formData.name} to the contract. `, 
             success: `Succesfully added the following job ${formData.name}`, 
             error: `Failed to create the job ${formData.name}`
+        }).then((result) => {
+            console.log(result)
+            if(result.status === "success"){
+                //call the backend to look for the job id 
+                onClose();
+            }
         })
 
 

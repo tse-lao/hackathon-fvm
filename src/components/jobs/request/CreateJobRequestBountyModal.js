@@ -2,12 +2,15 @@ import ModalLayout from '@/components/ModalLayout'
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton'
 import InputField from '@/components/application/elements/input/InputField'
 import TextArea from '@/components/application/elements/input/TextArea'
+import { useContract } from '@/hooks/useContract'
 import { useState } from 'react'
 import TagsInput from 'react-tagsinput'
+import { toast } from 'react-toastify'
 
 //TODO: implement data picker. 
 export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
   const [loading, setLoading] = useState(false);
+  const {bountyCreation} = useContract();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -30,9 +33,22 @@ export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
 
   const createRequest = async () => {
     //TODO: implement create request.
-    //const submitResult = await fetch('/api/polybase/jobs/createBounty')
-
-    window.alert("not uet implemetned")
+    toast.promise(bountyCreation(
+      formData.name, 
+      formData.description,
+      formData.categories.toString(),
+      formData.minReward
+    ),{
+      pending: "Creating Bounty",
+      success: "Bounty Created",
+      error: "Error Creating Bounty"
+    }).then((result) => {
+      if(result) {
+        onClose();
+      }
+    }
+    )
+    
   }
 
 

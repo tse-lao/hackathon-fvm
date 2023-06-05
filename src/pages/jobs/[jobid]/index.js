@@ -2,7 +2,6 @@ import Tabs from '@/components/application/elements/Tabs'
 import JobDetails from '@/components/jobs/JobDetails'
 import JobComputations from '@/components/jobs/details/JobComputations'
 import JobDatasets from '@/components/jobs/details/JobDatasets'
-import { DB_main } from '@/constants'
 import Layout from '@/pages/Layout'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { usePolybase } from '@polybase/react'
@@ -21,6 +20,7 @@ const tabs = [
 export default function Jobs() {
     const [openModal, setOpenModal] = useState(false)
     const [datasets, setDatasets] = useState([])
+    const [details, setDetails] = useState(null)
     const [select, setSelect] = useState("Details")
     const [selectedOption, setSelectedOption] = useState("datasets")
     const router = useRouter()
@@ -30,16 +30,13 @@ export default function Jobs() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const { data } = await polybase.collection('Jobs').where('id', '==', jobid).get()
-            console.log(data)
-            const where = `WHERE ${DB_main}.dataFormatCID = '${data[0].data.dataFormat}'`
-            const result = await fetch(`/api/tableland/token/all?where=${where}`)
+            const result = await fetch(`/api/tableland/jobs/single?jobID=${jobid}`)
             const datasets = await result.json()
-            console.log(datasets)
-            setDatasets(datasets.result)
+            console.log(datasets.result[0])
+            setDetails(datasets.result[0])
+            
 
 
-            const computations = await fetch(`/api/tableland/computations?`)
         }
 
         if (jobid) {
@@ -63,7 +60,7 @@ export default function Jobs() {
         
             <Tabs tabs={tabs} selected={setSelected} active={select} />
             <div className='mt-12'>
-              {select === "Details" && <JobDetails className="col-span-1" key="1" jobID={jobid}  />}
+              {select === "Details" && <JobDetails details={details} key="1" jobID={jobid}  />}
               {select === "Datasets" && <JobDatasets jobID={jobid} />}
               {select === "Computations" && <JobComputations jobID={jobid} />}
             </div>

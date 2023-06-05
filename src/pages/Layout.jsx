@@ -15,20 +15,7 @@ export default function Layout({ children, active }) {
 
     const wagmiConnected = localStorage.getItem('wagmi.connected');
     const isWagmiConnected = wagmiConnected ? JSON.parse(wagmiConnected) : false;
-    
-    ///
-    console.log("displaying all the statusses to see which is the right one")
-    console.log("status")
-    console.log(status)
-    console.log("isConnected")
-    console.log(isConnected)
-    console.log("isConnecting")
-    console.log(isConnecting)
-    console.log("isDisconnected")
-    console.log(isDisconnected)
-    console.log("end of statusses")
 
-    
     if(!isConnected && status == 'disconnected' ){
       console.log("@@@@@  user is disconnected please connect")
     }
@@ -44,7 +31,6 @@ export default function Layout({ children, active }) {
         }
       }
 
-      console.log(isWagmiConnected)
       
      
 
