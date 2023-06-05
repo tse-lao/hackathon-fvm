@@ -66,6 +66,16 @@ contract bacalhauTablelandStorage is Ownable {
         );
     }
 
+    function updateJobResult(string memory _set, uint256 requestID) public onlyOwner {
+        string memory set  = string.concat("result='", _set, "'");
+        string memory filter = string.concat("requestID=", Strings.toString(requestID));
+
+        mutate(
+            tableIDs[0],
+            SQLHelpers.toUpdate(COMPUTATION_TABLE_PREFIX, tableIDs[0], set, filter)
+        );
+    }
+
     function BountyInsertion(
         uint256 bountyID,
         string memory name,
@@ -128,7 +138,7 @@ contract bacalhauTablelandStorage is Ownable {
                     ",",
                     SQLHelpers.quote("pendingBacalhauJobID"),
                     ",",
-                    SQLHelpers.quote("pendingResult")
+                    SQLHelpers.quote("jobSubmitted")
                 )
             )
         );

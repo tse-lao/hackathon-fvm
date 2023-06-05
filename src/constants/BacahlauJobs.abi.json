@@ -158,17 +158,6 @@
     },
     {
         "inputs": [],
-        "name": "EPNS_COMM_ADDRESS",
-        "outputs": [{
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "EXECUTOR_ROLE",
         "outputs": [{
             "internalType": "bytes32",
@@ -208,16 +197,28 @@
             },
             {
                 "internalType": "string",
-                "name": "bacalhauJobID",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
                 "name": "_result",
                 "type": "string"
             }
         ],
         "name": "ExecutionFulfilled",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "requestID",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "bacalhauJobID",
+                "type": "string"
+            }
+        ],
+        "name": "ExecutionStarted",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -238,6 +239,21 @@
                 "internalType": "uint256",
                 "name": "bountyID",
                 "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "dataFormat",
+                "type": "string"
             },
             {
                 "internalType": "string",
@@ -417,14 +433,14 @@
     {
         "inputs": [{
             "internalType": "uint256",
-            "name": "jobID",
+            "name": "",
             "type": "uint256"
         }],
-        "name": "jobExists",
+        "name": "jobTaken",
         "outputs": [{
-            "internalType": "bool",
+            "internalType": "address",
             "name": "",
-            "type": "bool"
+            "type": "address"
         }],
         "stateMutability": "view",
         "type": "function"

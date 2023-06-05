@@ -14,6 +14,15 @@
         "type": "constructor"
     },
     {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "chainid",
+            "type": "uint256"
+        }],
+        "name": "ChainNotSupported",
+        "type": "error"
+    },
+    {
         "anonymous": false,
         "inputs": [{
                 "indexed": true,
@@ -29,6 +38,24 @@
             }
         ],
         "name": "AdminUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "txIndex",
+                "type": "uint256"
+            }
+        ],
+        "name": "ConfirmTransaction",
         "type": "event"
     },
     {
@@ -76,12 +103,48 @@
     {
         "anonymous": false,
         "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "txIndex",
+                "type": "uint256"
+            }
+        ],
+        "name": "ExecuteTransaction",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
             "indexed": false,
             "internalType": "uint8",
             "name": "version",
             "type": "uint8"
         }],
         "name": "Initialized",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "txIndex",
+                "type": "uint256"
+            }
+        ],
+        "name": "RevokeConfirmation",
         "type": "event"
     },
     {
@@ -201,37 +264,6 @@
         "type": "event"
     },
     {
-        "inputs": [{
-                "internalType": "bytes32",
-                "name": "_hashedMessage",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "uint8",
-                "name": "_v",
-                "type": "uint8"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "_r",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "_s",
-                "type": "bytes32"
-            }
-        ],
-        "name": "VerifyMessage",
-        "outputs": [{
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "addDeposit",
         "outputs": [],
@@ -287,6 +319,17 @@
         "type": "function"
     },
     {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "_txIndex",
+            "type": "uint256"
+        }],
+        "name": "confirmTransaction",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "contractURI",
         "outputs": [{
@@ -323,16 +366,6 @@
                 "internalType": "bytes",
                 "name": "_calldata",
                 "type": "bytes"
-            },
-            {
-                "internalType": "string",
-                "name": "message",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes[]",
-                "name": "signatures",
-                "type": "bytes[]"
             }
         ],
         "name": "execute",
@@ -342,21 +375,10 @@
     },
     {
         "inputs": [{
-                "internalType": "address",
-                "name": "_target",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_value",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "_calldata",
-                "type": "bytes"
-            }
-        ],
+            "internalType": "uint256",
+            "name": "_txIndex",
+            "type": "uint256"
+        }],
         "name": "execute",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -377,38 +399,6 @@
                 "internalType": "bytes[]",
                 "name": "_calldata",
                 "type": "bytes[]"
-            }
-        ],
-        "name": "executeBatch",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "address[]",
-                "name": "_targets",
-                "type": "address[]"
-            },
-            {
-                "internalType": "uint256[]",
-                "name": "_values",
-                "type": "uint256[]"
-            },
-            {
-                "internalType": "bytes[]",
-                "name": "_calldatas",
-                "type": "bytes[]"
-            },
-            {
-                "internalType": "string[]",
-                "name": "_uuids",
-                "type": "string[]"
-            },
-            {
-                "internalType": "bytes[][]",
-                "name": "signatures",
-                "type": "bytes[][]"
             }
         ],
         "name": "executeBatch",
@@ -451,67 +441,6 @@
             "type": "uint256"
         }],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "bytes32",
-            "name": "_messageHash",
-            "type": "bytes32"
-        }],
-        "name": "getEthSignedMessageHash",
-        "outputs": [{
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-        }],
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "address",
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "_data",
-                "type": "bytes"
-            },
-            {
-                "internalType": "string",
-                "name": "_uuid",
-                "type": "string"
-            }
-        ],
-        "name": "getMessageHash",
-        "outputs": [{
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-        }],
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-            "internalType": "string",
-            "name": "_message",
-            "type": "string"
-        }],
-        "name": "getMessageHash",
-        "outputs": [{
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-        }],
-        "stateMutability": "pure",
         "type": "function"
     },
     {
@@ -620,6 +549,53 @@
     },
     {
         "inputs": [{
+            "internalType": "uint256",
+            "name": "_txIndex",
+            "type": "uint256"
+        }],
+        "name": "getTransaction",
+        "outputs": [{
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            },
+            {
+                "internalType": "bool",
+                "name": "executed",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "numConfirmations",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTransactionCount",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
                 "internalType": "address",
                 "name": "_admin",
                 "type": "address"
@@ -642,6 +618,27 @@
             "type": "address"
         }],
         "name": "isAdmin",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "isConfirmed",
         "outputs": [{
             "internalType": "bool",
             "name": "",
@@ -909,27 +906,6 @@
     },
     {
         "inputs": [{
-                "internalType": "bytes32",
-                "name": "_ethSignedMessageHash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes",
-                "name": "_signature",
-                "type": "bytes"
-            }
-        ],
-        "name": "recoverSigner",
-        "outputs": [{
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-        }],
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "inputs": [{
                 "internalType": "address",
                 "name": "_account",
                 "type": "address"
@@ -995,28 +971,34 @@
     },
     {
         "inputs": [{
-            "internalType": "bytes",
-            "name": "sig",
-            "type": "bytes"
-        }],
-        "name": "splitSignature",
-        "outputs": [{
-                "internalType": "bytes32",
-                "name": "r",
-                "type": "bytes32"
+                "internalType": "address",
+                "name": "_to",
+                "type": "address"
             },
             {
-                "internalType": "bytes32",
-                "name": "s",
-                "type": "bytes32"
+                "internalType": "uint256",
+                "name": "_value",
+                "type": "uint256"
             },
             {
-                "internalType": "uint8",
-                "name": "v",
-                "type": "uint8"
+                "internalType": "bytes",
+                "name": "_data",
+                "type": "bytes"
+            },
+            {
+                "internalType": "string",
+                "name": "proposalName",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "proposalDescription",
+                "type": "string"
             }
         ],
-        "stateMutability": "pure",
+        "name": "submitTransaction",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -1031,6 +1013,57 @@
             "name": "",
             "type": "bool"
         }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "name": "tables",
+        "outputs": [{
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "name": "transactions",
+        "outputs": [{
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            },
+            {
+                "internalType": "bool",
+                "name": "executed",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "numConfirmations",
+                "type": "uint256"
+            }
+        ],
         "stateMutability": "view",
         "type": "function"
     },
@@ -1114,32 +1147,6 @@
             "type": "uint256"
         }],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "address",
-                "name": "_signer",
-                "type": "address"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "ethSignedMessageHash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes",
-                "name": "signature",
-                "type": "bytes"
-            }
-        ],
-        "name": "verify",
-        "outputs": [{
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-        }],
-        "stateMutability": "pure",
         "type": "function"
     },
     {

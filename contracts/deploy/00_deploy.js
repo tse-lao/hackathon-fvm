@@ -50,46 +50,59 @@ module.exports = async({ deployments }) => {
 
     //---------------------------------------------------------------MUMBAI DEPLOYMENT---------------------------------------------------------------------------------------
 
-    // const MultisigHelper = await hre.ethers.getContractFactory("MultisigHelper");
+    const MultisigHelper = await hre.ethers.getContractFactory("MultisigHelper");
 
-    // // const multisigHelper = await MultisigHelper.deploy()
-    // // await multisigHelper.deployed()
+    // const multisigHelper = await MultisigHelper.deploy()
+    // await multisigHelper.deployed()
 
-    // // console.log("3 :", multisigHelper.address)
-    // helperInstance = MultisigHelper.attach("0xC7567A0af88054E51E842252078A58Bed1A97fEe")
-    // let bytes = await helperInstance.getBytecodeTokenInfoPasser(["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"], 1)
-    // console.log(bytes)
+    // console.log("3 :", multisigHelper.address)
+    helperInstance = MultisigHelper.attach("0xC7567A0af88054E51E842252078A58Bed1A97fEe")
+    let bytes = await helperInstance.getBytecodeTokenInfoPasser(["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"], 1)
+    console.log(bytes)
 
-    // const MultisigFactory = await hre.ethers.getContractFactory("multisigFactory");
+    const MultisigFactory = await hre.ethers.getContractFactory("multisigFactory");
 
-    // const multisigFactory = await MultisigFactory.deploy("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789")
+    // const multisigFactory = await MultisigFactory.deploy("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789", { gasLimit: 10000000 })
     // await multisigFactory.deployed()
     // console.log("1 :", multisigFactory.address)
 
-    // const FactoryInstance = await MultisigFactory.attach("0x8933aFb68AF165D217A4AEB6d3a91FA7656e4B3B")
-    //     // const FactoryInstance = await MultisigFactory.attach(multisigFactory.address)
+    const FactoryInstance = await MultisigFactory.attach("0x376cA2cCC684Cb0a98a37c949cb888132EdDe90F")
+        // const FactoryInstance = await MultisigFactory.attach(multisigFactory.address)
 
 
-    // // let tx = await FactoryInstance.createAccount("0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", bytes, { gasLimit: 10000000 })
-    // // let receipt = await tx.wait()
-    // // console.log(receipt)
+    // let tx = await FactoryInstance.createAccount("0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", bytes, { gasLimit: 10000000 })
+    // let receipt = await tx.wait()
+    // console.log(receipt)
 
-    // const MultisigAccountV2 = await hre.ethers.getContractFactory("multisigAccountV2");
-    // const multisigAccountV2 = await MultisigAccountV2.deploy("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789", multisigFactory.address)
-    // await multisigAccountV2.deployed()
+    // const Multisig = await hre.ethers.getContractFactory("Multisig");
+    // const multisig = await Multisig.deploy("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789", multisigFactory.address, { gasLimit: 10000000 })
+    // await multisig.deployed()
 
-    // console.log("2 :", multisigAccountV2.address)
-
-
-    // const multisigAccountInstance = await MultisigAccountV2.attach("0x61405dfcE59758c6f2700Ce8e6Bc7A4974D449E1")
+    // console.log("2 :", multisig.address)
 
 
+    // const multisigAccountInstance = await Multisig.attach("0x76e66e82d8cb346423f6cd7f339d9be2332a4cc1")
 
-    let flatSig = await multisigAccountInstance.getMessageHash("message");
+    let flatSig = await wallet.signMessage(ethers.utils.arrayify(ethers.utils.id("nikos2")));
+    // let flatSig = await wallet.signMessage(ethers.utils.id("nikos"));
+
+    let signatures = [flatSig]
+    let ABI = [
+        "function createBounty(string, string, string) payable"
+    ];
+    let iface = new ethers.utils.Interface(ABI);
+    let data = iface.encodeFunctionData("createBounty", ["testBounty", "test", "test"])
+    console.log(data, "  ", tablelandBacalhauJobs.address, "   ", flatSig)
+
+    // let tx = await multisigAccountInstance.execute(tablelandBacalhauJobs.address, 0, data, "nikos", signatures)
+
+    // await tx.wait()
+
+    // let flatSig = await multisigAccountInstance.getMessageHash("message");
     let msg = ethers.utils.solidityPack(["address", "uint256", "bytes", "string"], ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", ethers.BigNumber.from("1"), "0x00", "nikos"])
-    console.log(msg)
+        // console.log(msg)
 
-    let flatSig = await wallet.signMessage(ethers.utils.arrayify(ethers.utils.id("nikos")));
+
 
     // // // print the raw transaction hash
     // console.log('Raw txhash string ' + flatSig);
