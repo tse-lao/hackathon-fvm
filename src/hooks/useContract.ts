@@ -752,11 +752,7 @@ export const useContract = () => {
         jobID,
         input,
         {
-<<<<<<< HEAD
-          value: ethers.utils.parseEther(value.toString())
-=======
-          value: ethers.utils.parseEther(value.toString()),
->>>>>>> ec4595af3ff49322ec706f9cc8b4a3e55690cd19
+          value: ethers.utils.parseEther(value.toString(0))
         }
       )
       console.log(tx)
