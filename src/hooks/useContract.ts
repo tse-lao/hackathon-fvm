@@ -669,9 +669,7 @@ export const useContract = () => {
         endCommand,
         numberOfInputs,
         winner,
-        {
-          gasLimit: 100000000,
-        }
+
       )
       console.log(tx)
       toast.update('Promise is pending', {

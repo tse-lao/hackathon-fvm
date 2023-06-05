@@ -7,7 +7,8 @@ import {
     DealRequests,
     MerkleHelper,
     computation,
-    data_contribution
+    data_contribution,
+    job
 } from '@/constants/tableland';
 import { getTableFromTableland } from "@/hooks/useTableland";
 import Layout from "@/pages/Layout";
@@ -24,6 +25,8 @@ exportsList.push(DB_attribute);
 exportsList.push(DealRequests);
 exportsList.push(DealClientDeals);
 exportsList.push(MerkleHelper);
+exportsList.push(job);
+
 
 export default function TableLand() {
     const [loading, setLoading] = useState(true);

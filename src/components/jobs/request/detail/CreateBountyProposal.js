@@ -1,12 +1,21 @@
 
 import ModalLayout from '@/components/ModalLayout';
+import LoadingSpinner from '@/components/application/elements/LoadingSpinner';
 import InputField from '@/components/application/elements/input/InputField';
 import TextArea from '@/components/application/elements/input/TextArea';
+import { getLighthouse } from '@/hooks/useLighthouse';
+import { submitProposal } from '@/hooks/usePolybase';
+import lighthouse from "@lighthouse-web3/sdk";
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
 
-export default function CreateBountyProposal({onClose, openModal}) {
+export default function CreateBountyProposal({bountyID, onClose, openModal}) {
     const [loadingFile, setLoadingFile] = useState(false);
+    const {address} = useAccount();
+;
+    
+
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -14,7 +23,7 @@ export default function CreateBountyProposal({onClose, openModal}) {
         spec_end: "",
         numOfInputs: 0,
     });
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState("");
     
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -28,15 +37,51 @@ export default function CreateBountyProposal({onClose, openModal}) {
             toast.error("No file selected");
             return;
         }
-        const cid = await uploadFileToIPFS(file);
-        setFile(cid);
+        
+        const api = await getLighthouse(address);
+
+
+        
+        //upload cid 
+        const mockEvent = {
+            target: e.target,
+            persist: () => { },
+        };
+        try {
+            const result = await lighthouse.upload(mockEvent, api);
+            console.log(result.data.Hash);
+            setFile(result.data.Hash);
+        }catch (e) {
+            console.log(e);
+        }
+        
         setLoadingFile(false);
     };
 
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { name, description, spec_start, spec_end, numOfInputs } = formData;
+    
+        if(formData.name.length < 3 ||formData.spec_start.length < 3 || formData.spec_end.length < 3 || formData.description.length < 3) {
+            toast.error("Please fill out all fields");
+            return;
+        }
+        
+        toast.promise(submitProposal(
+            bountyID,
+            formData.name,
+            formData.description,
+            file, 
+            formData.spec_start, 
+            formData.spec_end,
+            formData.numOfInputs,
+            address
+        ), {
+            pending: 'Submitting proposal...',
+            success: 'Proposal submitted!',
+            error: 'Error submitting proposal'
+        })
+        
     }
         
     
@@ -91,7 +136,7 @@ export default function CreateBountyProposal({onClose, openModal}) {
 
                 {file ? (
                     <div className="items-center">
-                        <a href={`https://gateway.ipfs.io/ipfs/${file}`}
+                        <a href={`https://gateway.lighthouse.storage/ipfs/${file}`}
                             className="text-cf-600 hover:text-cf-500"
                         >Preview file</a>
 
