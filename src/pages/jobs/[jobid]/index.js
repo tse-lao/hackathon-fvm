@@ -43,7 +43,7 @@ export default function Jobs() {
         }
 
         if (jobid) {
-            fetchData();
+          //  fetchData();
         }
     }, [jobid])
 

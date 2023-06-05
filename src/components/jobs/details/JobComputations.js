@@ -39,7 +39,7 @@ export default function JobComputations({jobId}) {
     useEffect(() => {
         //fetch here tableland for info 
         //TODO: call function here when its implements and check if jobID is indeed name JobId
-        console.alert("dummy data still.")
+        window.alert("dummy data still.")
     }, [jobId])
     
     const fetchDatasets = async() => {

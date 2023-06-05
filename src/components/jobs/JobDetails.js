@@ -24,7 +24,7 @@ export default function JobDetails({ jobID, input }) {
         }
 
         if (jobID) {
-            fetchJob();
+           // fetchJob();
         }
     }, [jobID])
 

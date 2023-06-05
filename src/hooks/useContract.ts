@@ -6,7 +6,11 @@ import { useProvider, useSigner } from 'wagmi'
 import {
   DBAbi,
   DB_NFT_address,
+  EncodeHelper,
   HyperspaceEscrow,
+  MultisigAbi,
+  MultisigFactory,
+  MultisigFactoryAbi,
   MumbaiEscrow,
   TWFactoryAbi,
   TWFactoryAddress,
@@ -16,16 +20,12 @@ import {
   crossChainTablelandDealClientAddress,
   crossChainTablelandDealRewarderAbi,
   crossChainTablelandDealRewarderAddress,
+  encodeHelperAbi,
   escrowAbi,
   helper,
   helperAbi,
   splitImplementation,
-  splitterAbi,
-  encodeHelperAbi,
-  MultisigFactoryAbi,
-  EncodeHelper,
-  MultisigFactory,
-  MultisigAbi
+  splitterAbi
 } from '../constants'
 
 export const useContract = () => {
@@ -553,10 +553,7 @@ export const useContract = () => {
         startCommand,
         endCommand,
         numberOfInputs,
-        creator,
-        {
-          gasLimit: 100000000,
-        }
+        creator
       )
       console.log(tx)
       toast.update('Promise is pending', {

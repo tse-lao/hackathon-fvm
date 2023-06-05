@@ -7,6 +7,8 @@ import { useEffect } from 'react'
 
 export default function JobBountyDetailPage() {
     const { query } = useRouter()
+    
+    //fidplsu bounyy
 
     useEffect(() => {
         //TODO: read here all the functions that can be done. 
@@ -14,7 +16,7 @@ export default function JobBountyDetailPage() {
         // [] financial contributors.
         // [] code contirbutors. 
         // [] code reviewers.
-        // [] button for paument. 
+        // [] button for payment. 
         // [] timeline of interactions. 
         // [] options to change proposal.
 
