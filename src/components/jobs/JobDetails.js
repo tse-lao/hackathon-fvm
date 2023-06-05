@@ -1,38 +1,22 @@
 import { usePolybase } from '@polybase/react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
-import Category from '../application/elements/Category';
 import DataNotFound from '../application/elements/message/DataNotFound';
 import DataFormatPreview from '../marketplace/DataFormatPreview';
 import ExecuteJob from './ExecuteJob';
 
-export default function JobDetails({ jobID, input }) {
+export default function JobDetails({ details, input }) {
     const polybase = usePolybase();
-    const [details, setDetails] = useState(null)
+
     const [showMetadata, setShowMetadata] = useState(false)
     const [openModal, setOpenModal] = useState(false)
     const { chain } = useNetwork()
     const {switchNetwork} = useSwitchNetwork()
     const HYPERSPACE_ID = 3141;
     const POLYGON = 80001;
-    useEffect(() => {
 
-        const fetchJob = async () => {
-            const job = await getJob(jobID);
-            setDetails(job);
-        }
 
-        if (jobID) {
-           // fetchJob();
-        }
-    }, [jobID])
-
-    const getJob = async (jobID) => {
-        const { data } = await polybase.collection("Jobs").where("id", "==", jobID).get()
-        console.log(data[0].data);
-        return data[0].data;
-    }
 
     const changeOpen = (e) => {
         setOpenModal(e)
@@ -53,7 +37,7 @@ export default function JobDetails({ jobID, input }) {
 
 
     return (
-        <div className='max-w-[600px] flex flex-col gap-3 text-sm overflow-auto w-fit bg-white p-6'>
+        <div className="flex w-full flex-col gap-3 text-sm px-8 py-4 bg-white'">
                     <h1 className='text-lg font-bold'>{details.name}</h1>
                     <span>
                         {details.description} <br />
@@ -63,6 +47,15 @@ export default function JobDetails({ jobID, input }) {
                         {details.categories && details.categories.map((category, index) => (
                             <Category key={index} category={category} />
                         ))}
+                    </div>
+                    
+                    <div>
+                        <label>Bacalhau example</label>
+                        <div className='flex gap-2'>
+                            <span className='px-6 py-2 bg-black text-cf-500 rounded-md'>
+                                {details.startCommand}  {details.endCommand}
+                            </span>
+                        </div>
                     </div>
 
 

@@ -32,7 +32,6 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
     const polybase = usePolybase();
     const { uploadMetadata } = useNftStorage();
 
-    console.log("METADATa", dataFormat)
 
     const handleTagChange = (tags) => {
         setFormData({ ...formData, categories: tags });
@@ -73,14 +72,6 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
         }
         
         
-
-        console.log(formData.name, 
-            formData.description, 
-            formData.metadata,
-            formData.spec_start, 
-            formData.spec_end, 
-            formData.numOfInputs, 
-            address)
         //(name: string, description: string, dataFormat: string, startCommand: string, endCommand: string, numberOfInputs: number, creator: string)
         toast.promise(createJob(
             formData.name, 
@@ -94,6 +85,12 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
             pending: `We are uploading your submission ${formData.name} to the contract. `, 
             success: `Succesfully added the following job ${formData.name}`, 
             error: `Failed to create the job ${formData.name}`
+        }).then((result) => {
+            console.log(result)
+            if(result.status === "success"){
+                //call the backend to look for the job id 
+                onClose();
+            }
         })
 
 

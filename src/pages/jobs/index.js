@@ -23,10 +23,10 @@ export default function Jobs({ children }) {
 
             //TODO: add filters later or maybe one search bar. 
 
-            const marketplace = await fetch(`/api/tableland/copmutations/all?where=${query}`);
-            const data = await marketplace.json();
+            const computations = await fetch(`/api/tableland/jobs/all`);
+            const data = await computations.json();
 
-            console.log(data)
+            console.log(data.result)
             setJobs(data.result)
 
             setLoading(false)

@@ -648,7 +648,6 @@ export const useContract = () => {
         input,
         {
           value: ethers.utils.parseEther(value.toString()),
-          gasLimit: 100000000,
         }
       )
       console.log(tx)

@@ -8,8 +8,11 @@ export default async (req, res) => {
         const url = 'https://testnets.tableland.network/api/v1/query';
         const params = new URLSearchParams({
             statement: `SELECT *
-            FROM ${job}`,
-   format: "objects", unwrap: false
+            FROM ${job}
+            WHERE jobID = ${req.query.jobID}
+            LIMIT 1
+            `,
+            format: "objects", unwrap: false
         });
     
         try {
