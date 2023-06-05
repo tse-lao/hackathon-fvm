@@ -117,9 +117,6 @@ export default function UploadModal({ onClose }) {
 
         let api = await getLighthouse(address);
         const jwt = await readJWT(address);
-        console.log(address);
-        console.log(api)
-        console.log(jwt);
         setUploadStatus("Uploading files to lighthouse drive.");
 
         let list = [];

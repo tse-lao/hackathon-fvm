@@ -26,17 +26,22 @@ export default function JobBountyDetailPage() {
         // [] timeline of interactions. 
         // [] options to change proposal.
             
-        getBountyDetails();
+        if(id > 0){
+            
+            getBountyDetails();
+        }
         
 
     }, [id])
     
     async function getBountyDetails(){
         setLoading(true)
-        let query = `WHERE bountyID = '${id}'}`
-        const result = await fetch(`/api/tableland/jobs/all?where=${query}`)
+        
+        let query = `WHERE bountyID = '${id}'`
+        console.log(query);
+        const result = await fetch(`/api/tableland/bounty/all?where=${query}`)
         const datasets = await result.json()
-        console.log(datasets.result[0])
+        
         setDetails(datasets.result[0])
         
         setLoading(false)
@@ -56,8 +61,8 @@ export default function JobBountyDetailPage() {
                 </div>
                 
                 <div className='bg-white w-[800px] p-8 rounded-md '>
-                    {active == 'details' && <JobBountyDetail id={1} details={details}/>}
-                    {active == 'proposals' && <JobBountyProposals id={1} details={details}/>}
+                    {active == 'details' && <JobBountyDetail id={id} details={details}/>}
+                    {active == 'proposals' && <JobBountyProposals bountyID={id} details={details}/>}
 
                     
                 </div>
