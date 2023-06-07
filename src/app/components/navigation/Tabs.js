@@ -1,8 +1,10 @@
-  function classNames(...classes) {
+import Link from "next/link"
+
+function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
   
-  export default function Tabs({tabs, selected, active}) {
+  export default function Tabs({tabs, active}) {
     
     return (
       <div>
@@ -25,8 +27,7 @@
         <div className="hidden sm:block">
           <nav className="isolate flex divide-x divide-gray-200 rounded-lg " aria-label="Tabs">
             {tabs.map((tab, tabIdx) => (
-              <div
-                onClick={() => selected(tab.name)}
+              <Link
                 href={tab.href}
                 key={tabIdx}
                 className={classNames(
@@ -45,7 +46,7 @@
                     'absolute inset-x-0 bottom-0 h-0.5'
                   )}
                 />
-              </div>
+              </Link>
             ))}
           </nav>
         </div>

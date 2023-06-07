@@ -429,9 +429,6 @@ export const useContract = () => {
       const tx = await multisigFactory.createAccount(
         owners[0],
         bytes,
-        {
-          gasLimit: 100000000,
-        }
       )
       console.log(tx)
       toast.update('Promise is pending', {
@@ -750,7 +747,7 @@ export const useContract = () => {
         jobID,
         input,
         {
-          value: ethers.utils.parseEther(value.toString(0))
+          value: ethers.utils.parseEther(value.toString())
         }
       )
       console.log(tx)

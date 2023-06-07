@@ -1,4 +1,4 @@
-import ClientOnly from '@/hooks/clientOnly';
+"use client"
 import { useEffect, useState } from 'react';
 import { useAccount, useConnect, useDisconnect, useNetwork } from 'wagmi';
 import ProfileDetails from '../../profile/ProfileDetails';
@@ -25,24 +25,43 @@ export default function LoginButton() {
 
 
 
-  return (
-    <ClientOnly>
-      <div className="flex gap-4 items-center">
-        {address &&
-        <button className='w-[150px] bg-gray-100 p-1 px-3 outline rounded-full outline-gray-200 text-sm overflow truncate' onClick={() => setShowModal(!showModal)}>
+  if (isConnecting) {
+    return (
+      <div className="text-md text-white bg-cf-500 rounded-full py-1 px-8" >
+        Loading
+      </div>
+    )
+  }
+
+  if (address) {
+    return (
+      <div className="flex rounded-md bg-white border items-center gap-2">
+        <div className='p-2'>
+          {status === 'connected' &&
+            (chain.id == 80001 ? <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Polygon_Blockchain_Matic_Logo.svg" alt={`${chain.id}`} className="w-6 h-6" /> :
+              <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Filecoin.svg" alt={`${chain.id}`} className="w-6 h-6" />
+            )}
+        </div>
+        <button className='w-[150px] bg-white p-1 px-3 outline rounded-full outline-gray-200 text-sm overflow truncate' onClick={() => setShowModal(!showModal)}>
           {address}
+
+          {showModal && <ProfileDetails address={address} showModal={showModal} setShowModal={setShowModal} />}
+
         </button>
-        }
-        <span className='text-sm'>
-        {status === 'connected' && 
- 
-           (chain.id == 80001 ? <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Polygon_Blockchain_Matic_Logo.svg" alt={`${chain.id}`} className="w-6 h-6" /> :
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Filecoin.svg" alt={`${chain.id}`} className="w-6 h-6" />
-          
-          )}
-      </span>
+      </div>
+
+    )
+  }
+
+
+  return (
+    <div>
+      <div className="flex gap-4 items-center">
+
+
+
         <div className='flex gap-4'>
-          {isReconnecting  ? (
+          {isReconnecting ? (
             <button>Loading</button>
           ) : !isConnected && (
 
@@ -56,10 +75,10 @@ export default function LoginButton() {
           )}
         </div>
       </div>
-      
+
       {showModal && <ProfileDetails address={address} showModal={showModal} setShowModal={setShowModal} />}
 
-    </ClientOnly>
+    </div>
 
   );
 

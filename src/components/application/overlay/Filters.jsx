@@ -50,16 +50,13 @@ export default function Filters({name, selectChange, currentFilters}) {
     
     
   return (
-    <div className="-mt">
-      <div className="px-4 py-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900">{name}</h1>
-      </div>
+    <div className="">
 
       {/* Filters */}
       <Disclosure
         as="section"
         aria-labelledby="filter-heading"
-        className="grid items-center border-b border-t border-gray-200 my-8 bg-white"
+        className="grid items-center border border-gray-200 my-8 bg-white rounded-md"
       >
         <h2 id="filter-heading" className="sr-only">
           Filters

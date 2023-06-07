@@ -22,20 +22,12 @@ export default function AssignBountyWinner({ onClose, getOpen, selected, bountyI
     setFormData({ ...formData, [name]: value });
   };
 
-  console.log(      bountyID, 
-    formData.name, 
-    formData.description,
-    selected.dataFormat, 
-    selected.startCommand, 
-    selected.endCommand, 
-    selected.numOfInputs, 
-    selected.creator)
-    
+
+  const assignWinner = async () => {
     let dataFormat = selected.dataFormat
     if(!dataFormat){
         dataFormat = "no_metdata"
     }
-  const assignWinner = async () => {
     //TODO: implement create request.
     toast.promise(assignBountyResult(
         bountyID, 

@@ -1,4 +1,3 @@
-import '@/styles/tailwind.css';
 import { Auth } from '@polybase/auth';
 import { Polybase } from "@polybase/client";
 import { AuthProvider, PolybaseProvider } from "@polybase/react";
@@ -9,9 +8,10 @@ import { WagmiConfig, configureChains, createClient } from 'wagmi';
 import { arbitrum, filecoinHyperspace, polygon, polygonMumbai } from "wagmi/chains";
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { publicProvider } from 'wagmi/providers/public';
+import '../styles/tailwind.css';
 
-import { AddressWrapper } from '@/hooks/AddressWrapper';
 import { Web3Auth } from "@web3auth/modal";
+import { AddressWrapper } from '../hooks/AddressWrapper';
 
 const auth = typeof window !== 'undefined' ? new Auth() : null;
 const db = new Polybase({

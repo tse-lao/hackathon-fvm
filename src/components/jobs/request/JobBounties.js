@@ -61,8 +61,9 @@ export default function JobBounties() {
   const fetchJobBounties = async() => {
     setLoading(true);
     
-    //TODO: this needs to be implemented
-    const result = await fetch(`/api/tableland/bounty/all`);
+    let query = `WHERE winner='undefined'`
+    
+    const result = await fetch(`/api/tableland/bounty/all?where=${query}`);
     const res = await  result.json();
     console.log(res.result)
     

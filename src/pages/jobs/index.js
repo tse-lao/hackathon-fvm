@@ -5,6 +5,7 @@ import CreateJob from '@/components/jobs/CreateJob'
 import AllJobs from '@/components/jobs/JobList'
 import { computation } from '@/constants'
 import Layout from '@/pages/Layout'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 export default function Jobs({ children }) {
@@ -45,7 +46,10 @@ export default function Jobs({ children }) {
     return (
         <Layout title="Jobs" active="Jobs">
             <div className="flex justify-between mb-12">
+            <div className='flex flex-col gap-6'>
                 <PageTitle title='Jobs' />
+                <Link href="/jobs/request" className='text-cf-500'>Open requests</Link>
+            </div>
                 <button
                     onClick={() => setOpenModal(!openModal)}
                     className="bg-cf-500 hover:bg-cf-700 self-end text-white font-bold py-2 px-4 rounded-full">

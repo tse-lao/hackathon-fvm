@@ -54,10 +54,10 @@ export default function JobBountyDetailPage() {
         <Layout>
             <div className='flex flex-col items-center justify-center gap-12 flex-wrap'>
                 <div className='flex gap-12 flex-wrap'>
-                    <span className='hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full' onClick={()=> setActive('details')}>Details</span>
-                    <span className='hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full' onClick={()=> setActive('proposals')}>Proposals</span>
-                    <span className='hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full'>Sponsors</span>
-                    <span className='hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full'>Contract</span>
+                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active === 'details' && 'bg-cf-500 text-white'}`} onClick={()=> setActive('details')}>Details</span>
+                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'proposals' && 'bg-cf-500 text-white'}`} onClick={()=> setActive('proposals')}>Proposals</span>
+                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'sponsor' && 'bg-cf-500 text-white'}`}>Sponsors</span>
+                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'contract' && 'bg-cf-500 text-white'}`}>Contract</span>
                 </div>
                 
                 <div className='bg-white w-[800px] p-8 rounded-md '>

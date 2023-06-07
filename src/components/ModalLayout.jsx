@@ -1,10 +1,11 @@
+"use client"
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Fragment, useEffect, useState } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 export default function ModalLayout({ title, children, showModal}) {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const HYPERSPACE_ID = 3141;
   const POLYGON = 80001;
   const {chain} = useNetwork();
@@ -40,7 +41,7 @@ export default function ModalLayout({ title, children, showModal}) {
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 ">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -52,7 +53,7 @@ export default function ModalLayout({ title, children, showModal}) {
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
               <h2 className='text-xl font-bold mb-4'>{title}</h2>
-              <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block mb-4">
+              <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block ">
               <button
                 type="button"
                 className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -62,7 +63,10 @@ export default function ModalLayout({ title, children, showModal}) {
                 <XMarkIcon className="h-6 w-6" aria-hidden="true" />
               </button>
             </div>  
-              {children}
+              <div className='mt-8'>
+                {children}
+              
+              </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
