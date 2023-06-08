@@ -151,13 +151,13 @@ export const useContract = () => {
   }
 
   // Now only contributors that at least one time submitted || only  the owner| NFT holder
-  const hasAccess = async (address: string, tokenId: number) => {
-    return await DB_NFT.hasAccess(address, tokenId)
+  const hasAccess = async (UserAddress: string, MultisigAddress:string, tokenId: number) => {
+    return await DB_NFT.hasAccess(UserAddress,MultisigAddress,tokenId)
   }
 
-  const hasRepoAccess = async (address: string, tokenId: number) => {
-    return await DB_NFT.hasRepoAccess(address, tokenId)
-  }
+  // const hasRepoAccess = async (address: string, tokenId: number) => {
+  //   return await DB_NFT.hasRepoAccess(address, tokenId)
+  // }
 
   const RequestDB = async (
     dataFormatCID: string,
