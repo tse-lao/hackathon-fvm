@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./interfaces/ITablelandStorage.sol";
+import "./interfaces/IMultisig.sol";
+
 
 /**
  * @title DB_NFT
@@ -48,9 +49,7 @@ contract DB_NFT is ERC1155, Ownable {
     enum DBState {
         RequestStatus,
         ReadyToBeMintable,
-        Mintable,
-        Repo,
-        OpenDataset
+        Mintable
     }
 
     // Counter for token IDs
@@ -70,6 +69,8 @@ contract DB_NFT is ERC1155, Ownable {
 
     // Instance of the Tableland storage contract
     ITablelandStorage private tablelandStorage;
+
+    IMultisig multisigInterface;
 
     constructor(ITablelandStorage _tablelandStorage, address _signerAddress) ERC1155("") {
         tablelandStorage = _tablelandStorage;
@@ -104,7 +105,7 @@ contract DB_NFT is ERC1155, Ownable {
         dbInfoMap[tokenId].creator = msg.sender;
         dbInfoMap[tokenId].dbState = DBState.RequestStatus;
 
-        tablelandStorage.insertMainStatement(tokenId,dataFormatCID,dbName,description,"dbCID",minSubRows,uint256(requiredRows),"label");
+        tablelandStorage.insertMainStatement(tokenId,dataFormatCID,dbName,description,"dbCID",minSubRows,uint256(requiredRows),"piece_cid");
 
         tablelandStorage.insertAttributeStatement(tokenId,"creator",Strings.toHexString(msg.sender));
 
@@ -112,69 +113,6 @@ contract DB_NFT is ERC1155, Ownable {
             tablelandStorage.insertAttributeStatement(tokenId, "category", categories[i]);
         }
     }
-
-
-    /**
-     * @notice Creates a private repo and can share it with others
-     * @dev Creating a Private Repo cannot be an NFT. Allowlisted addresses can add files in the repo and decrypt the repo contents using custom control conditions with lighthouse
-     * @param repoName Repo name
-     * @param description Repo description
-     * @param SubmitProof Contains the whitelisted addresses
-     * @param SubmitRoot MerkleRoot
-     */
-
-    function createPrivateRepo(
-        string memory repoName,
-        string memory description,
-        address[] memory SubmitProof,
-        bytes32 SubmitRoot
-    ) public {
-        require(SubmitProof.length > 0, "wrong input whitelisted address array must be greater than 0");
-        tokenID.increment();
-        uint256 tokenId = tokenID.current();
-        dbInfoMap[tokenId].creator = msg.sender;
-        dbInfoMap[tokenId].dbState = DBState.Repo;
-        // Adds the whitelisted Addresses on tableland and 
-        // assigns the MerkleRoot to the Repo token
-        setRepoSubmitAccessMerkleRoot(tokenId, SubmitProof, SubmitRoot);
-
-        tablelandStorage.insertMainStatement(tokenId,"repo",repoName,description,"repo",0,0,"repo");
-        tablelandStorage.insertAttributeStatement(tokenId,"creator",Strings.toHexString(msg.sender));
-    }
-
-
-    /**
-      * @notice Creates an open DataSet accessible to anyone
-      * It can get used to perform Compute Over Data 
-      * Operations using the lillypad contracts
-      * @dev Creating an OpenDB cannot be an NFT
-      * Open to Everyone
-      * @param dbCID: repoName
-      * @param label: repoDescription
-      * @param dataFormatCID: contains the whitelisted addresses
-      * @param dbName: MerkleRoot
-      * @param description: MerkleRoot
-      * @param categories: MerkleRoot
-     */
-
-    function createOpenDataSet(
-        string memory dbCID,
-        string memory label,
-        string memory dataFormatCID,
-        string memory dbName,
-        string memory description,
-        string[] memory categories
-    ) public {
-        tokenID.increment();
-        dbInfoMap[tokenID.current()].dbState = DBState.OpenDataset;
-        tablelandStorage.insertMainStatement(tokenID.current(),dataFormatCID,dbName,description,dbCID,0,0,label);
-        uint256 size = categories.length;
-        for (uint256 i = 0; i < size; i++) {
-                tablelandStorage.insertAttributeStatement(tokenID.current(),"category",categories[i]);
-        }
-        tablelandStorage.insertAttributeStatement(tokenID.current(),"creator",Strings.toHexString(msg.sender));
-    }
-
 
     /*
      * @notice Creates a contribution on a DB_NFT
@@ -198,41 +136,20 @@ contract DB_NFT is ERC1155, Ownable {
         uint256 tokenId,
         string memory dataCID,
         uint256 rows,
-        bytes32[] memory SubmitProof,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public {
-        _exists(tokenId);
-
+    ) public exists(tokenId) {
         string memory signedMessage = string.concat(Strings.toString(tokenId),dataCID,Strings.toString(rows));
 
-        bool policyOK;
-        // If there is access control for submissions check if sender
-        // is elligible to participate in that DB submission!!!
-        if (dbInfoMap[tokenId].submitRoot != bytes32(0)) {
-            checkSigPolicy(signedMessage, v, r, s);
-            policyOK = true;
-            bytes32 Root = dbInfoMap[tokenId].submitRoot;
-            require(verifyProof(SubmitProof, Root, msg.sender), "not in submit allowlist");
-            if (!contributors[tokenId].contains(msg.sender)) {
-                address[] memory proof = new address[](1);
-                proof[0] = msg.sender;
-                tablelandStorage.insertTokenProof(tokenId, proof, "VIEW");
-            }
-        }
-
         require(dbInfoMap[tokenId].minSubRows <= rows, "sumbit more data");
-        require(dbInfoMap[tokenId].dbState != DBState.OpenDataset,"this is an OpenDB you cannot submit");
 
-        if(!policyOK){
-            checkSigPolicy(signedMessage, v, r, s);
-            contributors[tokenId].add(msg.sender);
-        }
+        checkSigPolicy(signedMessage, v, r, s);
+        contributors[tokenId].add(msg.sender);
 
         dbInfoMap[tokenId].requiredRows -= int256(rows);
 
-        if (dbInfoMap[tokenId].requiredRows <= 0 && dbInfoMap[tokenId].dbState != DBState.Mintable && dbInfoMap[tokenId].dbState != DBState.OpenDataset && dbInfoMap[tokenId].dbState != DBState.Repo) {
+        if (dbInfoMap[tokenId].requiredRows <= 0 && dbInfoMap[tokenId].dbState != DBState.Mintable) {
             dbInfoMap[tokenId].dbState = DBState.ReadyToBeMintable;
         }
 
@@ -252,7 +169,7 @@ contract DB_NFT is ERC1155, Ownable {
     * @param dbCID: Merged CID of the DataBase
     * @param mintPrice: mint price of the DB
     * @param splitterContractAddress: ThirdWeb splitter contractAddress
-    * @param label: The Filecoin PayloadCID so it can get used to create
+    * @param piece_cid: The Filecoin PayloadCID so it can get used to create
     * cross chain join queries on the tableland tables to get the Tableland versions
     * of the dealClient and the dealRewarder Deals Status
     * @param v: v Signature param
@@ -265,12 +182,11 @@ contract DB_NFT is ERC1155, Ownable {
         string memory dbCID,
         uint256 mintPrice,
         address splitterContractAddress,
-        string memory label,
+        string memory piece_cid,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public {
-        _exists(tokenId);
+    ) public exists(tokenId) onlyTokenCreator(tokenId, msg.sender) {
         string memory signedMessage = string.concat(
             Strings.toString(tokenId),
             dbCID,
@@ -279,7 +195,6 @@ contract DB_NFT is ERC1155, Ownable {
         );
 
         require(dbInfoMap[tokenId].dbState == DBState.ReadyToBeMintable);
-        onlyTokenCreator(tokenId, msg.sender);
         checkSigPolicy(signedMessage, v, r, s);
 
         dbInfoMap[tokenId].dbState = DBState.Mintable;
@@ -289,67 +204,116 @@ contract DB_NFT is ERC1155, Ownable {
         string[] memory set = new string[](2);
         string memory filter = string.concat("tokenID=", Strings.toString(tokenId));
         set[0] = string.concat("dbCID='", dbCID, "'");
-        set[1] = string.concat("label='", label, "'");
+        set[1] = string.concat("piece_cid='", piece_cid, "'");
         tablelandStorage.toUpdate(set, filter);
         tablelandStorage.insertAttributeStatement(tokenId, "price", Strings.toString(mintPrice));
         tablelandStorage.insertAttributeStatement(tokenId,"splitterContract",Strings.toHexString(splitterContractAddress));
     }
 
 
-   /*
-    * @notice Update a DB_NFT 
+    /**
+     * @notice Creates a DB request
+     * @dev Users can request the creation of a DB by providing data format, DB name, description, and other details.
+     * @param dataFormatCID Format of data this DB will contain
+     * @param dbName DB Name
+     * @param description DB description
+     * @param categories Data field categories
+     * @param requiredRows Minimum amount of Rows to create the DB NFT
+     * @param minSubRows Minimum rows per Contribution
+     */
+
+    function MultisigRequestDB(
+        string memory dataFormatCID,
+        string memory dbName,
+        string memory description,
+        string[] memory categories,
+        int256 requiredRows,
+        uint256 minSubRows
+    ) public {
+        require(requiredRows > 0);
+        require(IMultisig(msg.sender).isMultisigOwner(tx.origin));
+        tokenID.increment();
+        uint256 tokenId = tokenID.current();
+        dbInfoMap[tokenId].minSubRows = minSubRows;
+        dbInfoMap[tokenId].creator = msg.sender;
+        dbInfoMap[tokenId].dbState = DBState.RequestStatus;
+
+        tablelandStorage.insertMainStatement(tokenId,dataFormatCID,dbName,description,"dbCID",minSubRows,uint256(requiredRows),"piece_cid");
+
+        tablelandStorage.insertAttributeStatement(tokenId,"creator",Strings.toHexString(msg.sender));
+        tablelandStorage.insertAttributeStatement(tokenId,"multisig","true");
+
+        for (uint256 i = 0; i < categories.length; i++) {
+            tablelandStorage.insertAttributeStatement(tokenId, "category", categories[i]);
+        }
+    }
+
+    /*
+     * @notice Creates a contribution on a DB_NFT
+     * adding into contribution table the contribution
+     * @dev The contribution needs to get signed by our
+     * Backend to evaluate the dataCID format is the same
+     * with the DB_dataFormat only signatures from Connect-Fast
+     * are accepted
+     * @param tokenId: tokenId to contribute
+     * @param dataCID: CID content of the file contributed
+     * @param rows: how many entries are included
+     * @param multisig: In case it is a repo it requires
+    */
+    
+    function MultisigContribute(
+        uint256 tokenId,
+        string memory dataCID,
+        uint256 rows,
+        address multisig
+    ) public exists(tokenId) onlyTokenCreator(tokenId, multisig) {
+
+        require(IMultisig(multisig).isMultisigOwner(msg.sender));
+
+        require(dbInfoMap[tokenId].minSubRows <= rows, "sumbit more data");
+
+        tablelandStorage.insertSubmissionStatement(tokenId, dataCID, rows, msg.sender);
+    }
+    
+
+
+    /*
+    * @notice Creates a DB_NFT SoulBound token others can mint
+    * it to gain access to the DB contents
     * @dev Create DB_NFT requires our
     * Backend to evaluate the dbCID witch is a merge
-    * of all the Newcontributions and the previous mergedCID
+    * of all the contributions and to create the splitterContract
+    * using the thirdWeb factory to distribute fairly all the token mint 
+    * Revenues to the Contributors callable only from the NFT Requestor-Creator
     * @param tokenId: tokenId to of the DB that will be created
     * @param dbCID: Merged CID of the DataBase
-    * @param label: The Filecoin PayloadCID so it can get used to create
+    * @param mintPrice: mint price of the DB
+    * @param splitterContractAddress: ThirdWeb splitter contractAddress
+    * @param piece_cid: The Filecoin PayloadCID so it can get used to create
     * cross chain join queries on the tableland tables to get the Tableland versions
     * of the dealClient and the dealRewarder Deals Status
-    * @param v: v Signature param
-    * @param r: r Signature param
-    * @param s: s Signature param 
-   */
+    */
 
-    function updateDB(
+    function MultisigCreateDBNFT(
         uint256 tokenId,
         string memory dbCID,
-        string memory label,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public {
-        _exists(tokenId);
-        onlyTokenCreator(tokenId, msg.sender);
-        string memory signedMessage = string.concat(Strings.toString(tokenId), dbCID);
-        checkSigPolicy(signedMessage, v, r, s);
-        require(dbInfoMap[tokenId].dbState == DBState.Mintable);
+        uint256 mintPrice,
+        string memory piece_cid
+    ) public exists(tokenId) onlyTokenCreator(tokenId, msg.sender) {
+ 
+        require(IMultisig(msg.sender).isMultisigOwner(tx.origin));
+
+        dbInfoMap[tokenId].dbState = DBState.Mintable;
+        dbInfoMap[tokenId].splitterContract = msg.sender;
+        dbInfoMap[tokenId].mintPrice = mintPrice;
 
         string[] memory set = new string[](2);
         string memory filter = string.concat("tokenID=", Strings.toString(tokenId));
         set[0] = string.concat("dbCID='", dbCID, "'");
-        set[1] = string.concat("label='", label, "'");
+        set[1] = string.concat("piece_cid='", piece_cid, "'");
         tablelandStorage.toUpdate(set, filter);
-    }
-
-
-   /*
-    * @dev Validates a Signed String that is Signed by our backend
-    * @param signedMessage: The Signed Message
-    * @param v: v Signature param
-    * @param r: r Signature param
-    * @param s: s Signature param 
-    */
-
-    function checkSigPolicy(
-        string memory signedMessage,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal {
-        require(!signedMessages[signedMessage], "CID already added");
-        require(tablelandStorage.verifyString(signedMessage, v, r, s, signerAddress),"Invalid Signature");
-        signedMessages[signedMessage] = true;
+        tablelandStorage.insertAttributeStatement(tokenId, "price", Strings.toString(mintPrice));
+        tablelandStorage.insertAttributeStatement(tokenId,"splitterContract",Strings.toHexString(msg.sender));
     }
     
 
@@ -358,14 +322,13 @@ contract DB_NFT is ERC1155, Ownable {
     * @param tokenid: TokenID to mint
     */
 
-    function mintDB(uint256 tokenid) public payable {
-        _exists(tokenid);
-        require(dbInfoMap[tokenid].dbState == DBState.Mintable, "DB not still mintable");
-        require(balanceOf(msg.sender, tokenid) < 1 && dbInfoMap[tokenid].mintPrice == msg.value,"cannot mint already owner or wrong price");
+    function mintDB(uint256 tokenId) public exists(tokenId) payable {
+        require(dbInfoMap[tokenId].dbState == DBState.Mintable, "DB not still mintable");
+        require(balanceOf(msg.sender, tokenId) < 1 && dbInfoMap[tokenId].mintPrice == msg.value,"cannot mint already owner or wrong price");
         tablelandStorage.sendViaCall{value: msg.value}(
-            payable(dbInfoMap[tokenid].splitterContract)
+            payable(dbInfoMap[tokenId].splitterContract)
         );
-        _mint(msg.sender, tokenid, 1, "");
+        _mint(msg.sender, tokenId, 1, "");
     }
 
 
@@ -376,46 +339,13 @@ contract DB_NFT is ERC1155, Ownable {
     * @param tokenid: TokenID to to check access for sender
     */
 
-    function hasAccess(address sender, uint256 tokenid) public view returns (bool) {
-        return contributors[tokenid].contains(sender) || dbInfoMap[tokenid].creator == sender || balanceOf(sender, tokenid) > 0;
-    }
-
-
-   /*
-    * @dev Custom Access Control condition used with lighthouse for private repos
-    * returns true if someone is in the allowlist and made at least one contribution
-    * @param sender: sender to check access
-    * @param tokenid: TokenID to to check access for sender
-    */
-
-    function hasRepoAccess(address sender, uint256 tokenid) public view returns (bool) {
-        return contributors[tokenid].contains(sender);
-    }
-
-
-   /*
-    * @dev Assigns the Merkle Tree allowlist the contributions of the private repo
-    * and adds the allowlisted this function can get also used for DB_NFTs to allow only
-    * a set of addresses to contribute to a DB_NFT 
-    * addresses into tableland to keep them in a decentralized enviroment
-    * @param tokenId: TokenID of the private repo
-    * @param SubmitProof: the allowlisted addresses in string to be added on tableland
-    * @param SubmitRoot: Merkle Root to validate contributions-Submission
-    */
-
-    function setRepoSubmitAccessMerkleRoot(
-        uint256 tokenId,
-        address[] memory SubmitProof,
-        bytes32 SubmitRoot
-    ) public {
-        onlyTokenCreator(tokenId, msg.sender);
-        dbInfoMap[tokenId].submitRoot = SubmitRoot;
-        tablelandStorage.insertTokenProof(tokenId, SubmitProof, "SUBMIT");
-        for(uint256 i = 0; i < SubmitProof.length; i++){
-            contributors[tokenId].add(SubmitProof[i]);
+    function hasAccess(address sender, address multisig, uint256 tokenid) public view returns (bool) {
+        if(multisig == address(0)){
+            return contributors[tokenid].contains(sender) || dbInfoMap[tokenid].creator == sender || balanceOf(sender, tokenid) > 0;
+        }else{
+            return IMultisig(multisig).isMultisigOwner(sender) || balanceOf(sender, tokenid) > 0;
         }
     }
-
 
    /*
     * @notice withdraw function of the contract funds 
@@ -467,8 +397,7 @@ contract DB_NFT is ERC1155, Ownable {
     * @param tokenId: TokenID of the private repo
     */
 
-    function uri(uint256 tokenId) public view virtual override returns (string memory) {
-        _exists(tokenId);
+    function uri(uint256 tokenId) public exists(tokenId) view virtual override returns (string memory) {
         return tablelandStorage.uri(tokenId);
     }
 
@@ -481,21 +410,6 @@ contract DB_NFT is ERC1155, Ownable {
     }
 
 
-   /*
-    * @dev Verifies if an address is allowed to interact with the tokenID
-    * based on the Merkle Tree
-    * @param proof: MerkleHexProof
-    * @param root: MerkleTree Root
-    * @param sender: Address to verify
-    */
-
-    function verifyProof(
-        bytes32[] memory proof,
-        bytes32 root,
-        address sender
-    ) internal pure returns (bool) {
-        return MerkleProof.verify(proof, root, keccak256(abi.encodePacked(sender)));
-    }
 
 
    /*
@@ -503,8 +417,9 @@ contract DB_NFT is ERC1155, Ownable {
     * @param tokenId: TokenID to make the check
     */
 
-    function _exists(uint256 tokenId) internal view {
+    modifier exists(uint256 tokenId) {
         require(tokenId <= tokenID.current(), "non existed tokenID");
+        _;
     }
 
 
@@ -513,32 +428,29 @@ contract DB_NFT is ERC1155, Ownable {
     * @param tokenId: TokenID to make the check
     * @param sender: TokenID to make the check
     */
-    function onlyTokenCreator(uint256 tokenId, address sender) internal view {
+
+    modifier onlyTokenCreator(uint256 tokenId, address sender) {
         require(dbInfoMap[tokenId].creator == sender, "only token creator");
+        _;
     }
 
-
-   /*
-    * @dev Makes the DB_NFTs SoulBound tokens
-    * @param operator:
-    * @param from: 
-    * @param to: 
-    * @param ids: 
-    * @param amounts: 
-    * @param data:
+       /*
+    * @dev Validates a Signed String that is Signed by our backend
+    * @param signedMessage: The Signed Message
+    * @param v: v Signature param
+    * @param r: r Signature param
+    * @param s: s Signature param 
     */
-   
-    function _beforeTokenTransfer(
-        address operator,
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal pure override {
-        require(
-            from == address(0) || to == address(0),
-            "This a Soulbound token. It cannot be transferred. It can only be burned by the token owner."
-        );
+
+    function checkSigPolicy(
+        string memory signedMessage,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal {
+        require(!signedMessages[signedMessage], "CID already added");
+        require(tablelandStorage.verifyString(signedMessage, v, r, s, signerAddress),"Invalid Signature");
+        signedMessages[signedMessage] = true;
     }
+
 }

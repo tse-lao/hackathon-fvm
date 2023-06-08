@@ -15,12 +15,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 contract TablelandStorage is Ownable {
 
     ITablelandTables private tablelandContract;
-    string main;
-    string attribute;
-    string contribution;
-    uint256 mainID;
-    uint256 attributeID;
-    uint256 contributionID;
 
     string[] private createStatements;
     string[] public tables;
@@ -30,7 +24,7 @@ contract TablelandStorage is Ownable {
 
     string private constant MAIN_TABLE_PREFIX = "main_table";
     string private constant MAIN_SCHEMA =
-        "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minRows text, requiredRows text, label text, blockTimestamp text";
+        "tokenID text, dataFormatCID text, dbName text, description text, dbCID text, minRows text, requiredRows text, piece_cid text, blockTimestamp text";
 
     string private constant ATTRIBUTE_TABLE_PREFIX = "attribute_table";
     string private constant ATTRIBUTE_SCHEMA = "tokenID text, trait_type text, value text";
@@ -39,10 +33,6 @@ contract TablelandStorage is Ownable {
     string private constant SUBMISSION_SCHEMA =
         "tokenID text, dataCID text, rows text, blockTimestamp text, creator text";
 
-    string private constant MERKLE_TREE_TABLE_PREFIX = "merkleHelper_table";
-    string private constant MERKLE_TREE_SCHEMA =
-        "tokenID text, address text, addressIndex text, AccessFor text, blockTimestamp text";
-
     constructor(string memory _baseURIString) {
         tablelandContract = TablelandDeployments.get();
 
@@ -50,11 +40,9 @@ contract TablelandStorage is Ownable {
             SQLHelpers.toCreateFromSchema(SUBMISSION_SCHEMA, SUBMISSION_TABLE_PREFIX)
         );
         createStatements.push(SQLHelpers.toCreateFromSchema(MAIN_SCHEMA, MAIN_TABLE_PREFIX));
+
         createStatements.push(
             SQLHelpers.toCreateFromSchema(ATTRIBUTE_SCHEMA, ATTRIBUTE_TABLE_PREFIX)
-        );
-        createStatements.push(
-            SQLHelpers.toCreateFromSchema(MERKLE_TREE_SCHEMA, MERKLE_TREE_TABLE_PREFIX)
         );
 
         tableIDs = tablelandContract.create(address(this), createStatements);
@@ -62,30 +50,9 @@ contract TablelandStorage is Ownable {
         tables.push(SQLHelpers.toNameFromId(SUBMISSION_TABLE_PREFIX, tableIDs[0]));
         tables.push(SQLHelpers.toNameFromId(MAIN_TABLE_PREFIX, tableIDs[1]));
         tables.push(SQLHelpers.toNameFromId(ATTRIBUTE_TABLE_PREFIX, tableIDs[2]));
-        tables.push(SQLHelpers.toNameFromId(MERKLE_TREE_TABLE_PREFIX, tableIDs[3]));
 
-        setTableInfo(tables[0], tableIDs[0], tables[1], tableIDs[1], tables[2], tableIDs[2]);
 
         baseURIString = _baseURIString;
-    }
-
-    /**
-     * @dev Internal function to set the table information (names and IDs).
-     */
-    function setTableInfo(
-        string memory contributionName,
-        uint256 contributionId,
-        string memory mainName,
-        uint256 mainId,
-        string memory attributeName,
-        uint256 attributeId
-    ) internal {
-        contribution = contributionName;
-        main = mainName;
-        attribute = attributeName;
-        contributionID = contributionId;
-        mainID = mainId;
-        attributeID = attributeId;
     }
 
     /*
@@ -94,8 +61,8 @@ contract TablelandStorage is Ownable {
      * @param {string} filter:Filter condition for the update.
      */
     function toUpdate(string[] memory set, string memory filter) public onlyOwner {
-        mutate(mainID, SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, mainID, set[0], filter));
-        mutate(mainID, SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, mainID, set[1], filter));
+        mutate(tableIDs[1], SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, tableIDs[1], set[0], filter));
+        mutate(tableIDs[1], SQLHelpers.toUpdate(MAIN_TABLE_PREFIX, tableIDs[1], set[1], filter));
     }
 
     /*
@@ -107,7 +74,7 @@ contract TablelandStorage is Ownable {
      * @param {string} dbCID - Database CID.
      * @param {uint256} minRows - Minimum number of rows.
      * @param {uint256} requiredRows - Required number of rows.
-     * @param {string} label - Label.
+     * @param {string} piece_cid - piece_cid.
      */
 
     function insertMainStatement(
@@ -118,14 +85,14 @@ contract TablelandStorage is Ownable {
         string memory dbCID,
         uint256 minRows,
         uint256 requiredRows,
-        string memory label
+        string memory piece_cid
     ) public onlyOwner {
         mutate(
-            mainID,
+            tableIDs[1],
             SQLHelpers.toInsert(
                 MAIN_TABLE_PREFIX,
-                mainID,
-                "tokenID, dataFormatCID, dbName, description, dbCID, minRows, requiredRows, label, blockTimestamp",
+                tableIDs[1],
+                "tokenID, dataFormatCID, dbName, description, dbCID, minRows, requiredRows, piece_cid, blockTimestamp",
                 string.concat(
                     SQLHelpers.quote(Strings.toString(tokenid)),
                     ",",
@@ -141,7 +108,7 @@ contract TablelandStorage is Ownable {
                     ",",
                     SQLHelpers.quote(Strings.toString(requiredRows)),
                     ",",
-                    SQLHelpers.quote(label),
+                    SQLHelpers.quote(piece_cid),
                     ",",
                     SQLHelpers.quote(Strings.toString(block.timestamp))
                 )
@@ -175,10 +142,10 @@ contract TablelandStorage is Ownable {
         address creator
     ) public onlyOwner {
         mutate(
-            contributionID,
+            tableIDs[0],
             SQLHelpers.toInsert(
                 SUBMISSION_TABLE_PREFIX,
-                contributionID,
+                tableIDs[0],
                 "tokenID, dataCID, rows, blockTimestamp, creator",
                 string.concat(
                     SQLHelpers.quote(Strings.toString(tokenid)),
@@ -208,10 +175,10 @@ contract TablelandStorage is Ownable {
         string memory value
     ) public onlyOwner {
         mutate(
-            attributeID,
+            tableIDs[2],
             SQLHelpers.toInsert(
                 ATTRIBUTE_TABLE_PREFIX,
-                attributeID,
+                tableIDs[2],
                 "tokenID, trait_type, value",
                 string.concat(
                     SQLHelpers.quote((Strings.toString(tokenid))),
@@ -234,18 +201,18 @@ contract TablelandStorage is Ownable {
                     baseURIString,
                     "SELECT%20",
                     "json_object%28%27tokenID%27%2C",
-                    main,
+                    tables[1],
                     "%2EtokenID%2C%27dbName%27%2CdbName%2C%27dbCID%27%2CdbCID%2C%27description%27%2Cdescription%2C%27dataFormatCID%27%2CdataFormatCID%2C%27attributes%27%2Cjson_group_array%28json_object%28%27trait_type%27%2Ctrait_type%2C%27value%27%2Cvalue%29%29%29%20",
                     "FROM%20",
-                    main,
+                    tables[1],
                     "%20JOIN%20",
-                    attribute,
+                    tables[2],
                     "%20WHERE%20",
-                    main,
+                    tables[1],
                     "%2EtokenID%20%3D%20",
-                    attribute,
+                    tables[2],
                     "%2EtokenID%20and%20",
-                    main,
+                    tables[1],
                     "%2EtokenID%3D",
                     Strings.toString(tokenId),
                     "&mode=list"
@@ -259,42 +226,6 @@ contract TablelandStorage is Ownable {
      */
     function setTableURI(string memory baseURI) public onlyOwner {
         baseURIString = baseURI;
-    }
-
-    /*
-     * @dev Inserts token proofs into the tokenProofs mapping.
-     * @param {uint256} tokenId - Token ID.
-     * @param {string} proof - Proof data.
-     * @param {string} accessFor - accessFor data.
-     */
-    function insertTokenProof(
-        uint256 tokenId,
-        address[] memory addresses,
-        string memory accessFor
-    ) public onlyOwner {
-        ITablelandTables.Statement[] memory statements = new ITablelandTables.Statement[](
-            addresses.length
-        );
-        for (uint256 i = 0; i < addresses.length; i++) {
-            statements[i].tableId = tableIDs[3];
-            statements[i].statement = SQLHelpers.toInsert(
-                MERKLE_TREE_TABLE_PREFIX,
-                tableIDs[3],
-                "tokenID, address, addressIndex, AccessFor, blockTimestamp",
-                string.concat(
-                    SQLHelpers.quote((Strings.toString(tokenId))),
-                    ",",
-                    SQLHelpers.quote(Strings.toHexString(addresses[i])),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(i)),
-                    ",",
-                    SQLHelpers.quote(accessFor),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(block.timestamp))
-                )
-            );
-        }
-        tablelandContract.mutate(address(this), statements);
     }
 
     /*
@@ -367,6 +298,54 @@ contract TablelandStorage is Ownable {
         // Perform the elliptic curve recover operation
         bytes32 check = keccak256(abi.encodePacked(header, message));
         return ecrecover(check, v, r, s) == pkp;
+    }
+
+    function verify(
+        string memory message,
+        bytes memory signature,
+        address _signer
+    ) public pure returns (bool) {
+        // bytes32 messageHash = getMessageHash(_message);
+        // bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
+
+        return recoverSigner(keccak256(
+                abi.encodePacked("\x19Ethereum Signed Message:\n32", message)
+            ), signature) == _signer;
+    }
+
+    function recoverSigner(
+        bytes32 _ethSignedMessageHash,
+        bytes memory _signature
+    ) public pure returns (address) {
+        (bytes32 r, bytes32 s, uint8 v) = splitSignature(_signature);
+
+        return ecrecover(_ethSignedMessageHash, v, r, s);
+    }
+
+    function splitSignature(
+        bytes memory sig
+    ) public pure returns (bytes32 r, bytes32 s, uint8 v) {
+        require(sig.length == 65, "invalid signature length");
+
+        assembly {
+            /*
+            First 32 bytes stores the length of the signature
+
+            add(sig, 32) = pointer of sig + 32
+            effectively, skips first 32 bytes of signature
+
+            mload(p) loads next 32 bytes starting at the memory address p into memory
+            */
+
+            // first 32 bytes, after the length prefix
+            r := mload(add(sig, 32))
+            // second 32 bytes
+            s := mload(add(sig, 64))
+            // final byte (first byte of the next 32 bytes)
+            v := byte(0, mload(add(sig, 96)))
+        }
+
+        // implicitly return (r, s, v)
     }
 
     function sendViaCall(address payable _to) public payable {

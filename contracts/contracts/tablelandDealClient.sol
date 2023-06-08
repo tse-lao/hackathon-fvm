@@ -23,8 +23,6 @@ contract tablelandDealClient is IDealClient, AccessControl {
         // if DEALcLIENT IS DEPLOYABLE USING CREATE2 I WILL CREATE A DAO WITH ACCESS CONTROLL GIVEN TO THE POLYGON MULTISIG OWNERS
         // 
     using EnumerableSet for EnumerableSet.UintSet;
-    using Counters for Counters.Counter;
-    Counters.Counter private tokenIDs;
 
     address private MARKET_ACTOR_ETH_ADDRESS = address(0xff00000000000000000000000000000000000005);
 
@@ -36,29 +34,19 @@ contract tablelandDealClient is IDealClient, AccessControl {
 
     mapping(bytes => currentRequestInfo) private currentPieceRequestInfo;
 
+    mapping(bytes => uint256) public fileDataCap;
+
     IDealTablelandStorage dealClientTablelandStorage;
 
-    struct tokenDealInfo {
-        bytes piece_cid;
-        string label;
-        uint64 piece_size;
-        string location_ref;
-        uint64 car_size;
-        uint256 dataCapAllocation;
-    }
-
-    mapping(uint256 => tokenDealInfo) public tokenInfoMap;
     // That mapping can solve the issue to create a dealClient capable of acceppting from different kind of contracts to store the tokens OF THAT CONTRACT
     // ON FIELCOIN THE OWNERS SOULD FIRST EXECUTE A TREANSACTION
     // TO SPESIFY THEIR TOKEN FILECOIN STORAGE DEALS INFO
-    mapping(address => mapping(uint256 => tokenDealInfo)) contractTotokenInfoMap;
 
-    mapping(address => uint) public userFunds;
 
     constructor(
         IDealTablelandStorage dealTablelandView,
         address[] memory _admins
-    ){
+    )  {
         dealClientTablelandStorage = dealTablelandView;
         uint256 size = _admins.length;
         address admin;
@@ -71,16 +59,10 @@ contract tablelandDealClient is IDealClient, AccessControl {
         }
     }
 
-    function setTokenInfo(
+    function addDataCapToFile(
         bytes memory piece_cid,
-        string memory label,
-        uint64 piece_size,
-        string memory location_ref,
-        uint64 car_size,
         uint256 tokenDataCapAllocationInBytes
     ) public onlyRole(DEFAULT_ADMIN_ROLE){
-        tokenIDs.increment();
-        uint256 newToken = tokenIDs.current();
         (uint256 contractDataCapInBytes, bool Converted) = BigInts.toUint256(
             DataCapAPI.balance(FilAddresses.fromEthAddress(address(this)))
         );
@@ -90,26 +72,12 @@ contract tablelandDealClient is IDealClient, AccessControl {
             "Issues converting uint256 to BigInt, may not have accurate values"
         );
         require(contractDataCapInBytes >= tokenDataCapAllocationInBytes);
-
-        tokenInfoMap[newToken] = tokenDealInfo(piece_cid, label, piece_size, location_ref, car_size,tokenDataCapAllocationInBytes);
+        fileDataCap[piece_cid] += tokenDataCapAllocationInBytes;
     }
 
 
     // After a proposal deal is materialized we offer more deal replications
-    function makeDealProposal(uint256 tokenId) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bytes32) {
-        require(tokenInfoMap[tokenId].car_size > 0);
-        tokenDealInfo memory dealInfo = tokenInfoMap[tokenId];
-        bool verifiedDeal;
-        if(dealInfo.dataCapAllocation >= dealInfo.car_size) {
-            verifiedDeal = true;
-        }
-        int64 blockNumber = int64(uint64(block.number));
-        DealRequest memory deal = DealRequest(dealInfo.piece_cid,dealInfo.piece_size,verifiedDeal,dealInfo.label,blockNumber + 5760,blockNumber + 2102400,0,0,0,1,
-                                                ExtraParamsV1(
-                                                    dealInfo.location_ref, dealInfo.car_size, false, false
-                                                )
-                                            );
-        // Checking if the deal is requested previously if so we only allow a deal for the same file only if the prev deal is terminated or activated or timeout occured
+    function makeDealProposal(DealRequest memory deal) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bytes32) {
         if (
             currentPieceRequestInfo[deal.piece_cid].currentRequestID != bytes32(0) ||
             piecedeals[deal.piece_cid].contains(currentPieceRequestInfo[deal.piece_cid].dealid)
@@ -122,8 +90,12 @@ contract tablelandDealClient is IDealClient, AccessControl {
                 "piece_cid is still in a pending deal try later"
             );
         }
-        if(verifiedDeal){
-            tokenInfoMap[tokenId].dataCapAllocation -= dealInfo.car_size;
+        // unverified price per GB per epoch
+        deal.storage_price_per_epoch = 500000000;
+        if(fileDataCap[deal.piece_cid] >= deal.piece_size) {
+            deal.verified_deal = true;
+            deal.storage_price_per_epoch = 0;
+            fileDataCap[deal.piece_cid] -= deal.piece_size;
         }
         // creates a unique ID for the deal proposal -- there are many ways to do this
         bytes32 id = keccak256(abi.encodePacked(block.number, msg.sender));
@@ -135,11 +107,11 @@ contract tablelandDealClient is IDealClient, AccessControl {
         );
         request[id] = deal;
         dealClientTablelandStorage.requestInsertion(
-            tokenId,
+            deal.piece_cid,
             deal.label,
             deal.extra_params.location_ref,
             deal.piece_size,
-            block.number
+            deal.verified_deal
         );
 
         // writes the proposal metadata to the event log
@@ -247,11 +219,9 @@ contract tablelandDealClient is IDealClient, AccessControl {
         currentPieceRequestInfo[proposal.piece_cid.data].dealid = DEAL_ID;
 
         currentPieceRequestInfo[proposal.piece_cid.data].status = Status.DealPublished;
-        string storage payloadCID = request[
-            currentPieceRequestInfo[proposal.piece_cid.data].currentRequestID
-        ].label;
+
         dealClientTablelandStorage.dealInsertion(
-            payloadCID,
+            proposal.piece_cid.data,
             DEAL_ID,
             uint256(provider),
             "DealPublished"

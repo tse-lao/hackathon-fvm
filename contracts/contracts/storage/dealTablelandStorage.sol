@@ -13,27 +13,35 @@ import {CommonTypes} from '@zondax/filecoin-solidity/contracts/v0.8/types/Common
 import {BigNumbers, BigNumber} from '@zondax/solidity-bignumber/src/BigNumbers.sol';
 import {BigInts} from '@zondax/filecoin-solidity/contracts/v0.8/utils/BigInts.sol';
 import {FilAddresses} from '@zondax/filecoin-solidity/contracts/v0.8/utils/FilAddresses.sol';
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import '../interfaces/IDealClient.sol';
+
 
 /** @title DB_NFT. */
 /// @author Nick Lionis (github handle : nijoe1 )
 /// @notice Use this contract for creating Decentralized datassets with others and sell them as NFTs
 /// All the data inside the tables are pointing on an IPFS CID.
-contract dealTablelandStorage is IDealClient, Ownable {
+contract dealTablelandStorage is IDealClient,AccessControl {
     ITablelandTables private tablelandContract;
     using CBOR for CBOR.CBORBuffer;
     using AccountCBOR for *;
     using MarketCBOR for *;
 
-    // string private _baseURIString;
+    bytes32 public constant ADD_DAO_ROLE = keccak256("ADD DAO ROLE");
+    bytes32 public constant CONTRACT_CALLER_ROLE = keccak256("CONTRACT CALLER ROLE");
 
+    
     string private constant REQUEST_TABLE_PREFIX = 'request';
     string private constant REQUEST_SCHEMA =
-        'label text, location_ref text, car_size text, piece_size text, storage_price_per_epoch text, timestampt text, creator text';
+        'piece_cid text, daoAddress text, label text, location_ref text, piece_size text, verified text, timestampt text';
 
     string private constant DEAL_TABLE_PREFIX = 'deal';
     string private constant DEAL_SCHEMA =
-        'label text, dealID text, provder text, status text';
+        'piece_cid text, dealID text, provider text, status text';
+
+    string private constant DATA_DAO_OWNER_TABLE_PREFIX = 'dao_owner';
+    string private constant DATA_DAO_OWNER_SCHEMA =
+        'daoAddress text, ownerAddress text, multisigAddress text';
 
     uint256 storage_price_per_epoch;
 
@@ -44,9 +52,9 @@ contract dealTablelandStorage is IDealClient, Ownable {
     // ["data_contribution_80001_6068","file_main_80001_6069","file_attribute_80001_6070"]
 
     // 0xBF62ef1486468a6bd26Dd669C06db43dEd5B849B,0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
-    constructor() {
+    constructor(address _dealClientFacory) {
         // _baseURIString = 'https://testnets.tableland.network/api/v1/query?format=objects&extract=true&unwrap=true&statement=';
-
+        _grantRole(ADD_DAO_ROLE,_dealClientFacory);
         tablelandContract = TablelandDeployments.get();
 
         createStatements.push(
@@ -56,10 +64,14 @@ contract dealTablelandStorage is IDealClient, Ownable {
             SQLHelpers.toCreateFromSchema(DEAL_SCHEMA, DEAL_TABLE_PREFIX)
         );
 
+        createStatements.push(
+            SQLHelpers.toCreateFromSchema(DATA_DAO_OWNER_SCHEMA, DATA_DAO_OWNER_TABLE_PREFIX)
+        );
         tableIDs = tablelandContract.create(address(this), createStatements);
 
         tables.push(SQLHelpers.toNameFromId(REQUEST_TABLE_PREFIX, tableIDs[0]));
         tables.push(SQLHelpers.toNameFromId(DEAL_TABLE_PREFIX, tableIDs[1]));
+        tables.push(SQLHelpers.toNameFromId(DATA_DAO_OWNER_TABLE_PREFIX, tableIDs[2]));
     }
 
     function mutate(uint256 tableId, string memory statement) internal {
@@ -111,58 +123,61 @@ contract dealTablelandStorage is IDealClient, Ownable {
     function toUpdateStatus(
         string memory status,
         uint256 dealID
-    ) public onlyOwner{
+    ) public onlyRole(CONTRACT_CALLER_ROLE){
          mutate(tableIDs[1],SQLHelpers.toUpdate(DEAL_TABLE_PREFIX, tableIDs[1], string.concat("status='", status, "'"), string.concat('dealID=', Strings.toString(dealID))));
     }
 
 
     function requestInsertion(
+        bytes memory piece_cid,
         string memory label,
         string memory location_ref,
-        uint64 car_size,
         uint64 piece_size,
-        uint256 timestampt,
-        address creator
-    ) public onlyOwner{
+        bool verified
+    ) public onlyRole(CONTRACT_CALLER_ROLE){
+        string memory _verified = "false";
+        if(verified){
+            _verified = "true";
+        }
         mutate(
             tableIDs[0],
             SQLHelpers.toInsert(
                 REQUEST_TABLE_PREFIX,
                 tableIDs[0],
-                'label, location_ref, car_size, piece_size, storage_price_per_epoch, timestampt, creator',
+                'piece_cid, daoAddress, label, location_ref, piece_size, verified, timestampt',
                 string.concat(
+                    SQLHelpers.quote(bytesToString(piece_cid)),
+                    ',',
+                    SQLHelpers.quote(Strings.toHexString(msg.sender)),
+                    ',',
                     SQLHelpers.quote(label),
                     ',',
                     SQLHelpers.quote(location_ref),
                     ',',
-                    SQLHelpers.quote(Strings.toString(car_size)),
-                    ',',
                     SQLHelpers.quote(Strings.toString(piece_size)),
                     ',',
-                    SQLHelpers.quote(Strings.toString(storage_price_per_epoch)),
+                    SQLHelpers.quote(_verified),
                     ',',
-                    SQLHelpers.quote(Strings.toString(timestampt)),
-                    ',',
-                    SQLHelpers.quote(Strings.toHexString(creator))
+                    SQLHelpers.quote(Strings.toString(block.number + 5500))
                 )
             )
         );
     }
 
     function dealInsertion(
-        string memory label,
+        bytes memory piece_cid,
         uint256 dealID,
         uint256 provider,
         string memory status
-    ) public onlyOwner{
+    ) public onlyRole(CONTRACT_CALLER_ROLE){
         mutate(
             tableIDs[1],
             SQLHelpers.toInsert(
                 DEAL_TABLE_PREFIX,
                 tableIDs[1],
-                'label, dealID, provider, status',
+                'piece_cid, dealID, provider, status',
                 string.concat(
-                    SQLHelpers.quote(label),
+                    SQLHelpers.quote(bytesToString(piece_cid)),
                     ',',
                     SQLHelpers.quote(Strings.toString(dealID)),
                     ',',
@@ -184,5 +199,47 @@ contract dealTablelandStorage is IDealClient, Ownable {
         buf.writeBool(params.skip_ipni_announce);
         buf.writeBool(params.remove_unsealed_copy);
         return buf.data();
+    }
+
+    function addDAO(address newDAO,address[] memory owners,address multisigAddress) public onlyRole(ADD_DAO_ROLE){
+        _grantRole(CONTRACT_CALLER_ROLE, newDAO);
+        uint size = owners.length;
+        address owner;
+        for( uint i = 0; i < size; ){
+            owner = owners[i];
+            mutate(
+                tableIDs[2],
+                SQLHelpers.toInsert(
+                    DATA_DAO_OWNER_TABLE_PREFIX,
+                    tableIDs[2],
+                    'daoAddress, ownerAddress, multisigAddress',
+                    string.concat(
+                        SQLHelpers.quote(Strings.toHexString(newDAO)),
+                        ',',
+                        SQLHelpers.quote(Strings.toHexString(owner)),
+                        ',',
+                        SQLHelpers.quote(Strings.toHexString(multisigAddress))
+                    )
+                )
+            );
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function bytesToString(bytes memory data) public pure returns (string memory) {
+
+        // Fixed buffer size for hexadecimal convertion
+        bytes memory converted = new bytes(data.length * 2);
+
+        bytes memory _base = "0123456789abcdef";
+
+        for (uint256 i = 0; i < data.length; i++) {
+            converted[i * 2] = _base[uint8(data[i]) / _base.length];
+            converted[i * 2 + 1] = _base[uint8(data[i]) % _base.length];
+        }
+
+        return string(abi.encodePacked("0x", converted));
     }
 }

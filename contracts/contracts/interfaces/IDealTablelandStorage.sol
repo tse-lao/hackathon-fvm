@@ -9,18 +9,18 @@ interface IDealTablelandStorage is IDealClient {
     // function toUpdate(string memory prefix, uint256 tableID,string memory set, string memory filter)external view returns(string memory);
 
     function dealInsertion(
-        string memory label,
+        bytes memory piece_cid,
         uint256 dealID,
         uint256 provider,
         string memory status
     ) external;
 
    function requestInsertion(
-        uint256 tokenId,
+        bytes memory piece_cid,
         string memory label,
         string memory location_ref,
         uint64 piece_size,
-        uint256 timestampt
+        bool verified
     ) external;
 
     function toUpdateStatus(
@@ -46,5 +46,7 @@ interface IDealTablelandStorage is IDealClient {
 
     function retBuf() external pure returns (bytes memory);
 
-    function addDAO(address newDAO,address[] memory owners) external;
+    function addDAO(address newDAO,address[] memory owners, address multisig) external;
+
+    function bytesToString(bytes memory data) external pure returns (string memory);
 }

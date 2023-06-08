@@ -34,7 +34,5 @@ interface IBacalhauTablelandStorage {
     ) external;
 
     function updateBountyWinner(address winner, uint256 bountyID) external;
-
-    function updateJobResult(string memory set, uint256 requestID) external;
     
 }
