@@ -12,4 +12,4 @@ export const splitImplementation = "0x31d8EAfF8AF8c1207644B1E04980d3E821fDDe05"
 export const MumbaiEscrow = "0x31B48aFC27789e84326F4d3F09A611E93245684a"
 export const HyperspaceEscrow = "0xa45f23B0fBA25E6B9E83d768e559f8e19cC8855e"
 
-export const MultisigFactory = "0x9e2eAB8f21D0bBFf03435Fa58ef3DEF5445f0589"
+export const MultisigFactory = "0x91ffeEc2A154BDbA3908443405929D425ce9bC00"
