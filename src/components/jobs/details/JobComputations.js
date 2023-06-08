@@ -39,14 +39,18 @@ export default function JobComputations({jobId}) {
     useEffect(() => {
         //fetch here tableland for info 
         //TODO: call function here when its implements and check if jobID is indeed name JobId
-        window.alert("dummy data still.")
+
+            fetchDatasets();
+
     }, [jobId])
     
     const fetchDatasets = async() => {
         setLoading(true)
         let query = `WHERE jobId = '${jobId}'`;
-        const marketplace = await fetch(`/api/tableland/computations/all?where=${query}`);
+        const marketplace = await fetch(`/api/tableland/computations/jobid?where=${query}`);
+
         const data = await marketplace.json();
+        console.log(data);
         setData(data.result);
         setLoading(false);
     }
@@ -54,7 +58,7 @@ export default function JobComputations({jobId}) {
 if(loading) return <LoadingEmpty />
     
   return (
-        computations.length > 0 ? computations.map((item, key) => (
+        data.length > 0 ? data.map((item, key) => (
             <JobComputationItem data={item} />
         )): 
         <DataNotFound message="No computation performed" />

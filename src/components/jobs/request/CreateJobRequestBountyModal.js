@@ -1,4 +1,3 @@
-import ModalLayout from '@/components/ModalLayout'
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton'
 import InputField from '@/components/application/elements/input/InputField'
 import SelectMultiSig from '@/components/application/elements/input/SelectMultiSig'
@@ -84,7 +83,7 @@ export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
 
 
   return (
-    <ModalLayout title="Job Request Bounty" onClose={onClose} showModal={getOpen} >
+
       <div className="flex flex-col gap-6">
         <div className='flex flex-row gap-2'>
           <span onClick={() => setAddressFunction("individual")} className={`flex px-6 cursor-pointer ${addressFunction == 'individual' && 'bg-cf-200'}`}>
@@ -124,6 +123,6 @@ export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
         <TagsInput value={formData.categories} onChange={handleTagChange} />
         <ActionButton loading={loading} onClick={createRequest} text="Create Job Bounty" />
       </div>
-    </ModalLayout>
+
   )
 }

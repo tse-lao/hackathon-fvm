@@ -86,7 +86,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
 
       setStatus(RECORD_CONTRIBUTION)
       
-      toast.promise(submitData(tokenID, selectedOptions[i], count.toString(), [], 0,  getData.v, getData.r, getData.s), {
+      toast.promise(submitData(tokenID, selectedOptions[i], count.toString(),  getData.v, getData.r, getData.s), {
         pending: "Waiting for transaction to confirm 🕐",
         success: "Successfully contributing to the dataset. Thank you for your support.  👌",
         error: "Something went wrong, please try again.. 🤯",

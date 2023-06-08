@@ -404,8 +404,11 @@ export const useContract = () => {
   ): Promise<any> => {
     try {
       const bytes = await multisigFactory.getMultisigInitBytes(name,description,owners,MultisigFactory,minimumSignatures)
+      var salt = randomSalt()
+
       const tx = await multisigFactory.createWallet(
-        bytes
+        bytes, 
+        salt
       )
       console.log(tx)
       toast.update('Promise is pending', {

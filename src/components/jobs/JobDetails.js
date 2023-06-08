@@ -29,7 +29,7 @@ export default function JobDetails({ details, input }) {
             error: 'Error starting job',
         }).then(() => {
             setLoading(false)
-            onClose;
+          
         })
     }
     

@@ -31,7 +31,7 @@ export default function GroupDetail({ members, details, address }) {
 
 
 
-    toast.promise(multisigAddMemberProposal(address, addMembers[0], name, description), {
+    toast.promise(multisigAddMemberProposal(address, addMembers[0], confirmations, name, description), {
       pening: "Creating multisig...",
       success: "Multisig created",
       error: "Error creating multisig",
@@ -58,6 +58,13 @@ export default function GroupDetail({ members, details, address }) {
                 placeholder="Create name"
                 onChange={(e) => setName(e.target.value)}
                 value={name}
+              />
+              <InputField
+                label="Confirmations"
+                type="number"
+                placeholder="Set confirmations"
+                onChange={(e) => setConfirmations(e.target.value)}
+                value={confirmations}
               />
 
               <TextArea

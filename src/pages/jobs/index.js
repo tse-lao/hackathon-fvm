@@ -1,6 +1,5 @@
 
 import LoadingFull from '@/components/application/elements/loading/LoadingFull'
-import PageTitle from '@/components/application/elements/text/PageTitle'
 import CreateJob from '@/components/jobs/CreateJob'
 import AllJobs from '@/components/jobs/JobList'
 import { computation } from '@/constants'
@@ -18,7 +17,7 @@ export default function Jobs({ children }) {
     useEffect(() => {
         //getting all the computations stored in there. 
         const getData = async () => {
-            setLoading(false)
+            setLoading(true)
 
             let query = `WHERE ${computation}.verified='true'`;
 
@@ -45,28 +44,32 @@ export default function Jobs({ children }) {
     if (loading) return <LoadingFull />
     return (
         <Layout title="Jobs" active="Jobs">
-        
-            <div className="grid grid-cols-2">
-                    <Link className="col-span-1" href="/jobs" >Verified Jobs</Link>
-                    <Link  className="col-span-1" href="/jobs/request">Jobs Request</Link>
-            </div>
-            <div className="flex justify-between mb-12">
-            <div className='flex flex-col gap-6'>
-                <PageTitle title='Jobs' />
-                <Link href="/jobs/request" className='text-cf-500'>Open requests</Link>
-            </div>
-                <button
-                    onClick={() => setOpenModal(!openModal)}
-                    className="bg-cf-500 hover:bg-cf-700 self-end text-white font-bold py-2 px-4 rounded-full">
-                        Create Job
-                </button>
-                {openModal && <CreateJob onClose={() => setOpenModal(false)} />}
-            </div>
-            <div className='flex flex-row gap-12 flex-wrap'>
-                <div className='grid grid-cols-2 py-4 px-8 max-h-full overflow-auto gap-6 items-center'>
-                    <AllJobs jobs={jobs}  />
-                </div>
-            </div>
+            {openModal ? <CreateJob onClose={() => setOpenModal(false)} /> :
+                (
+                    <div>
+                        <div className="grid grid-cols-2 text-center mb-4">
+                            <Link className="col-span-1 text-cf-500 font-md " href="/jobs" >Verified Jobs</Link>
+                            <Link className="col-span-1" href="/jobs/request">Jobs Request</Link>
+                        </div>
+                        
+                        <div className="grid lg:grid-cols-2 sm:grid-cols-1 flex-col justify-center">
+                            <AllJobs jobs={jobs} />
+                            </div>
+
+
+                    </div>
+                )
+
+            }
+
+
+            <button
+                className="fixed bottom-12 right-12 bg-cf-500 text-white px-4 py-2 rounded"
+                onClick={() => { setModalOpen(!modalOpen) }}
+            >
+                Create Job
+            </button>
+
         </Layout>
     )
 }

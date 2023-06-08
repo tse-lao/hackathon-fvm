@@ -13,7 +13,7 @@ export default async (req, res) => {
                 'description', description,
                 'dbCID', dbCID,
                 'minRows', minRows,
-                'label', label,
+                'piece_cid', piece_cid,
                 'attributes', json_group_array(
                   json_object(
                     'trait_type',trait_type,

@@ -10,6 +10,10 @@ export default function ProposalItem({ proposal, numberOfConfirmations, multiSig
     
     useEffect(() => {
         if (proposal.confirmations.length >= numberOfConfirmations) {
+            if(proposal.executed == true){
+                setStatus(3)
+                return
+            }
             setStatus(1);
             return
         }
@@ -17,9 +21,6 @@ export default function ProposalItem({ proposal, numberOfConfirmations, multiSig
             setStatus(2);
             return
         }
-        
-        //check if my vote is there 
-        
     }, [proposal.confirmations.length])
     
     const confirmProposal = async () => {
@@ -63,6 +64,10 @@ export default function ProposalItem({ proposal, numberOfConfirmations, multiSig
                   {proposal.confirmations.length}/{numberOfConfirmations}
                   </span>
             }
+            {status == 3 && 
+                <span className="text-center text-cf-500">Succesfully executed
+                </span>
+          }
                 
 
             </div>

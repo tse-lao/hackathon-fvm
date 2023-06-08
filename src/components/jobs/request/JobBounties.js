@@ -78,8 +78,8 @@ export default function JobBounties() {
   
   if(loading) return <LoadingEmpty />
   return (
-    <div>
-        {data.length > 0 && data.map((item, key ) => (
+    <div className="grid lg:grid-cols-2 sm:grid-cols-1 flex-col justify-center">
+    {data.length > 0 && data.map((item, key ) => (
           <JobBountyItem details={item} key={key} />
         ))}
     </div>

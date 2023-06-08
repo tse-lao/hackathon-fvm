@@ -8,7 +8,7 @@ export default function GroupProposals({address, proposalTable, confirmationTabl
     useEffect(() => {
       //proposalTable, confirmationTable
       const getData = async() => {
-        const res = await fetch(`/api/tableland/multisig/proposal?proposalTable=${proposalTable}&confirmationTable=${confirmationTable}`)
+        const res = await fetch(`/api/tableland/multisig/proposal?proposalTable=${proposalTable}&confirmationTable=${confirmationTable}&executed='false'`)
         const result = await res.json()
         console.log(result)
         if(result){

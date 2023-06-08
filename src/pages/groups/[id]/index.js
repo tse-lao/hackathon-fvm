@@ -82,7 +82,7 @@ export default function GroupDetailPage() {
                 <div className=' w-[800px] p-8 rounded-md '>
                     {active == 'details' && <GroupDetail details={details} address={id} members={members} />}
                     {active == 'proposals' && <GroupProposals address={id} confirmationTable={details.confirmationTable} proposalTable={details.proposalTable} numberOfConfirmations={details.numberOfConfirmations} />}
-                    {active == 'transactions' && <GroupTransactions address={id} />}
+                    {active == 'transactions' && <GroupTransactions address={id} confirmationTable={details.confirmationTable} proposalTable={details.proposalTable} numberOfConfirmations={details.numberOfConfirmations} />}
                     {active == 'bounty' && <GroupBountyProposal address={id} />}
 
 

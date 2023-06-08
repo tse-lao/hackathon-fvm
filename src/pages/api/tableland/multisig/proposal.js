@@ -29,10 +29,12 @@ export default async (req, res) => {
                 'description', ${proposalTable}.description,
                 'proposer', ${proposalTable}.proposer,
                 'proposalID', ${proposalTable}.proposalID,
+                'executed', ${proposalTable}.executed,
                 'confirmations', json_group_array(${confirmTable}.confirmationAddress)
             )       
             FROM  ${confirmTable} 
             JOIN  ${proposalTable} ON  ${proposalTable}.proposalID = ${confirmTable}.proposalID 
+            WHERE ${proposalTable}.executed = ${req.query.executed}
             GROUP BY ${confirmTable}.proposalID
             `,
              format: "objects", unwrap: false, extract:true
