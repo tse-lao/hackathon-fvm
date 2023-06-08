@@ -5,15 +5,26 @@ import {CommonTypes} from "@zondax/filecoin-solidity/contracts/v0.8/types/Common
 import {MarketTypes} from "@zondax/filecoin-solidity/contracts/v0.8/types/MarketTypes.sol";
 import {BigInts} from "@zondax/filecoin-solidity/contracts/v0.8/utils/BigInts.sol";
 import {FilAddresses} from "@zondax/filecoin-solidity/contracts/v0.8/utils/FilAddresses.sol";
+import {DataCapAPI} from "@zondax/filecoin-solidity/contracts/v0.8/DataCapAPI.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/IDealTablelandStorage.sol";
 import "./interfaces/IDealClient.sol";
+// Accept tokens from ERC1155 OR ERC721 address to tokenID
+// mapping(address => Enumerable.UintSet) contractTokensForPermanent deals
+// Each tokenID could have more than one files on it so maybe we need a counter for this contract and create something like thisContractCounterID => address => tokenID so then like apes can add files into their tokens
+// Each tokenID dataPiece has a funding pool to pay for the deals
 
-contract tablelandDealClient is IDealClient {
-    
-    IDealTablelandStorage dealClientTablelandStorage;
+contract tablelandDealClient is IDealClient, AccessControl {
 
+    // If i am going to create an address => tokensSet meaning that an address has made those deals so i need to add a token Counter
+        // IN GENERAL MAKE THAT WAY SO WE CAN ACCEPT DEALS FROM EVERYONE LIKE 
+        // if DEALcLIENT IS DEPLOYABLE USING CREATE2 I WILL CREATE A DAO WITH ACCESS CONTROLL GIVEN TO THE POLYGON MULTISIG OWNERS
+        // 
     using EnumerableSet for EnumerableSet.UintSet;
+    using Counters for Counters.Counter;
+    Counters.Counter private tokenIDs;
 
     address private MARKET_ACTOR_ETH_ADDRESS = address(0xff00000000000000000000000000000000000005);
 
@@ -25,21 +36,79 @@ contract tablelandDealClient is IDealClient {
 
     mapping(bytes => currentRequestInfo) private currentPieceRequestInfo;
 
-    // mapping(uint256 => bytes32) dealToRequestID
+    IDealTablelandStorage dealClientTablelandStorage;
 
-    // mapping(uint256 => MarketTypes.DealProposal) private dealToProposal;
+    struct tokenDealInfo {
+        bytes piece_cid;
+        string label;
+        uint64 piece_size;
+        string location_ref;
+        uint64 car_size;
+        uint256 dataCapAllocation;
+    }
+
+    mapping(uint256 => tokenDealInfo) public tokenInfoMap;
+    // That mapping can solve the issue to create a dealClient capable of acceppting from different kind of contracts to store the tokens OF THAT CONTRACT
+    // ON FIELCOIN THE OWNERS SOULD FIRST EXECUTE A TREANSACTION
+    // TO SPESIFY THEIR TOKEN FILECOIN STORAGE DEALS INFO
+    mapping(address => mapping(uint256 => tokenDealInfo)) contractTotokenInfoMap;
 
     mapping(address => uint) public userFunds;
 
     constructor(
-        IDealTablelandStorage dealTablelandView
-    ) {
+        IDealTablelandStorage dealTablelandView,
+        address[] memory _admins
+    ){
         dealClientTablelandStorage = dealTablelandView;
+        uint256 size = _admins.length;
+        address admin;
+        for (uint i = 0; i < size; ) {
+            admin = _admins[i];
+            _grantRole(DEFAULT_ADMIN_ROLE,admin);
+            unchecked {
+                ++i;
+            }
+        }
     }
-   
+
+    function setTokenInfo(
+        bytes memory piece_cid,
+        string memory label,
+        uint64 piece_size,
+        string memory location_ref,
+        uint64 car_size,
+        uint256 tokenDataCapAllocationInBytes
+    ) public onlyRole(DEFAULT_ADMIN_ROLE){
+        tokenIDs.increment();
+        uint256 newToken = tokenIDs.current();
+        (uint256 contractDataCapInBytes, bool Converted) = BigInts.toUint256(
+            DataCapAPI.balance(FilAddresses.fromEthAddress(address(this)))
+        );
+        contractDataCapInBytes = contractDataCapInBytes * 1073741824;
+        require(
+            !Converted,
+            "Issues converting uint256 to BigInt, may not have accurate values"
+        );
+        require(contractDataCapInBytes >= tokenDataCapAllocationInBytes);
+
+        tokenInfoMap[newToken] = tokenDealInfo(piece_cid, label, piece_size, location_ref, car_size,tokenDataCapAllocationInBytes);
+    }
+
 
     // After a proposal deal is materialized we offer more deal replications
-    function makeDealProposal(DealRequest memory deal) public returns (bytes32) {
+    function makeDealProposal(uint256 tokenId) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bytes32) {
+        require(tokenInfoMap[tokenId].car_size > 0);
+        tokenDealInfo memory dealInfo = tokenInfoMap[tokenId];
+        bool verifiedDeal;
+        if(dealInfo.dataCapAllocation >= dealInfo.car_size) {
+            verifiedDeal = true;
+        }
+        int64 blockNumber = int64(uint64(block.number));
+        DealRequest memory deal = DealRequest(dealInfo.piece_cid,dealInfo.piece_size,verifiedDeal,dealInfo.label,blockNumber + 5760,blockNumber + 2102400,0,0,0,1,
+                                                ExtraParamsV1(
+                                                    dealInfo.location_ref, dealInfo.car_size, false, false
+                                                )
+                                            );
         // Checking if the deal is requested previously if so we only allow a deal for the same file only if the prev deal is terminated or activated or timeout occured
         if (
             currentPieceRequestInfo[deal.piece_cid].currentRequestID != bytes32(0) ||
@@ -53,6 +122,9 @@ contract tablelandDealClient is IDealClient {
                 "piece_cid is still in a pending deal try later"
             );
         }
+        if(verifiedDeal){
+            tokenInfoMap[tokenId].dataCapAllocation -= dealInfo.car_size;
+        }
         // creates a unique ID for the deal proposal -- there are many ways to do this
         bytes32 id = keccak256(abi.encodePacked(block.number, msg.sender));
 
@@ -63,12 +135,11 @@ contract tablelandDealClient is IDealClient {
         );
         request[id] = deal;
         dealClientTablelandStorage.requestInsertion(
+            tokenId,
             deal.label,
             deal.extra_params.location_ref,
-            deal.extra_params.car_size,
             deal.piece_size,
-            block.number,
-            msg.sender
+            block.number
         );
 
         // writes the proposal metadata to the event log
@@ -77,18 +148,18 @@ contract tablelandDealClient is IDealClient {
         return id;
     }
 
-    // helper function to get deal request based from id
-    function getDealRequest(bytes32 requestId) public view returns (DealRequest memory) {
-        DealRequest storage deal = request[requestId];
-        return deal;
-    }
+    // // helper function to get deal request based from id
+    // function getDealRequest(bytes32 requestId) public view returns (DealRequest memory) {
+    //     DealRequest storage deal = request[requestId];
+    //     return deal;
+    // }
 
     // Returns a CBOR-encoded DealProposal.
     function getDealProposal(bytes32 proposalId) public view returns (bytes memory) {
         DealRequest storage deal = request[proposalId];
         return dealClientTablelandStorage.serializeDealProposal(deal);
     }
-
+    // Returns a CBOR-encoded ExtraParams.
     function getExtraParams(bytes32 proposalId) public view returns (bytes memory extra_params) {
         DealRequest storage deal = request[proposalId];
         return dealClientTablelandStorage.serializeExtraParamsV1(deal.extra_params);
@@ -163,7 +234,7 @@ contract tablelandDealClient is IDealClient {
         );
 
         uint256 DEAL_ID = uint256(uint64(mdnp.dealId));
-        
+
         // get deal client
         uint64 provider = MarketAPI.getDealProvider(mdnp.dealId);
 
@@ -176,7 +247,9 @@ contract tablelandDealClient is IDealClient {
         currentPieceRequestInfo[proposal.piece_cid.data].dealid = DEAL_ID;
 
         currentPieceRequestInfo[proposal.piece_cid.data].status = Status.DealPublished;
-        string storage payloadCID = request[currentPieceRequestInfo[proposal.piece_cid.data].currentRequestID].label;
+        string storage payloadCID = request[
+            currentPieceRequestInfo[proposal.piece_cid.data].currentRequestID
+        ].label;
         dealClientTablelandStorage.dealInsertion(
             payloadCID,
             DEAL_ID,
@@ -223,31 +296,8 @@ contract tablelandDealClient is IDealClient {
     // addBalance funds the builtin storage market actor's escrow
     // with funds from the contract's own balance
     // @value - amount to be added in escrow in attoFIL
-    function addBalance() public payable {
-        userFunds[msg.sender] = userFunds[msg.sender] + msg.value;
+    receive() external payable {
         MarketAPI.addBalance(FilAddresses.fromEthAddress(address(this)), msg.value);
-    }
-
-    // This function attempts to withdraw the specified amount from the contract addr's escrow balance
-    // If less than the given amount is available, the full escrow balance is withdrawn
-    // @client - Eth address where the balance is withdrawn to. This can be the contract address or an external address
-    // @value - amount to be withdrawn in escrow in attoFIL
-    function withdrawBalance(uint256 value) public returns (uint) {
-        require(userFunds[msg.sender] >= value, "you dont have that many funds");
-
-        MarketTypes.WithdrawBalanceParams memory params = MarketTypes.WithdrawBalanceParams(
-            FilAddresses.fromEthAddress(msg.sender),
-            BigInts.fromUint256(value)
-        );
-        CommonTypes.BigInt memory ret = MarketAPI.withdrawBalance(params);
-
-        (uint256 withdrawBalanceAmount, bool withdrawBalanceConverted) = BigInts.toUint256(ret);
-        require(
-            withdrawBalanceConverted,
-            "Problems converting withdraw balance into Big Int, may cause an overflow"
-        );
-
-        return withdrawBalanceAmount;
     }
 
     function receiveDataCap(bytes memory params) internal {

@@ -15,13 +15,12 @@ interface IDealTablelandStorage is IDealClient {
         string memory status
     ) external;
 
-    function requestInsertion(
+   function requestInsertion(
+        uint256 tokenId,
         string memory label,
         string memory location_ref,
-        uint64 car_size,
         uint64 piece_size,
-        uint256 timestampt,
-        address creator
+        uint256 timestampt
     ) external;
 
     function toUpdateStatus(
@@ -46,4 +45,6 @@ interface IDealTablelandStorage is IDealClient {
     ) external view returns (bytes memory);
 
     function retBuf() external pure returns (bytes memory);
+
+    function addDAO(address newDAO,address[] memory owners) external;
 }

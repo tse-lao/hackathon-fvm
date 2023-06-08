@@ -1,4 +1,4 @@
-export const DB_NFT_address = "0x61981aF3ae26E43782d129288715fCF2dF7252Aa"
+export const DB_NFT_address = "0x2fAa5469C2d51CC65Ed4f6f631803A1583bDB4E6"
 export const crossChainBacalhauJobs_address = "0xc20880d403Fc6Db43425e439Fb8aCbEAa3C33343"
 export const crossChainTablelandStorageAddress = "0x05266c6B991Bf2066c9cc67d28432D6b54dc01B9"
 
@@ -12,4 +12,4 @@ export const splitImplementation = "0x31d8EAfF8AF8c1207644B1E04980d3E821fDDe05"
 export const MumbaiEscrow = "0x31B48aFC27789e84326F4d3F09A611E93245684a"
 export const HyperspaceEscrow = "0xa45f23B0fBA25E6B9E83d768e559f8e19cC8855e"
 
-export const MultisigFactory = "0x4454Fd34f8cbC3ecc7FFE0B6807479149c25e896"
+export const MultisigFactory = "0x4E7491C2b41A65E16814600c4c4c034f61b30223"

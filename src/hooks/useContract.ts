@@ -294,30 +294,15 @@ export const useContract = () => {
     tokenId: number,
     dataCID: String,
     rows: number,
-    SubmitProof: string[],
-    index: number,
     v: number,
     r: string,
     s: string
   ): Promise<any> => {
-    if (SubmitProof.length > 0) {
-      const AccessSubmitleaves = SubmitProof.map((x) =>
-        ethers.utils.keccak256(x)
-      )
-      const SubmitTree = new MerkleTree(
-        AccessSubmitleaves,
-        ethers.utils.keccak256,
-        { sortPairs: true }
-      )
-      const hexProof = SubmitTree.getHexProof(AccessSubmitleaves[index])
-      SubmitProof = hexProof
-    }
     try {
       const tx = await DB_NFT.contribute(
         tokenId,
         dataCID,
         rows,
-        SubmitProof,
         v,
         r,
         s,
@@ -409,7 +394,7 @@ export const useContract = () => {
     return await tx.wait()
   }
 
-  // --------------------------------------------------- HyperSpace Compute Over Data x Tableland ------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------- Multisig Functions  ------------------------------------------------------------------------------------------------------
 
   const createMultisig = async (
     name:string,
@@ -441,20 +426,21 @@ export const useContract = () => {
   const multisigAddMemberProposal = async (
     Multisigaddress: string,
     member:string,
+    numberOfConfirmations:number,
     name: string,
     description: string,
   ): Promise<any> => {
     try {
 
-    let iface = new ethers.utils.Interface(MultisigFactoryAbi);
-    let data = iface.encodeFunctionData("addMember", [member])
+    let iface = new ethers.utils.Interface(MultisigAbi);
+    let data = iface.encodeFunctionData("addMember", [member,numberOfConfirmations])
 
       const multisig = new ethers.Contract(
         Multisigaddress,
         MultisigAbi,
         signer!
       )
-      const tx = await multisig.submitTransaction(MultisigFactory,0,data, name,description,  {
+      const tx = await multisig.submitTransaction(Multisigaddress,0,data, name,description,  {
         gasLimit: 1000000,
       })
       
@@ -477,20 +463,21 @@ export const useContract = () => {
   const multisigRemoveMemberProposal = async (
     Multisigaddress: string,
     member:string,
+    numberOfConfirmations:number,
     name: string,
     description: string,
   ): Promise<any> => {
     try {
 
-    let iface = new ethers.utils.Interface(MultisigFactoryAbi);
-    let data = iface.encodeFunctionData("removeMember", [member])
+    let iface = new ethers.utils.Interface(MultisigAbi);
+    let data = iface.encodeFunctionData("removeMember", [member,numberOfConfirmations])
 
       const multisig = new ethers.Contract(
         Multisigaddress,
         MultisigAbi,
         signer!
       )
-      const tx = await multisig.submitTransaction(name,description,MultisigFactory,0,data)
+      const tx = await multisig.submitTransaction(Multisigaddress,0,data,name,description)
       
       console.log(tx)
       toast.update('Promise is pending', {
@@ -549,6 +536,8 @@ export const useContract = () => {
     bountyID:number,
     name:string,
     description:string,
+    proposalName:string,
+    proposalDescription:string,
     dataFormat:string,
     startCommand:string,
     endCommand:string,
@@ -565,7 +554,118 @@ export const useContract = () => {
         MultisigAbi,
         signer!
       )
-      const tx = await multisig.submitTransaction(crossChainBacalhauJobs_address,0,data)
+      const tx = await multisig.submitTransaction(crossChainBacalhauJobs_address,0,data,proposalName,proposalDescription)
+      
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const multisigRequestDatabaseProposal = async (
+    Multisigaddress: string,
+    dataFormatCID: string,
+    dbName: string,
+    description: string,
+    categories:string[],
+    requiredRows:number,
+    minSubRows:number,
+    proposalName:string,
+    proposalDescription:string
+  ): Promise<any> => {
+    try {
+
+      let iface = new ethers.utils.Interface(DBAbi);
+      let data = iface.encodeFunctionData("MultisigRequestDB", [dataFormatCID,dbName,description,categories,requiredRows,minSubRows])
+      const multisig = new ethers.Contract(
+        Multisigaddress,
+        MultisigAbi,
+        signer!
+      )
+      const tx = await multisig.submitTransaction(DB_NFT_address,0,data,proposalName,proposalDescription)
+      
+      console.log(tx)
+      
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const MultisigOwnerSubmitData = async (
+    tokenId: number,
+    dataCID: String,
+    rows: number,
+    multisigAddress:string
+  ): Promise<any> => {
+    try {
+      const tx = await DB_NFT.MultisigContribute(
+        tokenId,
+        dataCID,
+        rows,
+        multisigAddress,
+        {
+          gasLimit: 1000000,
+        }
+      )
+
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const multisigCreateDatabaseProposal = async (
+    Multisigaddress: string,
+    proposalName: string,
+    proposalDescription: string,
+    tokenId:number,
+    dbCID:string,
+    mintPrice:number,
+    piece_cid:string
+  ): Promise<any> => {
+    try {
+
+      let iface = new ethers.utils.Interface(DBAbi);
+      let data = iface.encodeFunctionData("MultisigCreateDBNFT", [tokenId,dbCID,mintPrice,piece_cid])
+      const multisig = new ethers.Contract(
+        Multisigaddress,
+        MultisigAbi,
+        signer!
+      )
+      const tx = await multisig.submitTransaction(DB_NFT_address,0,data,proposalName,proposalDescription)
+      
+      console.log(tx)
       
       console.log(tx)
       toast.update('Promise is pending', {
@@ -611,33 +711,36 @@ export const useContract = () => {
     }
   }
 
-  const multisigExecuteTransaction = async (
-    Multisigaddress: string,
-    transactionIndex: number,
-  ): Promise<any> => {
-    try {
-      const multisig = new ethers.Contract(
-        Multisigaddress,
-        MultisigAbi,
-        signer!
-      )
-      const tx = await multisig.executeTransaction(transactionIndex)
+  // const multisigExecuteTransaction = async (
+  //   Multisigaddress: string,
+  //   transactionIndex: number,
+  // ): Promise<any> => {
+  //   try {
+  //     const multisig = new ethers.Contract(
+  //       Multisigaddress,
+  //       MultisigAbi,
+  //       signer!
+  //     )
+  //     const tx = await multisig.executeTransaction(transactionIndex)
       
-      console.log(tx)
-      toast.update('Promise is pending', {
-        render: 'Transaction sent, waiting for confirmation.',
-      })
+  //     console.log(tx)
+  //     toast.update('Promise is pending', {
+  //       render: 'Transaction sent, waiting for confirmation.',
+  //     })
 
-      const receipt = await tx.wait()
-      console.log(receipt)
-      toast.success('Promise resolved 👌')
-      return receipt
-    } catch (error) {
-      console.log(error)
-      toast.error('Promise rejected 🤯')
-      throw error
-    }
-  }
+  //     const receipt = await tx.wait()
+  //     console.log(receipt)
+  //     toast.success('Promise resolved 👌')
+  //     return receipt
+  //   } catch (error) {
+  //     console.log(error)
+  //     toast.error('Promise rejected 🤯')
+  //     throw error
+  //   }
+  // }
+
+
+
 
   const createJob = async (
     name:string,
@@ -1038,13 +1141,14 @@ export const useContract = () => {
     fundEscrowHyperspace,
     ExecutionStarted,
     ExecutionFulfilled,
-    multisigExecuteTransaction,
+    multisigCreateDatabaseProposal,
+    MultisigOwnerSubmitData,
+    multisigRequestDatabaseProposal,
     multisigConfirmTransaction,
     multisigAssignBountyWinnerProposal,
     multisigCreateBountyProposal,
     createMultisig,
     multisigRemoveMemberProposal,
     multisigAddMemberProposal
-
   }
 }

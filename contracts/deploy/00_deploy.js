@@ -15,33 +15,61 @@ module.exports = async({ deployments }) => {
     console.log("Wallet Ethereum Address:", wallet.address)
     const chainId = network.config.chainId
 
+    const Create2Deployer = await hre.ethers.getContractFactory(
+        "Create2Deployer"
+    );
+    const create2Deployer_ = await Create2Deployer.deploy()
+    await create2Deployer_.deployed()
+    const create2Deployer = await Create2Deployer.attach(
+        create2Deployer_.address
+    );
+
+    const WalletFactory = await hre.ethers.getContractFactory("multisigFactory");
+    const salt =
+        "0x0001000000000000000000000000000000000010000000000000000001011010";
+    console.log("salt", salt);
+
+    const tx = await create2Deployer.deploy(0, salt, WalletFactory.bytecode);
+    await tx.wait();
+    const bytecodehash = hre.ethers.utils.keccak256(WalletFactory.bytecode);
+    const addresss = await create2Deployer.computeAddress(salt, bytecodehash);
+    console.log("address", addresss);
+
     // await multisigHelper.deployed()
 
     // console.log("3 :", multisigHelper.address)
 
 
-
-
+    let randomSalt = await ethers.utils.randomBytes(32)
+    console.log(randomSalt)
 
     const MultisigFactory = await hre.ethers.getContractFactory(
         "multisigFactory"
     );
-    const multisigFactory = await deploy("multisigFactory", {
-        from: wallet.address,
-        args: [],
-        log: true,
-    });
+    // const multisigFactory = await deploy("multisigFactory", {
+    //     from: wallet.address,
+    //     args: [],
+    //     log: true,
+    // });
 
-    const _create2Deployer = await MultisigFactory.attach(
-        multisigFactory.address
+    const _multisigFactory = await MultisigFactory.attach(
+        addresss
     );
 
 
-    let bytes = await _create2Deployer.getMultisigInitBytes("A multisig created on the dataBridge", "a sick working multisig with name and description", ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"], multisigFactory.address, 1)
+    let bytes = await _multisigFactory.getMultisigInitBytes("A multisig created on the dataBridge", "a sick working multisig with name and description", ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"], addresss, 1)
     console.log(bytes)
 
-    let txx = await _create2Deployer.createWallet(bytes);
+    let txx = await _multisigFactory.createWallet(bytes, [
+        100, 136, 74, 176, 132, 26, 151, 143,
+        14, 183, 219, 236, 162, 206, 234, 180,
+        28, 8, 112, 223, 101, 150, 197, 48,
+        228, 44, 128, 46, 9, 175, 70, 199
+    ]);
     await txx.wait();
+
+    let address = await _multisigFactory.getMultisigAddress(0)
+    console.log(address)
 
     // txx = await _create2Deployer.multisigs(0);
     // console.log(txx)
