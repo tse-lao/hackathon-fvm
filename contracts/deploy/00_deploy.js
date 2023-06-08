@@ -15,59 +15,94 @@ module.exports = async({ deployments }) => {
     console.log("Wallet Ethereum Address:", wallet.address)
     const chainId = network.config.chainId
 
+    // await multisigHelper.deployed()
 
-    //deploy bacalhauTablelandStorage
-    const bacalhauTablelandStorage = await deploy("bacalhauTablelandStorage", {
+    // console.log("3 :", multisigHelper.address)
+
+
+
+
+
+    const MultisigFactory = await hre.ethers.getContractFactory(
+        "multisigFactory"
+    );
+    const multisigFactory = await deploy("multisigFactory", {
         from: wallet.address,
         args: [],
         log: true,
     });
 
-    const BacalhauTablelandStorage = await ethers.getContractFactory("bacalhauTablelandStorage", wallet)
-
-    const bacalhauTablelandStorageInstance = await BacalhauTablelandStorage.attach(bacalhauTablelandStorage.address)
-
-    // deploy TablelandBacalhauJobs
-    const tablelandBacalhauJobs = await deploy("tablelandBacalhauJobs", {
-        from: wallet.address,
-        args: [bacalhauTablelandStorage.address],
-        log: true,
-    });
-
-    const TablelandBacalhauJobs = await ethers.getContractFactory("tablelandBacalhauJobs", wallet)
-
-    const Tableland_BacalhauJobs = await TablelandBacalhauJobs.attach(tablelandBacalhauJobs.address)
-
-    await bacalhauTablelandStorageInstance.transferOwnership(tablelandBacalhauJobs.address)
-
-    // await Tableland_BacalhauJobs.executeJOB("specStart", "specStart", "specStart", "specStart")
-    let execTable = await bacalhauTablelandStorageInstance.tables(0)
-    let jobTable = await bacalhauTablelandStorageInstance.tables(1)
-    let bountyTable = await bacalhauTablelandStorageInstance.tables(2)
+    const _create2Deployer = await MultisigFactory.attach(
+        multisigFactory.address
+    );
 
 
-    console.log(execTable, "   ", jobTable, "    ", bountyTable)
+    let bytes = await _create2Deployer.getMultisigInitBytes("A multisig created on the dataBridge", "a sick working multisig with name and description", ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"], multisigFactory.address, 1)
+    console.log(bytes)
+
+    let txx = await _create2Deployer.createWallet(bytes);
+    await txx.wait();
+
+    // txx = await _create2Deployer.multisigs(0);
+    // console.log(txx)
+
+    // const Multisig = await hre.ethers.getContractFactory("Multisig");
+    // const salt =
+    //     "0x0001000000000000000000000000000000100010000000000000001001011010";
+    // console.log("salt", salt);
+
+    // console.log(MultisigFactory.bytecode)
+
+    // const tx = await _create2Deployer.deploy(0, salt, ethers.utils.arrayify(init), { gasLimit: 10000000 });
+    // await tx.wait();
+    // const bytecodehash = hre.ethers.utils.keccak256(Multisig.bytecode);
+    // const address = await _create2Deployer.computeAddress(salt, bytecodehash);
+    // console.log("address", address);
+
+
+    //deploy bacalhauTablelandStorage
+    // const bacalhauTablelandStorage = await deploy("bacalhauTablelandStorage", {
+    //     from: wallet.address,
+    //     args: [],
+    //     log: true,
+    // });
+
+    // const BacalhauTablelandStorage = await ethers.getContractFactory("bacalhauTablelandStorage", wallet)
+
+    // const bacalhauTablelandStorageInstance = await BacalhauTablelandStorage.attach(bacalhauTablelandStorage.address)
+
+    // // deploy TablelandBacalhauJobs
+    // const tablelandBacalhauJobs = await deploy("tablelandBacalhauJobs", {
+    //     from: wallet.address,
+    //     args: [bacalhauTablelandStorage.address],
+    //     log: true,
+    // });
+
+    // const TablelandBacalhauJobs = await ethers.getContractFactory("tablelandBacalhauJobs", wallet)
+
+    // const Tableland_BacalhauJobs = await TablelandBacalhauJobs.attach(tablelandBacalhauJobs.address)
+
+    // await bacalhauTablelandStorageInstance.transferOwnership(tablelandBacalhauJobs.address)
+
+    // // await Tableland_BacalhauJobs.executeJOB("specStart", "specStart", "specStart", "specStart")
+    // let execTable = await bacalhauTablelandStorageInstance.tables(0)
+    // let jobTable = await bacalhauTablelandStorageInstance.tables(1)
+    // let bountyTable = await bacalhauTablelandStorageInstance.tables(2)
+
+
+    // console.log(execTable, "   ", jobTable, "    ", bountyTable)
 
     //---------------------------------------------------------------MUMBAI DEPLOYMENT---------------------------------------------------------------------------------------
 
-    const MultisigHelper = await hre.ethers.getContractFactory("MultisigHelper");
 
-    // const multisigHelper = await MultisigHelper.deploy()
-    // await multisigHelper.deployed()
-
-    // console.log("3 :", multisigHelper.address)
-    helperInstance = MultisigHelper.attach("0xC7567A0af88054E51E842252078A58Bed1A97fEe")
-    let bytes = await helperInstance.getBytecodeTokenInfoPasser(["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", "0x464e3F471628E162FA34F130F4C3bCC41fF7635d"], 1)
-    console.log(bytes)
-
-    const MultisigFactory = await hre.ethers.getContractFactory("multisigFactory");
+    // const MultisigFactory = await hre.ethers.getContractFactory("multisigFactory");
 
     // const multisigFactory = await MultisigFactory.deploy("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789", { gasLimit: 10000000 })
     // await multisigFactory.deployed()
     // console.log("1 :", multisigFactory.address)
 
-    const FactoryInstance = await MultisigFactory.attach("0x376cA2cCC684Cb0a98a37c949cb888132EdDe90F")
-        // const FactoryInstance = await MultisigFactory.attach(multisigFactory.address)
+    // const FactoryInstance = await MultisigFactory.attach("0x376cA2cCC684Cb0a98a37c949cb888132EdDe90F")
+    // const FactoryInstance = await MultisigFactory.attach(multisigFactory.address)
 
 
     // let tx = await FactoryInstance.createAccount("0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", bytes, { gasLimit: 10000000 })
@@ -83,24 +118,24 @@ module.exports = async({ deployments }) => {
 
     // const multisigAccountInstance = await Multisig.attach("0x76e66e82d8cb346423f6cd7f339d9be2332a4cc1")
 
-    let flatSig = await wallet.signMessage(ethers.utils.arrayify(ethers.utils.id("nikos2")));
-    // let flatSig = await wallet.signMessage(ethers.utils.id("nikos"));
+    // let flatSig = await wallet.signMessage(ethers.utils.arrayify(ethers.utils.id("nikos2")));
+    // // let flatSig = await wallet.signMessage(ethers.utils.id("nikos"));
 
-    let signatures = [flatSig]
-    let ABI = [
-        "function createBounty(string, string, string) payable"
-    ];
-    let iface = new ethers.utils.Interface(ABI);
-    let data = iface.encodeFunctionData("createBounty", ["testBounty", "test", "test"])
-    console.log(data, "  ", tablelandBacalhauJobs.address, "   ", flatSig)
+    // let signatures = [flatSig]
+    // let ABI = [
+    //     "function createBounty(string, string, string) payable"
+    // ];
+    // let iface = new ethers.utils.Interface(ABI);
+    // let data = iface.encodeFunctionData("createBounty", ["testBounty", "test", "test"])
+    // console.log(data, "  ", tablelandBacalhauJobs.address, "   ", flatSig)
 
-    // let tx = await multisigAccountInstance.execute(tablelandBacalhauJobs.address, 0, data, "nikos", signatures)
+    // // let tx = await multisigAccountInstance.execute(tablelandBacalhauJobs.address, 0, data, "nikos", signatures)
 
-    // await tx.wait()
+    // // await tx.wait()
 
-    // let flatSig = await multisigAccountInstance.getMessageHash("message");
-    let msg = ethers.utils.solidityPack(["address", "uint256", "bytes", "string"], ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", ethers.BigNumber.from("1"), "0x00", "nikos"])
-        // console.log(msg)
+    // // let flatSig = await multisigAccountInstance.getMessageHash("message");
+    // let msg = ethers.utils.solidityPack(["address", "uint256", "bytes", "string"], ["0x044B595C9b94A17Adc489bD29696af40ccb3E4d2", ethers.BigNumber.from("1"), "0x00", "nikos"])
+    // console.log(msg)
 
 
 

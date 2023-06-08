@@ -1,16 +1,16 @@
 import { useContract } from "@/hooks/useContract";
 import useNftStorage from "@/hooks/useNftStorage";
 import { analyzeJSONStructure, readJSONFromFileInput } from "@/lib/dataHelper";
+import { ethers } from "ethers";
 import { useState } from "react";
 import TagsInput from "react-tagsinput";
 import 'react-tagsinput/react-tagsinput.css';
 import { toast } from "react-toastify";
 import LoadingSpinner from "../elements/LoadingSpinner";
 import { ActionButton } from "../elements/buttons/ActionButton";
-import CreateOverlay from "../overlay/CreateOverlay";
+import SelectMultiSig from "../elements/input/SelectMultiSig";
 
-
-export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
+export default function DataRequestForm({ changeOpen }) {
   const [formData, setFormData] = useState({
     name: "",
     categories: [],
@@ -19,6 +19,9 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
     minRows: 0,
     requiredRows: 0,
   });
+
+  const [group, setGroup] = useState(false);
+  const [multiSig, setMultiSig] = useState("");
 
   const [loadingFile, setLoadingFile] = useState(false);
   const [metadata, setMetadata] = useState(null);
@@ -65,7 +68,7 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // Process the form data and send it to the server or API endpoint.
     console.log(formData);
 
@@ -73,87 +76,131 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
       toast.error("You minimum rows must be greater than 0, otherwise you need to create an open Dataset.");
       return;
     }
-    
-    if(formData.name.length < 3 || formData.name.length > 50, formData.description.length < 25 ){
+
+    if (formData.name.length < 3 || formData.name.length > 50, formData.description.length < 25) {
       toast.error("Please fill out the form correctly, min length name should be 3 and min length description should be 25 characters.");
       return;
     }
-    
 
+
+
+    // Listen for transaction confirmation
     
-      // Listen for transaction confirmation
- 
+    if(group){
+      //check if valid address 
+      if(!ethers.utils.isAddress(multiSig)){
+        toast.error("Please select a valid multisig address");
+        return;
+      }
+      
       toast.promise(RequestDB(
-          metadata,
-          formData.name,
-          formData.description,
-          formData.categories,
-          formData.requiredRows,
-          formData.minRows
-        ),
+        metadata,
+        formData.name,
+        formData.description,
+        formData.categories,
+        formData.requiredRows,
+        formData.minRows
+      ),
         {
           pending: `Request started for ${formData.name} 🚀`,
           success: `Request ${formData.name} confirmed 🎉`,
           error: `Something went wrong..`,
         }
-    ).then(() => {
-        changeOpen(false)
+      ).then(() => {
         window.location.reload();
+        setLoading(false)
+      })
+    }
+
+    toast.promise(RequestDB(
+      metadata,
+      formData.name,
+      formData.description,
+      formData.categories,
+      formData.requiredRows,
+      formData.minRows
+    ),
+      {
+        pending: `Request started for ${formData.name} 🚀`,
+        success: `Request ${formData.name} confirmed 🎉`,
+        error: `Something went wrong..`,
+      }
+    ).then(() => {
+      window.location.reload();
+      setLoading(false)
     })
-    
+
   }
 
 
 
   return (
-<CreateOverlay title="Create a DB Request" onClose={onClose} getOpen={getOpen} changeOpen={changeOpen}>
+
     <div className="space-y-4">
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Name
-        </label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="colspan-1">
+        <div className='flex flex-row gap-2'>
+        <span onClick={() => setGroup(false)} className={`flex px-6 cursor-pointer ${!group  && 'bg-cf-200'}`}>
+          Individual
+        </span>
+
+        <span onClick={() => setGroup(true)} className={`flex px-6 cursor-pointer ${group && 'bg-cf-200'}`}>
+          Group
+        </span>
       </div>
+         {group &&  <SelectMultiSig onChange={(value) => setMultiSig(value)} />}
+        </div>
+        <div className="colspan-1">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+      </div>
+
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Category
         </label>
         <TagsInput value={formData.categories} onChange={handleTagChange} />
       </div>
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Min rows
-        </label>
-        <input
-          type="number"
-          name="minRows"
-          id="minRows"
-          value={formData.minRows}
-          onChange={handleChange}
-          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="colspan-1">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            Min rows
+          </label>
+          <input
+            type="number"
+            name="minRows"
+            id="minRows"
+            value={formData.minRows}
+            onChange={handleChange}
+            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div className="colspan-1">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            Required Rows
+          </label>
+          <input
+            type="number"
+            name="requiredRows"
+            id="requiredRows"
+            value={formData.requiredRows}
+            onChange={handleChange}
+            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
       </div>
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Required Rows
-        </label>
-        <input
-          type="number"
-          name="requiredRows"
-          id="requiredRows"
-          value={formData.requiredRows}
-          onChange={handleChange}
-          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        />
-      </div>
+
       <div>
         <label htmlFor="requestData" className="block text-sm font-medium text-gray-700">
           Description
@@ -170,24 +217,24 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
       </div>
       {loadingFile ? <LoadingSpinner loadingText='uploading metadata' /> :
         metadata ? (
-                <div>
-                <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">Preview
-              </label>
-              <a href={`https://gateway.ipfs.io/ipfs/${metadata}`}
+          <div>
+            <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">Preview
+            </label>
+            <a href={`https://gateway.ipfs.io/ipfs/${metadata}`}
               className="text-indigo-600 hover:text-indigo-500" target="_blank" rel="noreferrer"
-              >Click here to see metadata</a>
-              <button
-                onClick={() => setMetadata(null)}
-                
-                className="text-red-500"
-              >Remove</button>
-            </div>
-              
-              
-              ) : (
-                <div>
-                <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">
-                Upload to get metadata
+            >Click here to see metadata</a>
+            <button
+              onClick={() => setMetadata(null)}
+
+              className="text-red-500"
+            >Remove</button>
+          </div>
+
+
+        ) : (
+          <div>
+            <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">
+              Upload to get metadata
             </label>
             <input
               type="file"
@@ -197,9 +244,8 @@ export default function DataRequestForm({ onClose, changeOpen, getOpen }) {
           </div>
 
         )}
-        
-        <ActionButton  onClick={handleSubmit} loading={loading} text="Submit" />
+
+      <ActionButton onClick={handleSubmit} loading={loading} text="Submit" />
     </div>
-</CreateOverlay>
   );
 };

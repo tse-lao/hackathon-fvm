@@ -3,12 +3,14 @@ import crossChainTablelandDealRewarderAbi from './CrossChainTablelandDealRewarde
 import crossChainTablelandStorageAbi from './CrossChainTablelandStorage.abi.json'
 import DBAbi from './DB_NFT.abi.json'
 import TWFactoryAbi from './ThirdWebFactory.abi.json'
-import MultisigFactoryAbi from "./multisigFactory.abi.json"
 import MultisigAbi from "./multisig.abi.json"
+import MultisigFactoryAbi from "./multisigFactory.abi.json"
 
-import encodeHelperAbi from "./encodeHelper.abi.json"
 import {
     DB_NFT_address,
+    HyperspaceEscrow,
+    MultisigFactory,
+    MumbaiEscrow,
     TWFactoryAddress,
     crossChainBacalhauJobs_address,
     crossChainTablelandDealClientAddress,
@@ -16,15 +18,12 @@ import {
     crossChainTablelandStorageAddress,
     helper,
     splitImplementation,
-    HyperspaceEscrow,
-    MumbaiEscrow,
-    EncodeHelper,
-    MultisigFactory,
 } from './contractAddress'
 import crossChainTablelandDealClientAbi from './crossChainTablelandDealClient.abi.json'
+import encodeHelperAbi from "./encodeHelper.abi.json"
+import escrowAbi from './escrow.abi.json'
 import helperAbi from './helper.abi.json'
 import splitterAbi from './splitter.abi.json'
-import escrowAbi from './escrow.abi.json'
 import {
     DB_attribute,
     DB_main,
@@ -59,6 +58,5 @@ export {
     MultisigFactoryAbi,
     encodeHelperAbi,
     MultisigFactory,
-    EncodeHelper,
     MultisigAbi
 }

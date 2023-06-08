@@ -18,9 +18,7 @@ export default function JobBountyProposals({ bountyID, details }) {
     <div>
     
       <ModalButton onClick={() => setOpenModal(!openModal)} text="Create" />
-      {openModal && (address.toLowerCase()==details.creator ? <AssignBountyWinner selected={selected} bountyID={bountyID} /> : <CreateBountyProposal bountyID={bountyID} onClose={() => setOpenModal(!openModal)}
-        openModal={openModal}
-      />)}
+      {openModal && (address.toLowerCase()==details.creator ? <AssignBountyWinner selected={selected} bountyID={bountyID} /> : <CreateBountyProposal bountyID={bountyID} />)}
 
       <div className="flex flex-col gap-3 mt-6">
         

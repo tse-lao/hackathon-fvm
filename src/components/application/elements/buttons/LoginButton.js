@@ -1,14 +1,11 @@
 "use client"
 import { useEffect, useState } from 'react';
-import { useAccount, useConnect, useDisconnect, useNetwork } from 'wagmi';
+import { useAccount, useConnect, useNetwork } from 'wagmi';
 import ProfileDetails from '../../profile/ProfileDetails';
 
 export default function LoginButton() {
   const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
-
-  const { address, status, isConnected, isConnecting, isReconnecting, isDisconnected } =
-    useAccount();
+  const { address, status, isConnected, isConnecting, isReconnecting, isDisconnected } = useAccount();
   const { chain } = useNetwork()
   const [showModal, setShowModal] = useState(false);
 
@@ -21,7 +18,7 @@ export default function LoginButton() {
     if (!isWagmiConnected) return;
 
     connect({ connector: connectors });
-  }, [connect, connectors]);
+  }, []);
 
 
 
@@ -33,7 +30,7 @@ export default function LoginButton() {
     )
   }
 
-  if (address) {
+  if (!isConnecting && address) {
     return (
       <div className="flex rounded-md bg-white border items-center gap-2">
         <div className='p-2'>
@@ -44,7 +41,7 @@ export default function LoginButton() {
         </div>
         <button className='w-[150px] bg-white p-1 px-3 outline rounded-full outline-gray-200 text-sm overflow truncate' onClick={() => setShowModal(!showModal)}>
           {address}
-
+          
           {showModal && <ProfileDetails address={address} showModal={showModal} setShowModal={setShowModal} />}
 
         </button>
@@ -53,34 +50,31 @@ export default function LoginButton() {
     )
   }
 
+  if (!isReconnecting && !isConnected && !isConnecting && !address) {
 
-  return (
-    <div>
+    return (
       <div className="flex gap-4 items-center">
-
-
-
         <div className='flex gap-4'>
-          {isReconnecting ? (
-            <button>Loading</button>
-          ) : !isConnected && (
+          {!isReconnecting && !isConnected && (
 
-            connectors.map((connector) => {
-              return (
-                <button className="text-md text-white bg-cf-500 rounded-full py-1 px-8" key={connector.id} onClick={() => connect({ connector })}>
-                  {connector.name}
-                </button>
-              );
-            })
-          )}
+            connectors.map((connector) =>
+            (
+              <button className="text-md text-white bg-cf-500 rounded-full py-1 px-8" key={connector.id} onClick={() => connect({ connector })}>
+                {connector.name}
+              </button>
+            )
+            ))}
         </div>
       </div>
 
-      {showModal && <ProfileDetails address={address} showModal={showModal} setShowModal={setShowModal} />}
+    );
+  }
 
+  return (
+    <div className="text-md text-white bg-cf-500 rounded-full py-1 px-8" >
+      Loading
     </div>
-
-  );
+  )
 
 }
 

@@ -2,21 +2,24 @@
 import GroupView from '@/app/components/users/GroupView';
 import { TextField } from '@/components/Fields';
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
+import TextArea from '@/components/application/elements/input/TextArea';
 import AddMember from '@/components/groups/AddMember';
 import { useContract } from '@/hooks/useContract';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { toast } from 'react-toastify';
-import { useAccount } from 'wagmi';
+import Layout from '../Layout';
 
 
 export default function CreateGroup() {
     const {createMultisig} = useContract();
-    const {address} = useAccount();
     const router = useRouter();
     const [openModal, setOpenModal] = useState(false);
     const [formData, setFormData] = useState({
         minimumSignatures: 0,
+        name: "", 
+        description: "",
         owners: [],
     });
 
@@ -25,21 +28,23 @@ export default function CreateGroup() {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
-
     
-    const handleViewers = (tags) => {
-        setFormData({ ...formData, owners: tags });
-    };
-    
-
     const createGroup = async (e) => {
         e.preventDefault();
         // Process the form data and send it to the server or API endpoint.
         console.log(formData);
+        
+        if(formData.owners.length === 0 || formData.minimumSignatures < 1){
+            toast.error("Please add at least one owner or signatures.");
+            return;
+        }
+        
 
   
         //only list of onwers. 
         toast.promise(createMultisig(
+            formData.name, 
+            formData.description,
             formData.owners, 
             formData.minimumSignatures
           ), 
@@ -59,13 +64,43 @@ export default function CreateGroup() {
         console.log(e);
         console.log("adding");
         let newOwner = formData.owners;
+        //check if its already on there
+        if(newOwner.includes(e)){
+            toast.error("This address is already on the list.");
+            return;
+        }
         newOwner.push(e);
         setFormData({ ...formData, owners: newOwner });
         setOpenModal(!openModal);
     }
 
     return (
-            <div className="flex flex-col gap-4 w-fit justify-self-center">
+        <Layout active="Groups">
+        <div className='flex gap-2 items-center mb-4'>
+            <ArrowLeftIcon className="h-6 w-6 cursor-pointer" onClick={() => router.push('/groups')} />
+            <span>Go back to groups</span>
+        </div>
+        
+            <div className="flex flex-col gap-4 self-center w-[480px] content-center">
+            <TextField
+                    label="Name"
+                    type="text"
+                    name="name"
+                    id="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                />
+
+                <TextArea
+                    label="Description"
+                    rows={2}
+                    type="text"
+                    name="description"
+                    id="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                />
+
                 <TextField
                     label="Min Signatures"
                     type="number"
@@ -75,13 +110,12 @@ export default function CreateGroup() {
                     onChange={handleChange}
                 />
 
-                <GroupView members={formData.owners} add={true}/>
+                <GroupView addedMembers={formData.owners} add={true}/>
                 <AddMember showModal={openModal} addMember={addMember} />
 
                 <ActionButton text
                 ="Create Group" onClick={createGroup} />
-
-             
             </div>
+            </Layout>
     )
 }

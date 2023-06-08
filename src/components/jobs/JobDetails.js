@@ -1,39 +1,39 @@
-import { usePolybase } from '@polybase/react';
+import { useContract } from '@/hooks/useContract';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useNetwork, useSwitchNetwork } from 'wagmi';
+import { toast } from 'react-toastify';
+import { ActionButton } from '../application/elements/buttons/ActionButton';
 import DataNotFound from '../application/elements/message/DataNotFound';
 import DataFormatPreview from '../marketplace/DataFormatPreview';
-import ExecuteJob from './ExecuteJob';
 
 export default function JobDetails({ details, input }) {
-    const polybase = usePolybase();
-
+    const[loading,setLoading ]  = useState(false);
     const [showMetadata, setShowMetadata] = useState(false)
-    const [openModal, setOpenModal] = useState(false)
-    const { chain } = useNetwork()
-    const {switchNetwork} = useSwitchNetwork()
-    const HYPERSPACE_ID = 3141;
-    const POLYGON = 80001;
-
-
-
-    const changeOpen = (e) => {
-        setOpenModal(e)
-        console.log("closing up")
-        console.log(chain.id)
-        
-        if(chain.id != POLYGON){
-            switchNetwork?.(POLYGON)
-        }
-
-    }
+    const {ExecuteJob} = useContract()
 
     
     if(details == undefined) {
         return  <DataNotFound message="We cannot find any data for this jobID" />
       
     }
+    
+    const startComputing = async () => {
+        console.log("starting job")
+        setLoading(true)
+        
+        console.log(details);
+        fetch(`${process.env.NEXT_PUBLIC_BACALHAU_SERVER}/startJob`)
+        toast.promise(ExecuteJob(details.jobID, [], 0.001), {
+            pending: `Pending transaction for execution for job ${details.jobID}...`,
+            success: 'Job started!',
+            error: 'Error starting job',
+        }).then(() => {
+            setLoading(false)
+            onClose;
+        })
+    }
+    
+
 
 
     return (
@@ -69,18 +69,15 @@ export default function JobDetails({ details, input }) {
                         <span key={index} className='text-xs'> {input} </span>
                     )}
 
-                    <button
-                        className='bg-cf-500 hover:bg-cf-700 text-white font-bold py-2 px-4 rounded-full'
-                        onClick={() => setOpenModal(!openModal)}
-                    >
-                        Start computing
-                    </button>
+                    <ActionButton loading={loading} onClick={startComputing} text="Start Computation" /> 
+                    
+                    
                     
                     <a className='text-cf-500 text-center cursor:pointer'  onClick={() => setShowMetadata(!showMetadata)}>Show metadata</a>
 
                 
                     {showMetadata && <DataFormatPreview cid={details.dataFormat} />}
-                    {openModal && <ExecuteJob data={details} input={input} openModal={openModal} changeOpen={changeOpen}/> }
+                
     
         </div>
 

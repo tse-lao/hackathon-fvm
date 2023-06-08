@@ -1,4 +1,3 @@
-import ModalLayout from '@/components/ModalLayout'
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton'
 import InputField from '@/components/application/elements/input/InputField'
 import TextArea from '@/components/application/elements/input/TextArea'
@@ -53,7 +52,7 @@ export default function AssignBountyWinner({ onClose, getOpen, selected, bountyI
 
 
   return (
-    <ModalLayout title="Assign Bounty Winner" onClose={onClose} getOpen={getOpen} >
+
       <div className="flex flex-col gap-6">
         <span>Bounty ID: {bountyID}</span>
         <span>Selected: {selected.name}</span>
@@ -77,6 +76,6 @@ export default function AssignBountyWinner({ onClose, getOpen, selected, bountyI
 
         <ActionButton loading={loading} onClick={assignWinner} text="Assign Winner" />
       </div>
-    </ModalLayout>
+
   )
 }

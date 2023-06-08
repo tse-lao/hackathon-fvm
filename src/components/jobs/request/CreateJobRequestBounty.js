@@ -8,8 +8,8 @@ export default function CreateJobRequestBounty() {
 
   return (
     <div>
-      <ModalButton onClick={() => setModalOpen(!modalOpen)} text="Create Job Bounty "/>
-      {modalOpen && <CreateJobRequestBountyModal changeOpen={modalOpen} onClose={(e) => setModalOpen(false)} />}
+      <ModalButton onClick={() => {setModalOpen(!modalOpen); console.log(!modalOpen)}} text="Create Job Bounty "/>
+      {modalOpen && <CreateJobRequestBountyModal getOpen={modalOpen} onClose={() => {setModalOpen(!modalOpen); console.log(!modalOpen)}} />}
     </div>
   )
 }

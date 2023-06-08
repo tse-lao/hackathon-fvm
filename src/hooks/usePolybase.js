@@ -100,7 +100,7 @@ export async function submitProposal(bountyID, name, description, proposalCID, s
 
 //check if user already has a Profile, if not then we create a profile for the user. 
 
-export async function createProfile(name){
+export async function createProfile(name, owner){
     const db = await signInPolybase().catch((err) => {
         console.log(err);
     });
@@ -109,6 +109,7 @@ export async function createProfile(name){
         try {
             const collection = await db.collection("Profile").create([
                 name,
+                owner
             ])
 
             resolve(collection)

@@ -55,7 +55,7 @@ export default function ListRequest() {
 
 
             <main className="flex-1">
-                <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-col-3 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                     {data.length > 0 ? data.map((request, index) => (
                         <RequestElement index={index} request={request} key={index} />
                     )) : (<p>No data found!</p>)}

@@ -1,5 +1,5 @@
 
-const MaticLogo = ({ color = '#000', height = '100%', size = '100%' }) => {
+const Matic = ({ color = '#000', height = '100%', size = '100%' }) => {
   return (
     <svg
       version="1.1"
@@ -28,4 +28,4 @@ const MaticLogo = ({ color = '#000', height = '100%', size = '100%' }) => {
   );
 };
 
-export default MaticLogo;
+export default Matic;

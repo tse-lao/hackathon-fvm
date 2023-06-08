@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import SettingsLayout from './SettingsLayout'
 
 import { createProfile } from '@/hooks/usePolybase'
+import { useAccount } from 'wagmi'
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -15,9 +16,10 @@ export default function Example() {
   const [allowCommenting, setAllowCommenting] = useState(true)
   const [allowMentions, setAllowMentions] = useState(true)
   const[username, setUsername] = useState("")
+  const {address} = useAccount();
   
   const submitProfile = async () => {
-      toast.promise(createProfile(username), {
+      toast.promise(createProfile(username, address), {
         pending: 'Creating profile...',
         success: 'Profile created!',
         error: 'Error creating profile',

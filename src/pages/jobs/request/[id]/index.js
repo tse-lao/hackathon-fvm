@@ -60,7 +60,7 @@ export default function JobBountyDetailPage() {
                     <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'contract' && 'bg-cf-500 text-white'}`}>Contract</span>
                 </div>
                 
-                <div className='bg-white w-[800px] p-8 rounded-md '>
+                <div className='w-[800px] p-8 rounded-md '>
                     {active == 'details' && <JobBountyDetail id={id} details={details}/>}
                     {active == 'proposals' && <JobBountyProposals bountyID={id} details={details}/>}
 

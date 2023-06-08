@@ -1,5 +1,4 @@
 
-import ModalLayout from '@/components/ModalLayout';
 import LoadingSpinner from '@/components/application/elements/LoadingSpinner';
 import InputField from '@/components/application/elements/input/InputField';
 import TextArea from '@/components/application/elements/input/TextArea';
@@ -10,11 +9,10 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
-export default function CreateBountyProposal({bountyID, onClose, openModal}) {
+export default function CreateBountyProposal({bountyID}) {
     const [loadingFile, setLoadingFile] = useState(false);
     const {address} = useAccount();
 ;
-    
 
     const [formData, setFormData] = useState({
         name: "",
@@ -87,7 +85,6 @@ export default function CreateBountyProposal({bountyID, onClose, openModal}) {
     
     
     return (
-        <ModalLayout title="Create Job" onClose={onClose} getOpen={openModal}>
             <div className="space-y-4">
                 <InputField
                     label="Name"
@@ -162,7 +159,7 @@ export default function CreateBountyProposal({bountyID, onClose, openModal}) {
                     Submit
                 </button>
             </div>
-        </ModalLayout>
+
 
     )
 }

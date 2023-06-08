@@ -45,6 +45,11 @@ export default function Jobs({ children }) {
     if (loading) return <LoadingFull />
     return (
         <Layout title="Jobs" active="Jobs">
+        
+            <div className="grid grid-cols-2">
+                    <Link className="col-span-1" href="/jobs" >Verified Jobs</Link>
+                    <Link  className="col-span-1" href="/jobs/request">Jobs Request</Link>
+            </div>
             <div className="flex justify-between mb-12">
             <div className='flex flex-col gap-6'>
                 <PageTitle title='Jobs' />

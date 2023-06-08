@@ -2,6 +2,7 @@
 import { Disclosure, Menu } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import LoginButton from './application/elements/buttons/LoginButton'
  
 
@@ -72,16 +73,26 @@ export default function Navigation({ active }) {
                   >
                     Jobs
                   </Link>
+                  <Link
+                  href="/groups"
+                  className={classNames(
+                    "Groups" == active
+                      ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                      : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                  )}
+                >
+                  Groups
+                </Link>
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-4 flex-shrink-0 flex gap-6">
-                <div>
-                  <LoginButton />
+                <Suspense fallback={<span>Loading..</span>}>
+                    <LoginButton />
 
-                  </div>
+                  </Suspense>
                 </Menu>
 
 

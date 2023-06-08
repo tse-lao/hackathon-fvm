@@ -1,23 +1,24 @@
 import ModalLayout from '@/components/ModalLayout';
+import { usePolybase } from '@polybase/react';
 import { ethers } from 'ethers';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useConnect, useDisconnect, useNetwork } from 'wagmi';
+import { useAccount, useDisconnect, useNetwork } from 'wagmi';
 import ProfileBalance from './stats/ProfileBalance';
 export default function ProfileDetails({ showModal, open, setShowModal }) {
-  const { connect, connectors } = useConnect();
+
   const { disconnect } = useDisconnect();
   const [maticBalance, setMaticBalance] = useState(0);
   const [fileBalance, setFileBalance] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
   const { chain } = useNetwork();
-  const { address, status, isConnected, isConnecting, isReconnecting, isDisconnected } =
+  const polybase = usePolybase();
+
+  const { address, isConnected } =
     useAccount();
-
-
-
   useEffect(() => {
-
     //balance get rom different api connecters. 
     const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
     const balance = provider.getBalance(address).then((balance) => {
@@ -28,9 +29,20 @@ export default function ProfileDetails({ showModal, open, setShowModal }) {
       setFileBalance(Math.round(ethers.utils.formatEther(balance) * 10000) / 10000);
       console.log(balance)
       setLoading(false)
+      
+      //check for address 
+      
+      
+      getName();
     });
   }, [address]);
 
+  
+  async function getName() {
+    const data = await polybase.collection("Profile").where("id", "==", address).get();
+    console.log(data.data)
+  
+  }
 
   async function copyAddress() {
     navigator.clipboard.writeText(address)
@@ -43,28 +55,36 @@ export default function ProfileDetails({ showModal, open, setShowModal }) {
 
         <div className='flex flex-col divide-y divide-solid'>
           <div id="username" className='py-4'>
-            <div className='bg-gray-100 outline outline-gray-300 text-center py-3 rounded hover:bg-gray-300 cursor-context-menu	'
+            <span>{name}</span>
+            <div className='text-xs text-center py-1 rounded hover:bg-gray-300 cursor-context-menu'
               onClick={() => copyAddress()}
             >
               {address}
             </div>
 
           </div>
-          <div id="balances" className='py-4'>
-            
-             <ProfileBalance loading={loading} balance={fileBalance} />
-             <ProfileBalance loading={loading} balance={maticBalance} />
-              <div className="flex flex-row items-center gap-4 hover:bg-gray-400 p-4 rounded-md ">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Polygon_Blockchain_Matic_Logo.svg" className="w-12 h-12" />
-                <span className={`text-gray-800 font-bold ${chain.id === 80001 && 'text-green-500'}`}>{loading ? "loading" : maticBalance}
-                </span>
+          <div id="balances" className='grid grid-cols-2 py-4'>
 
-              </div>
+            <ProfileBalance loading={loading} token="filecoin" balance={fileBalance} />
+            <ProfileBalance loading={loading} token="matic" balance={maticBalance} />
+
           </div>
-          <div id="actions">
-            <div className='flex justify-center'>
-              <button className='text-red-500 font-bold bg-red-100 border-red-500 outline py-1 px-3 rounded-md' onClick={() => { disconnect(); setShowModal(false) }}>Disconnect</button>
-            </div>
+          <div className="grid grid-cols-2 p-4 gap-2">
+            <Link
+              href="/profile/settings"
+              className=' font-bold bg-gray-100  px-3 rounded-md py-4 text-center hover:bg-gray-400'
+            >
+              Setting
+            </Link>
+            <button
+              className='text-red-500 py-4 font-bold bg-red-100 border-red-500 hover:bg-red-400 outline  px-3 rounded-md'
+              onClick={() => { disconnect(); setShowModal(false) }}
+            >
+              Disconnect
+            </button>
+
+
+
           </div>
         </div>
 

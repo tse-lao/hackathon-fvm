@@ -19,14 +19,15 @@ export default function Request() {
       <div className="container mx-auto px-4 py-8">
       <div className="flex place-content-end">
       <button
-      onClick={() => setOpenModal(true)}
+      onClick={() => setOpenModal(!openModal)}
       className="bg-cf-500 hover:bg-cf-700 self-end text-white font-bold py-2 px-4 rounded-full"
     >
-      <DataRequestForm changeOpen={changeOpen} getOpen={openModal} />
+      
 
       Create Request
     </button>
       </div>
+     {openModal && <DataRequestForm/>}
       
         <ListRequest />
       </div>

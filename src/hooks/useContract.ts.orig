@@ -418,9 +418,16 @@ export const useContract = () => {
     minimumSignatures: number,
   ): Promise<any> => {
     try {
+<<<<<<< HEAD
+      const bytes = await Helper.getBytecodeTokenInfoPasser(owners,minimumSignatures)
+      const tx = await multisigFactory.createAccount(
+        owners[0],
+        bytes,
+=======
       const bytes = await multisigFactory.getMultisigInitBytes(name,description,owners,MultisigFactory,minimumSignatures)
       const tx = await multisigFactory.createWallet(
         bytes
+>>>>>>> 6d17e35ae92b1b9bc6db5b3bf9d69a573aa32b41
       )
       console.log(tx)
       toast.update('Promise is pending', {
@@ -454,9 +461,7 @@ export const useContract = () => {
         MultisigAbi,
         signer!
       )
-      const tx = await multisig.submitTransaction(MultisigFactory,0,data, name,description,  {
-        gasLimit: 1000000,
-      })
+      const tx = await multisig.submitTransaction(name,description,MultisigFactory,0,data)
       
       console.log(tx)
       toast.update('Promise is pending', {
@@ -525,8 +530,7 @@ export const useContract = () => {
         MultisigAbi,
         signer!
       )
-        let reward = ethers.utils.parseEther(value.toString())
-      const tx = await multisig.submitTransaction(crossChainBacalhauJobs_address,reward,data, name, description)
+      const tx = await multisig.submitTransaction(crossChainBacalhauJobs_address,value,data)
       
       console.log(tx)
       toast.update('Promise is pending', {
