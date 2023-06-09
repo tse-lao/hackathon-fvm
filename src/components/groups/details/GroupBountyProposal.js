@@ -41,8 +41,8 @@ export default function GroupBountyProposal({address}) {
   return (    
     <div>
         <div className="grid grid-cols-2 text-center mb-4">
-          <span onClick={() => setRequest(false)}>Jobs</span>
-          <span onClick={() => setRequest(true)}>Request</span>
+          <span onClick={() => setRequest(false)} className={`${!request && 'text-cf-500'}`}>Jobs</span>
+          <span onClick={() => setRequest(true)} className={`${request && 'text-cf-500'}`}>Request</span>
         </div>
         
         {request ?  <JobBounties address={address} /> :  <JobList jobs={jobs} />}

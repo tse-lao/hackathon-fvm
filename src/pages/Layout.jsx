@@ -24,7 +24,7 @@ export default function Layout({ children, active }) {
   
   
         if (!api || !jwt){
-       //   window.location.href = '/profile/onboarding'
+          window.location.href = '/profile/onboarding'
         }
       }
 

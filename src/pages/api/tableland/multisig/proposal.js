@@ -17,7 +17,8 @@ export default async (req, res) => {
               'description', ${proposalTable}.description,
               'proposer', ${proposalTable}.proposer,
               'proposalID', ${proposalTable}.proposalID
-          )       
+              'executed', ${proposalTable}.executed,
+            )       
           FROM  ${proposalTable} 
           GROUP BY ${proposalTable}.proposalID`,
            format: "objects", extract:true

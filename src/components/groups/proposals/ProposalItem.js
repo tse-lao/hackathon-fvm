@@ -9,7 +9,7 @@ export default function ProposalItem({ proposal, numberOfConfirmations, multiSig
     const {address} = useAccount();
     
     useEffect(() => {
-        if(proposal.executed == 'truec '){
+        if(proposal.executed == 'true'){
             setStatus(3)
             return
         }
@@ -66,8 +66,7 @@ export default function ProposalItem({ proposal, numberOfConfirmations, multiSig
                   </span>
             }
             {status == 3 && 
-                <span className="text-center text-cf-500">Succesfully executed
-                </span>
+                <span className="text-center text-cf-500">Executed</span>
           }
                 
 
