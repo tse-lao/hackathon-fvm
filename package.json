@@ -48,7 +48,6 @@
         "nft.storage": "^7.0.3",
         "openai": "^3.2.1",
         "papaparse": "^5.4.1",
-        "path": "^0.12.7",
         "postcss-focus-visible": "^6.0.4",
         "react": "^18.2.0",
         "react-blockies": "^1.4.1",
@@ -58,7 +57,6 @@
         "react-slider": "^2.0.4",
         "react-tagsinput": "^3.20.1",
         "react-toastify": "^9.1.2",
-        "stream": "^0.0.2",
         "tailwindcss": "^3.1.8",
         "twitter-lite": "^1.1.0",
         "use-debounce": "^8.0.4",
@@ -73,9 +71,5 @@
         "prettier": "^2.7.1",
         "prettier-plugin-tailwindcss": "^0.1.13",
         "typescript": "5.0.4"
-    },
-    "browser": {
-        "path": false,
-        "stream": false
     }
 }
