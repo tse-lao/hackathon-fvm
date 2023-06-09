@@ -23,7 +23,9 @@ import {
   helper,
   helperAbi,
   splitImplementation,
-  splitterAbi
+  splitterAbi,
+  openDBandFolderAddress,
+  openDBandFolderAbi
 } from '../constants'
 
 export const useContract = () => {
@@ -31,6 +33,12 @@ export const useContract = () => {
 
   const provider = useProvider()
   const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
+
+  const folderAndOpenDB = new ethers.Contract(
+    openDBandFolderAddress,
+    openDBandFolderAbi,
+    signer!
+  )
 
   const multisigFactory = new ethers.Contract(
     MultisigFactory,
@@ -201,40 +209,34 @@ export const useContract = () => {
     dataFormatCID: string,
     dbName: string,
     description: string,
-    categories: string[]
+    categories: string[],
+    mimeType:string
   ) => {
     //read dataFormatCID from the contract.
-    const tx = await DB_NFT.createOpenDataSet(
-      dbCID,
-      label,
-      dataFormatCID,
+    const tx = await folderAndOpenDB.createOpenDataSet(
       dbName,
       description,
       categories,
+      dbCID,
+      dataFormatCID,
+      mimeType,
+      label,
       { gasLimit: 1000000 }
     )
     return await tx.wait()
   }
 
-  const createPrivateRepo = async (
-    repoName: string,
-    description: string,
-    SubmitProof: string[]
-  ) => {
-    const AccessSubmitleaves = SubmitProof.map((x) => ethers.utils.keccak256(x))
-    const SubmitTree = new MerkleTree(
-      AccessSubmitleaves,
-      ethers.utils.keccak256,
-      { sortPairs: true }
-    )
-    const SubmitRoot = SubmitTree.getHexRoot()
 
+  const createMultisigFolder = async (
+    folderName: string,
+    description: string,
+    multisigAddress: string
+  ) => {
     try {
-      const tx = await DB_NFT.createPrivateRepo(
-        repoName,
+      const tx = await folderAndOpenDB.createMultisigFolder(
+        folderName,
         description,
-        SubmitProof,
-        SubmitRoot,
+        multisigAddress,
         { gasLimit: 1000000 }
       )
 
@@ -253,6 +255,184 @@ export const useContract = () => {
       throw error
     }
   }
+
+
+const addFileonMultisigFolder = async (
+  tokenId: string,
+  multisigAddress: string,
+  dataCID: string
+) => {
+  try {
+    const tx = await folderAndOpenDB.addFileOnMultisigGroup(
+      tokenId,
+      multisigAddress,
+      dataCID,
+      { gasLimit: 1000000 }
+    )
+
+    console.log(tx)
+    toast.update('Promise is pending', {
+      render: 'Transaction sent, waiting for confirmation.',
+    })
+
+    const receipt = await tx.wait()
+    console.log(receipt)
+    toast.success('Promise resolved 👌')
+    return receipt
+  } catch (error) {
+    console.log(error)
+    toast.error('Promise rejected 🤯')
+    throw error
+  }
+}
+
+
+  const createPrivateRepo = async (
+    repoName: string,
+    description: string,
+    adminAddress: string,
+    membersAddresses:string[]
+  ) => {
+
+    try {
+      const tx = await folderAndOpenDB.createPrivateRepo(
+        repoName,
+        description,
+        adminAddress,
+        membersAddresses,
+        { gasLimit: 1000000 }
+      )
+
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      console.log(receipt)
+      toast.success('Promise resolved 👌')
+      return receipt
+    } catch (error) {
+      console.log(error)
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  
+const addFileonPrivateFolder = async (
+  tokenId: string,
+  dataCID: string
+) => {
+  try {
+    const tx = await folderAndOpenDB.addFileOnPrivateGroup(
+      tokenId,
+      dataCID,
+      { gasLimit: 1000000 }
+    )
+
+    console.log(tx)
+    toast.update('Promise is pending', {
+      render: 'Transaction sent, waiting for confirmation.',
+    })
+
+    const receipt = await tx.wait()
+    console.log(receipt)
+    toast.success('Promise resolved 👌')
+    return receipt
+  } catch (error) {
+    console.log(error)
+    toast.error('Promise rejected 🤯')
+    throw error
+  }
+}
+
+const hasFolderAccess = async (
+  sender: string,
+  folderID: string,
+  multisig: string,
+) => {
+  try {
+    const hasAccess = await folderAndOpenDB.hasFolderAccess(
+      sender,
+      multisig,
+      folderID,
+      { gasLimit: 1000000 }
+    )
+
+    console.log(hasAccess)
+    toast.update('Promise is pending', {
+      render: 'Transaction sent, waiting for confirmation.',
+    })
+    
+    // console.log(tx)
+    toast.success('Promise resolved 👌')
+    return hasAccess
+  } catch (error) {
+    console.log(error)
+    toast.error('Promise rejected 🤯')
+    throw error
+  }
+}
+
+// removeMemberFromPrivateFolder(uint256 folderID, address member)
+
+
+// addMemberToPrivateFolder(uint256 folderID, address newMember)
+
+const addMemberToPrivateFolder = async (
+  folderID: string,
+  newMember: string,
+) => {
+  try {
+    const tx = await folderAndOpenDB.addMemberToPrivateFolder(
+      folderID,
+      newMember,
+      { gasLimit: 1000000 }
+    )
+
+    console.log(tx)
+    toast.update('Promise is pending', {
+      render: 'Transaction sent, waiting for confirmation.',
+    })
+
+    const receipt = await tx.wait()
+    console.log(receipt)
+    toast.success('Promise resolved 👌')
+    return receipt
+  } catch (error) {
+    console.log(error)
+    toast.error('Promise rejected 🤯')
+    throw error
+  }
+}
+
+const removeMemberFromPrivateFolder = async (
+  folderID: string,
+  newMember: string,
+) => {
+  try {
+    const tx = await folderAndOpenDB.removeMemberFromPrivateFolder(
+      folderID,
+      newMember,
+      { gasLimit: 1000000 }
+    )
+
+    console.log(tx)
+    toast.update('Promise is pending', {
+      render: 'Transaction sent, waiting for confirmation.',
+    })
+
+    const receipt = await tx.wait()
+    console.log(receipt)
+    toast.success('Promise resolved 👌')
+    return receipt
+  } catch (error) {
+    console.log(error)
+    toast.error('Promise rejected 🤯')
+    throw error
+  }
+}
 
   const updateRepoSubmitAccessControl = async (
     tokenId: number,
@@ -1152,6 +1332,12 @@ export const useContract = () => {
     multisigCreateBountyProposal,
     createMultisig,
     multisigRemoveMemberProposal,
-    multisigAddMemberProposal
+    multisigAddMemberProposal,
+    createMultisigFolder,
+    addFileonMultisigFolder,
+    addFileonPrivateFolder,
+    removeMemberFromPrivateFolder,
+    addMemberToPrivateFolder,
+    hasFolderAccess
   }
 }

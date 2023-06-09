@@ -13,3 +13,5 @@ export const MumbaiEscrow = "0x31B48aFC27789e84326F4d3F09A611E93245684a"
 export const HyperspaceEscrow = "0xa45f23B0fBA25E6B9E83d768e559f8e19cC8855e"
 
 export const MultisigFactory = "0xE24ed2AD31102a18c687d2dB5921218F35fa24E5"
+
+export const openDBandFolderAddress = "0x03dBADc3E17D143F4E29672251FD7152aa660760"

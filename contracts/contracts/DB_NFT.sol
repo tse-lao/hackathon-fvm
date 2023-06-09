@@ -228,10 +228,11 @@ contract DB_NFT is ERC1155, Ownable {
         string memory description,
         string[] memory categories,
         int256 requiredRows,
-        uint256 minSubRows
+        uint256 minSubRows,
+        address multisig
     ) public {
         require(requiredRows > 0);
-        require(IMultisig(msg.sender).isMultisigOwner(tx.origin));
+        require(IMultisig(multisig).isMultisigOwner(msg.sender));
         tokenID.increment();
         uint256 tokenId = tokenID.current();
         dbInfoMap[tokenId].minSubRows = minSubRows;

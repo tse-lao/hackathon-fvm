@@ -5,6 +5,7 @@ import DBAbi from './DB_NFT.abi.json'
 import TWFactoryAbi from './ThirdWebFactory.abi.json'
 import MultisigAbi from "./multisig.abi.json"
 import MultisigFactoryAbi from "./multisigFactory.abi.json"
+import openDBandFolderAbi from "./openDBandFolder.abi.json"
 
 import {
     DB_NFT_address,
@@ -18,6 +19,7 @@ import {
     crossChainTablelandStorageAddress,
     helper,
     splitImplementation,
+    openDBandFolderAddress
 } from './contractAddress'
 import crossChainTablelandDealClientAbi from './crossChainTablelandDealClient.abi.json'
 import encodeHelperAbi from "./encodeHelper.abi.json"
@@ -58,5 +60,7 @@ export {
     MultisigFactoryAbi,
     encodeHelperAbi,
     MultisigFactory,
-    MultisigAbi
+    MultisigAbi,
+    openDBandFolderAbi,
+    openDBandFolderAddress,
 }
