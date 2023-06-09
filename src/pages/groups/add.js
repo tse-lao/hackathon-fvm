@@ -1,19 +1,25 @@
 "use client"
-import GroupView from '@/app/components/users/GroupView';
+
+
 import { TextField } from '@/components/Fields';
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
 import TextArea from '@/components/application/elements/input/TextArea';
 import AddMember from '@/components/groups/AddMember';
+import GroupView from '@/components/groups/details/GroupView';
 import { useContract } from '@/hooks/useContract';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
 import Layout from '../Layout';
 
 
 export default function CreateGroup() {
     const {createMultisig} = useContract();
+    const {address} = useAccount();
+    const [loading,setLoading] = useState(false);
+
     const router = useRouter();
     const [openModal, setOpenModal] = useState(false);
     const [formData, setFormData] = useState({
@@ -32,15 +38,23 @@ export default function CreateGroup() {
     const createGroup = async (e) => {
         e.preventDefault();
         // Process the form data and send it to the server or API endpoint.
+
         console.log(formData);
         
+        setLoading(true)
         if(formData.owners.length === 0 || formData.minimumSignatures < 1){
             toast.error("Please add at least one owner or signatures.");
+            setLoading(false);
             return;
         }
         
 
   
+        if(!formData.owners.includes(address)){
+            toast.error("You must be an owner of the group.");
+            setLoading(false);
+            return;
+        }
         //only list of onwers. 
         toast.promise(createMultisig(
             formData.name, 
@@ -57,12 +71,13 @@ export default function CreateGroup() {
                 router.push('/groups')
             }
           });
+          
        
     };
     
     const addMember = (e) => {
-        console.log(e);
-        console.log("adding");
+
+
         let newOwner = formData.owners;
         //check if its already on there
         if(newOwner.includes(e)){
@@ -114,7 +129,9 @@ export default function CreateGroup() {
                 <AddMember showModal={openModal} addMember={addMember} />
 
                 <ActionButton text
-                ="Create Group" onClick={createGroup} />
+                ="Create Group" onClick={createGroup} 
+                loading={loading}
+                />
             </div>
             </Layout>
     )

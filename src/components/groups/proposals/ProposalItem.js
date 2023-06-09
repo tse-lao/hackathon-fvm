@@ -9,11 +9,12 @@ export default function ProposalItem({ proposal, numberOfConfirmations, multiSig
     const {address} = useAccount();
     
     useEffect(() => {
+        if(proposal.executed == 'truec '){
+            setStatus(3)
+            return
+        }
         if (proposal.confirmations.length >= numberOfConfirmations) {
-            if(proposal.executed == true){
-                setStatus(3)
-                return
-            }
+            
             setStatus(1);
             return
         }

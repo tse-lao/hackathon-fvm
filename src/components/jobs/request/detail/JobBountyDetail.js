@@ -34,6 +34,8 @@ export default function JobBountyDetail({jobId, details}) {
     <div className="flex flex-col items-center justify-center gap-4">
         <span className="text-xl font-bold mb-2 ">{details.name}</span>
         <span>{details.description}</span>
+        
+        <span>Group address</span>
             
     </div>
   )

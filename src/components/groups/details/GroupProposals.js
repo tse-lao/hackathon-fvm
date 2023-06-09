@@ -1,3 +1,4 @@
+import DataNotFound from "@/components/application/elements/message/DataNotFound";
 import { useEffect, useState } from "react";
 import ProposalItem from "../proposals/ProposalItem";
 
@@ -25,9 +26,9 @@ export default function GroupProposals({address, proposalTable, confirmationTabl
     }, [address, proposalTable, confirmationTable])
   return (
     <div className="flex flex-col gap-2">
-        {proposals.length > 0 && proposals.map((proposal, key) => (
+        {proposals.length > 0 ? proposals.map((proposal, key) => (
           <ProposalItem key={key} proposal={proposal} numberOfConfirmations={numberOfConfirmations} multiSigAddress={address}/>
-        ))
+        )): <DataNotFound message="No proposals found"/>
         }
     </div>
     

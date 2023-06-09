@@ -5,6 +5,7 @@ import GroupBountyProposal from "@/components/groups/details/GroupBountyProposal
 import GroupDetail from "@/components/groups/details/GroupDetail";
 import GroupProposals from "@/components/groups/details/GroupProposals";
 import GroupTransactions from "@/components/groups/details/GroupTransactions";
+import GroupDataRequest from "@/components/groups/details/data/GroupDataRequest";
 import Layout from "@/pages/Layout";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -43,12 +44,6 @@ export default function GroupDetailPage() {
 
             setMembers(mem)
         }
-        setDetails({
-            name: "some name",
-            description: "some description"
-        })
-
-
         if (id == undefined) return;
 
         getData()
@@ -60,8 +55,8 @@ export default function GroupDetailPage() {
         <Layout active="Groups">
 
             <div className='flex flex-col items-center justify-center gap-12 flex-wrap text-sm'>
-                <div className="grid grid-cols-3 gap-4 items-center">
-                    <div className="col-span-2">
+                <div className="grid lg:grid-cols-3 sm:grid-cols-1 md:grid-cols-2 gap-4 items-center bg-white p-4 rounded-sm">
+                    <div className="lg:col-span-2 md:col-span-1 sm:col-span-1">
                         <h1 className="text-md text-gray-800">{details.name}</h1>
                         <span className="text-gray-500">
                             {details.description}
@@ -72,11 +67,11 @@ export default function GroupDetailPage() {
                     </div>
 
                 </div>
-                <div className='flex gap-12 flex-wrap'>
-                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active === 'details' && 'bg-cf-500 text-white'}`} onClick={() => setActive('details')}>Details</span>
-                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'proposals' && 'bg-cf-500 text-white'}`} onClick={() => setActive('proposals')}>Proposals</span>
-                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'transactions' && 'bg-cf-500 text-white'}`} onClick={() => setActive('transactions')}>Transations</span>
-                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'bounty' && 'bg-cf-500 text-white'}`} onClick={() => setActive('bounty')}>Bounty</span>
+                <div className='flex gap-6 flex-wrap'>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer  ${active === 'details' && 'text-cf-500'}`} onClick={() => setActive('details')}>Details</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'proposals' && 'text-cf-500'}`} onClick={() => setActive('proposals')}>Proposals</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'transactions' && ' text-cf-500'}`} onClick={() => setActive('transactions')}>Transations</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'request' && 'text-cf-500'}`} onClick={() => setActive('request')}>Requests</span>
                 </div>
 
                 <div className=' w-[800px] p-8 rounded-md '>
@@ -84,6 +79,7 @@ export default function GroupDetailPage() {
                     {active == 'proposals' && <GroupProposals address={id} confirmationTable={details.confirmationTable} proposalTable={details.proposalTable} numberOfConfirmations={details.numberOfConfirmations} />}
                     {active == 'transactions' && <GroupTransactions address={id} confirmationTable={details.confirmationTable} proposalTable={details.proposalTable} numberOfConfirmations={details.numberOfConfirmations} />}
                     {active == 'bounty' && <GroupBountyProposal address={id} />}
+                    {active == 'request' && <GroupDataRequest address={id} />}
 
 
 

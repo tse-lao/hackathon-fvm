@@ -72,12 +72,12 @@ export default function ProfileDetails({ showModal, open, setShowModal }) {
           <div className="grid grid-cols-2 p-4 gap-2">
             <Link
               href="/profile/settings"
-              className=' font-bold bg-gray-100  px-3 rounded-md py-4 text-center hover:bg-gray-400'
+              className=' font-bold  px-3 rounded-md py-4 text-center hover:bg-gray-400'
             >
               Setting
             </Link>
             <button
-              className='text-red-500 py-4 font-bold bg-red-100 border-red-500 hover:bg-red-400 outline  px-3 rounded-md'
+              className='text-red-500 py-4 font-bold hover:bg-red-400   px-3 rounded-md'
               onClick={() => { disconnect(); setShowModal(false) }}
             >
               Disconnect

@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from 'react';
-import { useAccount, useConnect, useNetwork } from 'wagmi';
+import { useAccount, useBalance, useConnect, useNetwork } from 'wagmi';
 import ProfileDetails from '../../profile/ProfileDetails';
 
 export default function LoginButton() {
@@ -8,6 +8,7 @@ export default function LoginButton() {
   const { address, status, isConnected, isConnecting, isReconnecting, isDisconnected } = useAccount();
   const { chain } = useNetwork()
   const [showModal, setShowModal] = useState(false);
+  const {data:balance} = useBalance({address:address})
 
   // Eager connection
   useEffect(() => {
@@ -19,6 +20,21 @@ export default function LoginButton() {
 
     connect({ connector: connectors });
   }, []);
+  
+  function truncateTextMiddle(text, maxLength) {
+    if (text.length <= maxLength) {
+      return text;
+    }
+  
+    const halfLength = Math.floor((maxLength - 3) / 2); // Subtracting 3 to accommodate for the ellipsis
+  
+    const start = text.slice(0, halfLength);
+    const end = text.slice(-halfLength);
+  
+    const truncatedText = start + '...' + end;
+    return truncatedText;
+  }
+  
 
 
 
@@ -32,15 +48,16 @@ export default function LoginButton() {
 
   if (!isConnecting && address) {
     return (
-      <div className="flex rounded-md bg-white border items-center gap-2">
-        <div className='p-2'>
+      <div className="flex rounded-md  items-center gap-2">
+        <div className='p-2 flex gap-2'>
           {status === 'connected' &&
             (chain.id == 80001 ? <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Polygon_Blockchain_Matic_Logo.svg" alt={`${chain.id}`} className="w-6 h-6" /> :
               <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Filecoin.svg" alt={`${chain.id}`} className="w-6 h-6" />
             )}
+            {Math.round(balance.formatted * 100000)/10000}
         </div>
-        <button className='w-[150px] bg-white p-1 px-3 outline rounded-full outline-gray-200 text-sm overflow truncate' onClick={() => setShowModal(!showModal)}>
-          {address}
+        <button className='w-[150px] bg-white p-1 px-1 outline rounded-full outline-gray-200 text-sm overflow truncate' onClick={() => setShowModal(!showModal)}>
+          {truncateTextMiddle(address, 11)}
           
           {showModal && <ProfileDetails address={address} showModal={showModal} setShowModal={setShowModal} />}
 

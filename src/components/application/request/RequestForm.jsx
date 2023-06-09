@@ -26,7 +26,7 @@ export default function DataRequestForm({ changeOpen }) {
   const [loadingFile, setLoadingFile] = useState(false);
   const [metadata, setMetadata] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { RequestDB } = useContract();
+  const { RequestDB, multisigRequestDatabaseProposal} = useContract();
   const { uploadMetadata } = useNftStorage();
 
   const handleTagChange = (tags) => {
@@ -93,16 +93,19 @@ export default function DataRequestForm({ changeOpen }) {
         return;
       }
       
-      toast.promise(RequestDB(
+      toast.promise(multisigRequestDatabaseProposal(
+        multiSig,
         metadata,
         formData.name,
         formData.description,
         formData.categories,
         formData.requiredRows,
-        formData.minRows
+        formData.minRows,
+        formData.name, 
+        formData.description,
       ),
         {
-          pending: `Request started for ${formData.name} 🚀`,
+          pending: `Request started for proposal ${formData.name} 🚀`,
           success: `Request ${formData.name} confirmed 🎉`,
           error: `Something went wrong..`,
         }
@@ -110,6 +113,8 @@ export default function DataRequestForm({ changeOpen }) {
         window.location.reload();
         setLoading(false)
       })
+      
+      return;
     }
 
     toast.promise(RequestDB(

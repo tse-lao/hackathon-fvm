@@ -44,7 +44,7 @@ export default function Jobs({ children }) {
     if (loading) return <LoadingFull />
     return (
         <Layout title="Jobs" active="Jobs">
-            {openModal ? <CreateJob onClose={() => setOpenModal(false)} /> :
+            {openModal ? <CreateJob onClose={() => setOpenModal(!openModal)} /> :
                 (
                     <div>
                         <div className="grid grid-cols-2 text-center mb-4">
@@ -65,7 +65,7 @@ export default function Jobs({ children }) {
 
             <button
                 className="fixed bottom-12 right-12 bg-cf-500 text-white px-4 py-2 rounded"
-                onClick={() => { setModalOpen(!modalOpen) }}
+                onClick={() => { setOpenModal(!openModal) }}
             >
                 Create Job
             </button>

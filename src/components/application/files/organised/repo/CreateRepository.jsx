@@ -1,8 +1,9 @@
-import GroupView from '@/app/components/users/GroupView';
+
 import { TextField } from '@/components/Fields';
 import ModalLayout from '@/components/ModalLayout';
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
 import TextArea from '@/components/application/elements/input/TextArea';
+import GroupView from '@/components/groups/details/GroupView';
 import { useContract } from '@/hooks/useContract';
 import { useState } from "react";
 import { toast } from 'react-toastify';

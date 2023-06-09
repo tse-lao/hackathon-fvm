@@ -15,7 +15,7 @@ export default function ListRequest() {
         const getData = async () => {
             setLoading(true)
 
-            let query = `WHERE ${DB_main}.piece_cid='piece_cid'`;
+            let query = `WHERE ${DB_main}.piece_cid='piece_cid' AND ${DB_attribute}.trait_type='multisig' AND  ${DB_attribute}.value = 'false'`;
 
             if (filters.categories.length > 0) {
                 filters.categories.forEach((category, index) => {

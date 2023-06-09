@@ -5,7 +5,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 export default function ModalLayout({ title, children, showModal}) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const HYPERSPACE_ID = 3141;
   const POLYGON = 80001;
   const {chain} = useNetwork();

@@ -27,7 +27,6 @@ export default function JobBountyDetailPage() {
         // [] options to change proposal.
             
         if(id > 0){
-            
             getBountyDetails();
         }
         
@@ -44,6 +43,10 @@ export default function JobBountyDetailPage() {
         
         setDetails(datasets.result[0])
         
+        //console.log(datasets.result[0])
+        
+        
+        
         setLoading(false)
     }
 
@@ -54,17 +57,24 @@ export default function JobBountyDetailPage() {
         <Layout>
             <div className='flex flex-col items-center justify-center gap-12 flex-wrap'>
                 <div className='flex gap-12 flex-wrap'>
-                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active === 'details' && 'bg-cf-500 text-white'}`} onClick={()=> setActive('details')}>Details</span>
-                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'proposals' && 'bg-cf-500 text-white'}`} onClick={()=> setActive('proposals')}>Proposals</span>
-                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'sponsor' && 'bg-cf-500 text-white'}`}>Sponsors</span>
-                    <span className={`hover:bg-cf-500 px-4 py-2 cursor-pointer hover:text-white rounded-full ${active == 'contract' && 'bg-cf-500 text-white'}`}>Contract</span>
+                    <span 
+                        className={`px-4 py-2 cursor-pointer hover:text-cf-800 ${active === 'details' && 'text-cf-500 font-md'}`} 
+                        onClick={()=> setActive('details')}>
+                            Details
+                    </span>
+                    <span 
+                        className={`px-4 py-2 cursor-pointer hover:text-cf-800 ${active == 'proposals' && 'text-cf-500 font-md'}`} 
+                        onClick={()=> setActive('proposals')}>
+                            Proposals
+                    </span>
                 </div>
-                
                 <div className='w-[800px] p-8 rounded-md '>
-                    {active == 'details' && <JobBountyDetail id={id} details={details}/>}
-                    {active == 'proposals' && <JobBountyProposals bountyID={id} details={details}/>}
-
-                    
+                    {active == 'details' && 
+                        <JobBountyDetail id={id} details={details}/>
+                    }
+                    {active == 'proposals' && 
+                        <JobBountyProposals bountyID={id} details={details}/>
+                    }
                 </div>
             </div>
 

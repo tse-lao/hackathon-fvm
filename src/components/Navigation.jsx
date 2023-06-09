@@ -47,7 +47,7 @@ export default function Navigation({ active }) {
                     href="/market"
                     className={classNames(
                       "Market" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-cf-500'
                         : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
                     )}
                   >
@@ -57,7 +57,7 @@ export default function Navigation({ active }) {
                     href="/request"
                     className={classNames(
                       "Request" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-cf-500'
                         : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
                     )}
                   >
@@ -67,7 +67,7 @@ export default function Navigation({ active }) {
                     href="/jobs"
                     className={classNames(
                       "Jobs" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-cf-500'
                         : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
                     )}
                   >
@@ -77,7 +77,7 @@ export default function Navigation({ active }) {
                   href="/groups"
                   className={classNames(
                     "Groups" == active
-                      ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                      ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-cf-500'
                       : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
                   )}
                 >

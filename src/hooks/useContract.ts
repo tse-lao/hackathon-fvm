@@ -155,9 +155,9 @@ export const useContract = () => {
     return await DB_NFT.hasAccess(UserAddress,MultisigAddress,tokenId)
   }
 
-  // const hasRepoAccess = async (address: string, tokenId: number) => {
-  //   return await DB_NFT.hasRepoAccess(address, tokenId)
-  // }
+   const hasRepoAccess = async (address: string, tokenId: number) => {
+     return await DB_NFT.hasRepoAccess(address, tokenId)
+   }
 
   const RequestDB = async (
     dataFormatCID: string,
@@ -1133,8 +1133,8 @@ export const useContract = () => {
     getPayeeShares,
     distributeShares,
     makeDealProposal,
-    hasRepoAccess,
     createPrivateRepo,
+    hasRepoAccess,
     updateRepoSubmitAccessControl,
     claimBounty,
     createBounty,

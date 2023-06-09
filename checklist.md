@@ -13,18 +13,18 @@ check out this about the findings.
 - [x]  Create seperate module.
 - [x]  How to call a docker image or node to run the command:
 - [x]  figure out some rust codes.
-- [ ]  convert python script to wasm.
-- [ ]  Request Bounties
+- [x]  convert python script to wasm.
+- [x]  Request Bounties
 - [x]  Create Bounty Request marketplace.
 
 **UI updates done 2 june.** 
 
-- [ ]  Create Job
-- [ ]  Create Job Bounty
-- [ ]  Display Job Bounty
-- [ ]  Show datasets available
-- [ ]  Show Computations over Data
-- [ ]  Job Request Details.
+- [x]  Create Job
+- [x]  Create Job Bounty
+- [x]  Display Job Bounty
+- [x]  Show datasets available
+- [x]  Show Computations over Data
+- [x]  Job Request Details.
 
 **TODO’s**
 

@@ -6,31 +6,31 @@ import { toast } from 'react-toastify';
 
 export async function readBlobAsJson(blob) {
   return new Promise((resolve, reject) => {
-  const reader = new FileReader();
+    const reader = new FileReader();
 
 
-  reader.addEventListener('error', () => {
-    reject(new Error('Error reading file'));
-  });
-  // Define the onload event handler
-  reader.addEventListener('load', async () => {
-    try {
-       json = JSON.parse(event.target.result);
-      resolve(json);
-    } catch (error) {
-      reject(error);
-    }
-  });
+    reader.addEventListener('error', () => {
+      reject(new Error('Error reading file'));
+    });
+    // Define the onload event handler
+    reader.addEventListener('load', async () => {
+      try {
+        json = JSON.parse(event.target.result);
+        resolve(json);
+      } catch (error) {
+        reject(error);
+      }
+    });
 
-  // Define the onerror event handler
-  reader.onerror = function () {
-    reject(reader.error);
-  };
+    // Define the onerror event handler
+    reader.onerror = function () {
+      reject(reader.error);
+    };
 
-  // Read the Blob as a text string
-  reader.readAsText(blob);
+    // Read the Blob as a text string
+    reader.readAsText(blob);
 
-  return reader;
+    return reader;
   })
 }
 
@@ -159,7 +159,7 @@ export async function getMetadataFromFile(file) {
         const metadata = analyzeJSONStructure(json);
         console.log(metadata)
         const result = await getMetadataCID(JSON.stringify(metadata));
-        
+
         resolve(result);
       } catch (error) {
         toast.error(error);
@@ -175,14 +175,14 @@ export async function getMetadataFromFile(file) {
   });
 }
 
-export async function getMetadataCID(file){
+export async function getMetadataCID(file) {
   const blob = new Blob([file], { type: "application/json" })
 
   const { cid } = await NFTStorage.encodeBlob(blob)
 
 
   //return await storage.storeBlob(blob)
-  return  cid.toString()
+  return cid.toString()
 }
 
 

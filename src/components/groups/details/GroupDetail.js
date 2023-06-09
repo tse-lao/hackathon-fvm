@@ -1,4 +1,4 @@
-import GroupView from "@/app/components/users/GroupView";
+
 import { ActionButton } from "@/components/application/elements/buttons/ActionButton";
 import InputField from "@/components/application/elements/input/InputField";
 import TextArea from "@/components/application/elements/input/TextArea";
@@ -6,9 +6,11 @@ import { useContract } from "@/hooks/useContract";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import AddMember from "../AddMember";
+import GroupView from "./GroupView";
 
 export default function GroupDetail({ members, details, address }) {
   const [addMembers, setAddMembers] = useState([])
+  const [loading, setLoading] = useState(false)
   const { multisigAddMemberProposal } = useContract();
   const [added, setAdded] = useState(false)
   const [confirmations, setConfirmations] = useState(0)
@@ -23,8 +25,7 @@ export default function GroupDetail({ members, details, address }) {
   }
 
   const submitMember = () => {
-    //here wec call the function to add a memmber to the multisig. 
-
+    setLoading(true)
     console.log(addMembers[0]);
     console.log(address);
 
@@ -35,53 +36,62 @@ export default function GroupDetail({ members, details, address }) {
       pening: "Creating multisig...",
       success: "Multisig created",
       error: "Error creating multisig",
-    });
+    })
+
+    setLoading(false)
   }
   return (
     <div className="flex flex-col gap-4">
-    
+
 
 
 
       {members && (
-        <div className="flex flex-col gap-4">
-          <GroupView members={members}  />
+        <div className="flex flex-col">
+          <GroupView members={members} />
           <div className="flex flex-col gap-2">
-            <span>New member</span>
             <AddMember addMember={addMember} />
           </div>
           {added && (
-            <div className="flex flex-col gap-2">
-              <InputField
-                label="Name"
-                type="type"
-                placeholder="Create name"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-              />
-              <InputField
-                label="Confirmations"
-                type="number"
-                placeholder="Set confirmations"
-                onChange={(e) => setConfirmations(e.target.value)}
-                value={confirmations}
-              />
-
+            <div className="grid grid-cols-2  gap-2 m-4">
+              <div className="col-span-1">
+                <InputField
+                  label="Name"
+                  type="type"
+                  placeholder="Create name"
+                  onChange={(e) => setName(e.target.value)}
+                  value={name}
+                />
+              </div>
+              <div className="col-span-1">
+                <InputField
+                  label="Confirmations"
+                  type="number"
+                  placeholder="Set confirmations"
+                  onChange={(e) => setConfirmations(e.target.value)}
+                  value={confirmations}
+                />
+              </div>
+              <div className="col-span-2">
               <TextArea
-                label="Description"
-                type="text"
-                rows={2}
-                placeholder="Type description"
-                onChange={(e) => setDescription(e.target.value)}
-                value={description}
-              />
+              label="Description"
+              type="text"
+              rows={2}
+              placeholder="Type description"
+              onChange={(e) => setDescription(e.target.value)}
+              value={description}
+            />
+              </div>
 
-              <ActionButton onClick={submitMember} text="Add Member" />
+
+             
+
+              <ActionButton onClick={submitMember} loading={loading} text="Add Member" />
             </div>
           )}
         </div>
       )
       }
-</div>
-      )
+    </div>
+  )
 }
