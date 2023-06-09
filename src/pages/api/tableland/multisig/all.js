@@ -19,8 +19,9 @@ export default async (req, res) => {
           'members', json_group_array( json_object( 'ownerAddress',  ${MultisigOwnersTable}.ownerAddress ) ) ) 
           FROM  ${MultisigTable} 
           JOIN  ${MultisigOwnersTable} ON  ${MultisigTable}.multisigAddress =  ${MultisigOwnersTable}.multisigAddress 
-          GROUP BY ${MultisigTable}.multisigAddress
           ${where}
+          GROUP BY ${MultisigTable}.multisigAddress
+          
          `
          ,
           format: "objects", unwrap: false, extract: true

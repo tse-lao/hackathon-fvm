@@ -20,7 +20,7 @@ export default function GroupBountyProposal({address}) {
       let query = ``;
 
       if(address){
-        query += ` WHERE $creator='${address}'`
+        query += ` WHERE creator='${address}'`
       }
       //TODO: add filters later or maybe one search bar. 
 

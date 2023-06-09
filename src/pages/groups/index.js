@@ -1,14 +1,18 @@
 import { GroupListItem } from "@/components/groups/GroupListItem";
+import { MultisigOwnersTable } from "@/constants/tableland";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import Layout from "../Layout";
 
 export default function Groups() {
   const [data, setData] = useState([])
+  const {address} = useAccount();
 
   useEffect(() => {
     async function getData() {
-      const res = await fetch(`/api/tableland/multisig/all`)
+      let query = `WHERE ${MultisigOwnersTable}.ownerAddress='${address.toLowerCase()}'`
+      const res = await fetch(`/api/tableland/multisig/all?where=${query}`)
       // The return value is *not* serialized
       // You can return Date, Map, Set, etc.
 
@@ -18,9 +22,10 @@ export default function Groups() {
       setData(result.result);
     }
 
+    if(address == undefined) return;
     getData();
 
-  }, [])
+  }, [address])
 
 
 

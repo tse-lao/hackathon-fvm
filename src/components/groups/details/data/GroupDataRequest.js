@@ -7,7 +7,11 @@ export default function GroupDataRequest({address}) {
     const [data, setData] = useState([])
     useEffect(() => {
         const getData = async() => {
-            let query = `WHERE ${DB_main}.piece_cid='piece_cid' AND ${DB_attribute}.trait_type='multisig' AND  ${DB_attribute}.value = 'true'`;
+            let query = `WHERE ${DB_main}.piece_cid='piece_cid' AND
+            ${DB_attribute}.trait_type='creator' AND  ${DB_attribute}.value = '${address.toLowerCase()}'
+
+            `;
+            
             
             const res = await fetch(`/api/tableland/token/all?where=${query}`)
             const result = await res.json()

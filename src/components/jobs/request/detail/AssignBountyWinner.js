@@ -6,9 +6,9 @@ import { useState } from 'react'
 import { toast } from 'react-toastify'
 
 //TODO: implement data picker. 
-export default function AssignBountyWinner({ onClose, getOpen, selected, bountyID }) {
+export default function AssignBountyWinner({ onClose, multiSig, selected, bountyID, address}) {
   const [loading, setLoading] = useState(false);
-  const {assignBountyResult} = useContract();
+  const {assignBountyResult, multisigAssignBountyWinnerProposal} = useContract();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -27,6 +27,32 @@ export default function AssignBountyWinner({ onClose, getOpen, selected, bountyI
     if(!dataFormat){
         dataFormat = "no_metdata"
     }
+    
+    
+    if(multiSig){
+      toast.promise(multisigAssignBountyWinnerProposal(
+        address, 
+        bountyID, 
+      formData.name, 
+      formData.description,
+      'Bounty winner ' + formData.name,
+      'Bounty winner proposal ' + formData.description + ' for bounty ' + bountyID,
+      dataFormat,
+      selected.startCommand, 
+      selected.endCommand, 
+      selected.numOfInputs, 
+      selected.creator
+    ),{
+      pending: "Creating Bounty",
+      success: "Bounty Created",
+      error: "Error Creating Bounty"
+    }).then((result) => {
+      if(result) {
+        window.location.reload();
+      }
+    }
+    )
+    }
     //TODO: implement create request.
     toast.promise(assignBountyResult(
         bountyID, 
@@ -43,7 +69,7 @@ export default function AssignBountyWinner({ onClose, getOpen, selected, bountyI
       error: "Error Creating Bounty"
     }).then((result) => {
       if(result) {
-        onClose();
+        window.location.reload();
       }
     }
     )

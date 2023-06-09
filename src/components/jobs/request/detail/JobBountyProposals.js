@@ -1,6 +1,6 @@
 import { ModalButton } from "@/components/application/elements/buttons/ModalButton";
 import { useCollection, usePolybase } from "@polybase/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import AssignBountyWinner from "./AssignBountyWinner";
 import CreateBountyProposal from "./CreateBountyProposal";
@@ -8,12 +8,19 @@ import CreateBountyProposal from "./CreateBountyProposal";
 //TODO: implement later. 
 export default function JobBountyProposals({ bountyID, details }) {
   const [openModal, setOpenModal] = useState(false)
-  const [proposals, setProposals] = useState([])
+  const [multiSig, setMultiSig] = useState(false)
   const {address} = useAccount();
   const [selected, setSelected] = useState("");
   const polybase = usePolybase()
   const {data:proposal, loading} = useCollection(polybase.collection("BountyProposal").where('bountyID', '==', bountyID));
   console.log(details);
+  
+  
+  useEffect(() => {
+      //check here if 
+      if(details.members[0] != null) {setMultiSig(true); return;}
+      
+  }, [details])
   
   const clickSelect = (proposal) => {
     if(selected == proposal) return setSelected("");
@@ -23,7 +30,13 @@ export default function JobBountyProposals({ bountyID, details }) {
     <div>
     
       <ModalButton onClick={() => setOpenModal(!openModal)} text="Create" />
-      {openModal && (address.toLowerCase()==details.creator ? <AssignBountyWinner selected={selected} bountyID={bountyID} /> : <CreateBountyProposal bountyID={bountyID} />)}
+      {openModal && (
+        (address.toLowerCase() == details.creator || details.members.includes(address.toLowerCase())) ? 
+        <AssignBountyWinner selected={selected} bountyID={bountyID} multiSig={multiSig} address={details.creator}/> 
+          :
+         <CreateBountyProposal bountyID={bountyID} />
+        )
+      }
 
       <div className="flex flex-col gap-3 mt-6">
         

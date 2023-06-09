@@ -38,9 +38,10 @@ export default function JobBountyDetailPage() {
         
         let query = `WHERE bountyID = '${id}'`
         console.log(query);
-        const result = await fetch(`/api/tableland/bounty/all?where=${query}`)
+        const result = await fetch(`/api/tableland/bounty/one?bountyID=${id}`)
         const datasets = await result.json()
         
+        console.log(datasets)
         setDetails(datasets.result[0])
         
         //console.log(datasets.result[0])
