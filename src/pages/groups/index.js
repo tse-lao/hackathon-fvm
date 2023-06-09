@@ -15,7 +15,6 @@ export default function Groups() {
       const result = await res.json();
       
       console.log(result);
-
       setData(result.result);
     }
 

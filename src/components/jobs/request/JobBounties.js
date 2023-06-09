@@ -49,19 +49,23 @@ const requests = [
   }
 ]
 
-export default function JobBounties() {
+export default function JobBounties({address}) {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   
   useEffect(() => {
-
       fetchJobBounties();
   }, [])
   
   const fetchJobBounties = async() => {
     setLoading(true);
     
+    
     let query = `WHERE winner='undefined'`
+    
+    if(address){
+      query += ` AND creator='${address}'`
+    }
     
     const result = await fetch(`/api/tableland/bounty/all?where=${query}`);
     const res = await  result.json();

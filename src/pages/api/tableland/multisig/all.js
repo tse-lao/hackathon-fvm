@@ -3,8 +3,14 @@ import { MultisigOwnersTable, MultisigTable } from "@/constants/tableland";
 
 //TODO: implement this
 export default async (req, res) => {    
-   
+        
+      let where = "";
+      
+      if(req.query.where){
+        where = req.query.where;
+      }
         console.log(req.query)
+        
         const result = await new Promise(async (resolve, reject) => {
         const url = 'https://testnets.tableland.network/api/v1/query';
         const params = new URLSearchParams({
@@ -14,7 +20,7 @@ export default async (req, res) => {
           FROM  ${MultisigTable} 
           JOIN  ${MultisigOwnersTable} ON  ${MultisigTable}.multisigAddress =  ${MultisigOwnersTable}.multisigAddress 
           GROUP BY ${MultisigTable}.multisigAddress
-
+          ${where}
          `
          ,
           format: "objects", unwrap: false, extract: true

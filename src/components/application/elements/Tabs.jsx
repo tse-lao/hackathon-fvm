@@ -23,7 +23,7 @@
           </select>
         </div>
         <div className="hidden sm:block">
-          <nav className="isolate flex divide-x divide-gray-200 rounded-lg " aria-label="Tabs">
+          <nav className="isolate flex divide-gray-200 rounded-lg " aria-label="Tabs">
             {tabs.map((tab, tabIdx) => (
               <div
                 onClick={() => selected(tab.name)}

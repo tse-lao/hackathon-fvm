@@ -54,7 +54,7 @@ export default function LoginButton() {
             (chain.id == 80001 ? <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Polygon_Blockchain_Matic_Logo.svg" alt={`${chain.id}`} className="w-6 h-6" /> :
               <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Filecoin.svg" alt={`${chain.id}`} className="w-6 h-6" />
             )}
-            {Math.round(balance.formatted * 100000)/10000}
+            {Math.round(balance.formatted * 100000)/100000}
         </div>
         <button className='w-[150px] bg-white p-1 px-1 outline rounded-full outline-gray-200 text-sm overflow truncate' onClick={() => setShowModal(!showModal)}>
           {truncateTextMiddle(address, 11)}

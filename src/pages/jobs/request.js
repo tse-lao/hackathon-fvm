@@ -7,7 +7,7 @@ export default function RequestPlace() {
   const [modalOpen, setModalOpen] = useState(false)
 
   return (
-    <Layout>
+    <Layout active="Jobs">
 
 
       {modalOpen ? <CreateJobRequestBountyModal getOpen={modalOpen} onClose={() => { setModalOpen(!modalOpen); console.log(!modalOpen) }} />

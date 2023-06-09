@@ -12,7 +12,7 @@ import { useAccount } from 'wagmi'
 export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
   const [loading, setLoading] = useState(false);
   const { bountyCreation, multisigCreateBountyProposal } = useContract();
-  const {account} = useAccount();
+  const { account } = useAccount();
   const [addressFunction, setAddressFunction] = useState("individual");
   const [multiSig, setMultiSig] = useState("");
   const [formData, setFormData] = useState({
@@ -37,11 +37,11 @@ export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
 
   const createRequest = async () => {
     //TODO: implement create request.
-    
-    if(addressFunction == "group"){
+
+    if (addressFunction == "group") {
       toast.promise(multisigCreateBountyProposal(
         multiSig,
-        formData.minReward, 
+        formData.minReward,
         formData.name,
         formData.description,
         formData.categories.toString(),
@@ -55,7 +55,7 @@ export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
         }
       }
       )
-      
+
       return;
     };
     toast.promise(bountyCreation(
@@ -75,7 +75,7 @@ export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
     )
 
   }
-  
+
   function onChangeSelect(address) {
     console.log(address)
     setMultiSig(address);
@@ -84,45 +84,52 @@ export default function CreateJobRequestBountyModal({ onClose, getOpen }) {
 
   return (
 
-      <div className="flex flex-col gap-6">
-        <div className='flex flex-row gap-2'>
-          <span onClick={() => setAddressFunction("individual")} className={`flex px-6 cursor-pointer ${addressFunction == 'individual' && 'bg-cf-200'}`}>
+    <div className="flex flex-col gap-6">
+      <h1 className='text-xl '>Create Job Request</h1>
+      <div className='grid grid-cols-4'>
+        <div className='flex flex-row gap-2 col-span-1'>
+          <span onClick={() => setAddressFunction("individual")} className={`flex px-6 cursor-pointer py-2 rounded-md ${addressFunction == 'individual' && 'bg-cf-200'}`}>
             Individual
           </span>
 
-          <span onClick={() => setAddressFunction("group")} className={`flex px-6 cursor-pointer ${addressFunction == 'group' && 'bg-cf-200'}`}>
+          <span onClick={() => setAddressFunction("group")} className={`flex px-6 cursor-pointer py-2 rounded-md ${addressFunction == 'group' && 'bg-cf-200'}`}>
             Group
           </span>
         </div>
-        {addressFunction == "group" &&  <SelectMultiSig address={account} onChange={onChangeSelect} />}
+        <div className='col-span-1'>
 
-        <InputField
-          label="Name"
-          name="name"
-          type="text"
-          value={formData.name}
-          onChange={handleChange}
-          required={true}
-        />
-        <InputField
-          label="Minimum Reward"
-          name="minReward"
-          type="number"
-          value={formData.minFee}
-          onChange={handleChange}
-        />
-
-        <TextArea
-          label="Description"
-          name="description"
-          rows="3"
-          value={formData.description}
-          onChange={handleChange}
-          required={true}
-        />
-        <TagsInput value={formData.categories} onChange={handleTagChange} />
-        <ActionButton loading={loading} onClick={createRequest} text="Create Job Bounty" />
+          {addressFunction == "group" && <SelectMultiSig address={account} onChange={onChangeSelect} />}
+        </div>
       </div>
+
+
+      <InputField
+        label="Name"
+        name="name"
+        type="text"
+        value={formData.name}
+        onChange={handleChange}
+        required={true}
+      />
+      <InputField
+        label="Minimum Reward"
+        name="minReward"
+        type="number"
+        value={formData.minFee}
+        onChange={handleChange}
+      />
+
+      <TextArea
+        label="Description"
+        name="description"
+        rows="3"
+        value={formData.description}
+        onChange={handleChange}
+        required={true}
+      />
+      <TagsInput value={formData.categories} onChange={handleTagChange} />
+      <ActionButton loading={loading} onClick={createRequest} text="Create Job Bounty" />
+    </div>
 
   )
 }
