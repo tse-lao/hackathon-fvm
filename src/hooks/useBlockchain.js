@@ -122,7 +122,7 @@ async function uploadRecord(record) {
         const addedAt = new Date().toISOString();
         console.log(record.carRecord)
         const cidHexRaw = new CID(record.carRecord.pieceCid).toString('base16').substring(1)
-        const cidHex = "0x00" + cidHexRaw
+        const cidHex = "0x" + cidHexRaw
         console.log(cidHex)
         
         

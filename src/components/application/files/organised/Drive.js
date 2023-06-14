@@ -1,11 +1,13 @@
+import UploadModal from "@/components/UploadModal";
 import { useCollection, usePolybase } from "@polybase/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import LoadingSpinner from "../../elements/LoadingSpinner";
 import LoadingEmpty from "../../elements/loading/LoadingEmpty";
 import DataNotFound from "../../elements/message/DataNotFound";
 import DriveItem from "./data/DriveItem";
 
 export default function Drive({ address }) {
+    const [uploadFile, setUploadFile] = useState(false);
     const polybase = usePolybase();
     const { data, error, loading } =
         useCollection(polybase.collection("File").where("owner", "==", address.toLowerCase()).sort("addedAt", "desc"));
@@ -35,6 +37,19 @@ export default function Drive({ address }) {
                         </div>
                     </div>
                 </div>
+            </div>
+            {uploadFile && 
+                <UploadModal onClose={() => setUploadFile(false)} open={uploadFile}  />
+            }
+            
+            <button
+            className="fixed bottom-12 right-12 bg-cf-500 text-white px-4 py-2 rounded"
+            onClick={() => setUploadFile(true)}
+          >
+            Upload Files
+          </button>
+            <div>
+                                    
             </div>
         </div>
 

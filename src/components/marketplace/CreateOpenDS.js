@@ -3,6 +3,7 @@ import MatchRecord from '@/hooks/useBlockchain';
 import { useContract } from '@/hooks/useContract';
 import { getDataDepoAuth } from '@/hooks/useLighthouse';
 import { getLighthouse } from '@/lib/createLighthouseApi';
+import { getMetadataFromFile } from '@/lib/dataHelper';
 import { matchAndSetCarFile, uploadAndSetFile, uploadFileWithProgress } from '@/lib/uploadHelpers';
 import lighthouse from '@lighthouse-web3/sdk';
 import { useState } from 'react';
@@ -50,10 +51,20 @@ export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
             const dummyFile = await uploadAndSetFile(mockEvent, apiKey, progressCallback);
             console.log("DUMMY FILE")
             console.log(dummyFile);
+            
+            //get metadata
+        
             setFile(dummyFile);
             await uploadFileWithProgress(uploadFile, progressCallback, authToken.data.access_token);
             await sleep(3000);
             await matchAndSetCarFile(dummyFile, authToken.data.access_token, setLoadingFile, setFile, setCarError);
+            
+            if (mockEvent.target.files[0].type === "application/json") {
+                let tempMeta = await getMetadataFromFile(mockEvent.target);
+                
+                setFormData({ ...formData, metadata: tempMeta });
+            
+            }
         } catch (error) {
             console.log(error);
             toast.error(error.message);
@@ -118,6 +129,7 @@ export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
             formData.name,
             formData.description,
             formData.categories,
+            file.type,
         )
 
         console.log(contract);
@@ -174,7 +186,7 @@ export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
                         </div>
                     )}
 
-                {carError ? <ActionButton text="Find Car" onClick={() => matchCarFile(file)} /> : <ActionButton text="Create Open Dataset" onClick={submitOpen} />}
+                {carError ? <ActionButton loading={loading} text="Find Car" onClick={() => matchCarFile(file)} /> : <ActionButton text="Create Open Dataset" onClick={submitOpen} />}
 
 
 

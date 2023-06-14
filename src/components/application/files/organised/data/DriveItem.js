@@ -1,7 +1,5 @@
 // components/FileItem.js
 
-import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
-import { OpenButton } from '@/components/application/elements/buttons/OpenButton';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import ShareRepoModal from '../repo/ShareRepoModal';
@@ -43,10 +41,14 @@ export default function DriveItem({ file }) {
               <DetailItem label="CID" value={file.cid} />
               <DetailItem label="Metadata" value={file.metadata} />
             </div>
-            <div className='flex items-center justify-center py-2'>
-              <ActionButton onClick={() => router.push(`/files/${file.cid}`)} text="View File" /> 
+            <div className='grid grid-cols-2 items-center  text-center justify-center py-2'>
+              <span  onClick={() => router.push(`/files/${file.cid}`)} className='text-cf-600 hover:text-cf-800 cursor-pointer py-6'>
+                View 
+              </span>
+              <span onClick={() => setShareModal(!shareModal)} className='text-cf-600 hover:text-cf-800 cursor-pointer py-6'>
+                Share Repo
+              </span>
 
-              <OpenButton onClick={() => setShareModal(!shareModal)} text="Share to Repo" />
             </div>
           
             {shareModal &&  <ShareRepoModal changeOpenModal={setShareModal} cid={file.cid} /> }
@@ -63,7 +65,7 @@ export default function DriveItem({ file }) {
 
 const DetailItem = ({ label, value, extraStyling = "" }) => (
   <div className={`flex flex-col p-4 `}>
-    <span className="font-bold text-gray-600">{label}</span>
+    <span className=" text-gray-800">{label}</span>
     <span className="text-sm text-gray-600 truncate">{value}</span>
   </div>
 );

@@ -2,14 +2,12 @@ import { useContract } from '@/hooks/useContract';
 import { useDocument, usePolybase } from '@polybase/react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useBlockNumber, useNetwork, useSwitchNetwork } from 'wagmi';
+import { useBlockNumber } from 'wagmi';
 import ModalLayout from '../ModalLayout';
 import LoadingSpinner from '../application/elements/LoadingSpinner';
 import { ActionButton } from '../application/elements/buttons/ActionButton';
 import { OpenButton } from '../application/elements/buttons/OpenButton';
 
-const HYPERSPACE_ID = 3141;
-const POLYGON = 80001;
 export default function CreateDeal({ cid, onClose, getOpen }) {
     const polybase = usePolybase();
     const { data, loading, error } = useDocument(polybase.collection("File").where("cid", "==", cid));
@@ -18,17 +16,17 @@ export default function CreateDeal({ cid, onClose, getOpen }) {
     const [errorMessage, setErrorMessage] = useState(null)
     const [pending, setPending] = useState()
     const [deals, setDeals] = useState([])
-    const { chain } = useNetwork()
     const { data: blocknumber, isError, isLoading: blockloading } = useBlockNumber()
-    const { switchNetwork } = useSwitchNetwork()
 
     useEffect(() => {
         //make a check here to see if the cid is already in teh database. 
 
         const fetchData = async () => {
-            const piece_cid = data.data[0].data.carPayload;
+            const piece_cid = data.data[0].data.carPayload
             const result = await fetch(`/api/tableland/request/status?piece_cid=${piece_cid}`);
             const status = await result.json();
+            
+            console.log(status)
             
             setDeals(status.result)
             setPending(true)
@@ -45,6 +43,8 @@ export default function CreateDeal({ cid, onClose, getOpen }) {
             if(data.data[0]){
                 fetchData()
             }
+            
+            console.log(data);
         }
     }, [cid])
 
@@ -128,10 +128,7 @@ if(data.data[0] == undefined)  return (
                     <RecordItem label="Id" value={data.data[0].data.carId} />
                     <RecordItem label="Current Block" value={blocknumber} />
 
-                    {chain.id == HYPERSPACE_ID ? <ActionButton loading={makingDeal} onClick={makeProposal} text="Make Deal" /> :
-                        <OpenButton text="Change to HyperSpace"
-                            onClick={() => switchNetwork?.(HYPERSPACE_ID)}
-                        />}
+                <ActionButton loading={makingDeal} onClick={makeProposal} text="Make Deal" /> 
 
                 </div>
             )}

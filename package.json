@@ -16,8 +16,6 @@
         "@ipld/car": "^5.1.1",
         "@lighthouse-web3/kavach": "^0.1.2",
         "@lighthouse-web3/sdk": "^0.2.3",
-        "@lit-protocol/auth-browser": "^2.1.160",
-        "@lit-protocol/lit-node-client": "^2.1.160",
         "@mantine/notifications": "^6.0.10",
         "@polybase/auth": "^0.5.0",
         "@polybase/client": "^0.5.0",

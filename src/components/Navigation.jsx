@@ -53,16 +53,7 @@ export default function Navigation({ active }) {
                   >
                     Marketplace
                   </Link>
-                  <Link
-                    href="/request"
-                    className={classNames(
-                      "Request" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-cf-500'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                    )}
-                  >
-                    Requests
-                  </Link>
+                 
                   <Link
                     href="/jobs"
                     className={classNames(
@@ -73,16 +64,7 @@ export default function Navigation({ active }) {
                   >
                     Jobs
                   </Link>
-                  <Link
-                  href="/groups"
-                  className={classNames(
-                    "Groups" == active
-                      ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-cf-500'
-                      : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                  )}
-                >
-                  Groups
-                </Link>
+
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
