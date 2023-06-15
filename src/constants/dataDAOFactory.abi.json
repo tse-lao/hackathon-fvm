@@ -1,0 +1,39 @@
+[{
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [{
+                "internalType": "address[]",
+                "name": "owners",
+                "type": "address[]"
+            },
+            {
+                "internalType": "address",
+                "name": "multisig",
+                "type": "address"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "randomSalt",
+                "type": "bytes32"
+            }
+        ],
+        "name": "createDataDAO",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "_tablelandStorage",
+            "type": "address"
+        }],
+        "name": "setDealTablelandStorage",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

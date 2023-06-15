@@ -25,7 +25,9 @@ import {
   splitImplementation,
   splitterAbi,
   openDBandFolderAddress,
-  openDBandFolderAbi
+  openDBandFolderAbi,
+  dataDAOFactory,
+  dataDAOFactoryAbi,
 } from '../constants'
 
 export const useContract = () => {
@@ -63,6 +65,12 @@ export const useContract = () => {
   const TablelandDealClient = new ethers.Contract(
     crossChainTablelandDealClientAddress,
     crossChainTablelandDealClientAbi,
+    signer!
+  )
+
+  const TablelandDealClientFactory = new ethers.Contract(
+    dataDAOFactory,
+    dataDAOFactoryAbi,
     signer!
   )
 
@@ -1158,6 +1166,146 @@ const removeMemberFromPrivateFolder = async (
     }
   }
 
+
+  const createDataDAO = async (
+    // The multisig owners need to get passed here
+    owners: string[],
+    multisigAddress:string,
+    
+  ): Promise<any> => {
+    
+    try {
+      const tx = await TablelandDealClientFactory.createDataDAO(owners,multisigAddress,await ethers.utils.randomBytes(32),{gasLimit: 10000000000 })
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      return receipt
+    } catch (error) {
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+
+  const createDealRequest = async (
+    locationRef: string,
+    carSize: number,
+    cidHex: string,
+    pieceSize: number,
+    label: string,
+    dataDAOAddress :string
+  ): Promise<any> => {
+    let latestBlock = await provider.getBlock("latest")
+    let startEpoch = latestBlock.number + 27670
+    let endEpoch = startEpoch + 568000
+    let DealRequestStruct = [
+      cidHex,
+      pieceSize,
+      false,
+      label,
+      startEpoch,
+      endEpoch,
+      0,
+      0,
+      0,
+      1,
+      [locationRef, carSize, false, false],
+    ]
+    const tablelandDealClient = new ethers.Contract(
+      dataDAOAddress,
+      crossChainTablelandDealClientAbi,
+      signer!
+    )
+    try {
+      const tx = await tablelandDealClient.makeDealProposal(DealRequestStruct,{gasLimit: 10000000000 })
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      const receipt = await tx.wait()
+      return receipt
+    } catch (error) {
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+
+  const getDealRequest = async (
+    requestID: string,
+    dataDAOAddress :string
+  ): Promise<any> => {
+    
+    const tablelandDealClient = new ethers.Contract(
+      dataDAOAddress,
+      crossChainTablelandDealClientAbi,
+      provider
+    )
+    try {
+      const tx = await tablelandDealClient.request(requestID)
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      return tx
+    } catch (error) {
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const getDataCap = async (
+    dataDAOAddress :string
+  ): Promise<any> => {
+    
+    const tablelandDealClient = new ethers.Contract(
+      dataDAOAddress,
+      crossChainTablelandDealClientAbi,
+      provider
+    )
+    try {
+      const tx = await tablelandDealClient.dataCapBalance()
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      return tx
+    } catch (error) {
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  const getMarketBalance = async (
+    dataDAOAddress :string
+  ): Promise<any> => {
+    
+    const tablelandDealClient = new ethers.Contract(
+      dataDAOAddress,
+      crossChainTablelandDealClientAbi,
+      provider
+    )
+    try {
+      const tx = await tablelandDealClient.balance();
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      return tx
+    } catch (error) {
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
+  
   const createBounty = async (
     label: string,
     cidHex: string,
@@ -1338,6 +1486,11 @@ const removeMemberFromPrivateFolder = async (
     addFileonPrivateFolder,
     removeMemberFromPrivateFolder,
     addMemberToPrivateFolder,
-    hasFolderAccess
+    hasFolderAccess,
+    getMarketBalance,
+    getDataCap,
+    getDealRequest,
+    createDealRequest,
+    createDataDAO
   }
 }
