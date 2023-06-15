@@ -14,7 +14,7 @@ const tabs = [
   { name: 'Contributions', href: '#', current: true },
   { name: 'DataSets', href: '#', current: false },
   { name: 'Files', href: '#', current: false },
-  { name: 'Groups', href: '#', current: false },
+  { name: 'DAO', href: '#', current: false },
   { name: 'Proposals', href: '#', current: false },
 ]
 
@@ -53,7 +53,7 @@ export default function Profile() {
           {select === "Contributions" && <Contributions creator={address} />}
           {select === "DataSets" && <ProfileDataSets creator={address} />}
           {select === "Files" && <Drive address={address} />}
-          {select === "Groups" && <Repository adress={address} />}
+          {select === "DAO" && <Repository adress={address} />}
           {select === "Proposals" && <IndividualProposal address={address} />}
         </div>
       </div>

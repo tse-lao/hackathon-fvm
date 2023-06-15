@@ -1,14 +1,22 @@
 
 import Table from "@/components/application/data/Table";
 import {
+    BountiesTable,
+    ClaimDealsTable,
     DB_attribute,
     DB_main,
     DealClientDeals,
     DealRequests,
     MerkleHelper,
+    MultisigOwnersTable,
+    MultisigTable,
     computation,
     data_contribution,
-    job
+    job,
+    job_bounty,
+    openAttribute,
+    openContribution,
+    openMain,
 } from '@/constants/tableland';
 import { getTableFromTableland } from "@/hooks/useTableland";
 import Layout from "@/pages/Layout";
@@ -16,6 +24,7 @@ import { useEffect, useState } from "react";
 
 // Define an array to store the imported values
 const exportsList = [];
+
 
 // Add the imported values to the array
 exportsList.push(computation);
@@ -25,7 +34,15 @@ exportsList.push(DB_attribute);
 exportsList.push(DealRequests);
 exportsList.push(DealClientDeals);
 exportsList.push(MerkleHelper);
+exportsList.push(MultisigTable);
+exportsList.push(MultisigOwnersTable);
+exportsList.push(openMain);
+exportsList.push(openAttribute);
+exportsList.push(openContribution);
 exportsList.push(job);
+exportsList.push(job_bounty);
+exportsList.push(ClaimDealsTable);
+exportsList.push(BountiesTable);
 
 
 export default function TableLand() {

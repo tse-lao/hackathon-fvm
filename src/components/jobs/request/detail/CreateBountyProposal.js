@@ -72,7 +72,7 @@ export default function CreateBountyProposal({bountyID}) {
             file, 
             formData.spec_start, 
             formData.spec_end,
-            formData.numOfInputs,
+            parseInt(formData.numOfInputs), 
             address
         ), {
             pending: 'Submitting proposal...',

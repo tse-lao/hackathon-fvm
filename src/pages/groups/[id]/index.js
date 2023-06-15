@@ -73,6 +73,7 @@ export default function GroupDetailPage() {
                     <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'transactions' && ' text-cf-500'}`} onClick={() => setActive('transactions')}>Transations</span>
                     <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'data-request' && 'text-cf-500'}`} onClick={() => setActive('data-request')}>Data Request</span>
                     <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'job-request' && 'text-cf-500'}`} onClick={() => setActive('job-request')}>Job Request</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'group-files' && 'text-cf-500'}`} onClick={() => setActive('group-files')}>Files</span>
                 </div>
 
                 <div className=' w-[800px] p-8 rounded-md '>
@@ -81,6 +82,7 @@ export default function GroupDetailPage() {
                     {active == 'transactions' && <GroupTransactions address={id} confirmationTable={details.confirmationTable} proposalTable={details.proposalTable} numberOfConfirmations={details.numberOfConfirmations} />}
                     {active == 'job-request' && <GroupBountyProposal address={id} />}
                     {active == 'data-request' && <GroupDataRequest address={id} />}
+                    {active == 'group-files' && <GroupDataRequest address={id} />}
 
 
 
