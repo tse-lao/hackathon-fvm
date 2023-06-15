@@ -32,7 +32,9 @@ import {
 
 export const useContract = () => {
   const { data: signer } = useSigner()
-
+  const CalibrationProvider = new ethers.providers.JsonRpcProvider(
+    "https://api.calibration.node.glif.io/rpc/v1"
+  )
   const provider = useProvider()
   const DB_NFT = new ethers.Contract(DB_NFT_address, DBAbi, signer!)
 
@@ -1243,7 +1245,7 @@ const removeMemberFromPrivateFolder = async (
     const tablelandDealClient = new ethers.Contract(
       dataDAOAddress,
       crossChainTablelandDealClientAbi,
-      provider
+      CalibrationProvider
     )
     try {
       const tx = await tablelandDealClient.request(requestID)
@@ -1266,7 +1268,7 @@ const removeMemberFromPrivateFolder = async (
     const tablelandDealClient = new ethers.Contract(
       dataDAOAddress,
       crossChainTablelandDealClientAbi,
-      provider
+      CalibrationProvider
     )
     try {
       const tx = await tablelandDealClient.dataCapBalance()
@@ -1289,7 +1291,7 @@ const removeMemberFromPrivateFolder = async (
     const tablelandDealClient = new ethers.Contract(
       dataDAOAddress,
       crossChainTablelandDealClientAbi,
-      provider
+      CalibrationProvider
     )
     try {
       const tx = await tablelandDealClient.balance();
