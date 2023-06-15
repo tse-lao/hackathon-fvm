@@ -17,28 +17,24 @@ module.exports = {
             },
         },
     },
-    defaultNetwork: "mumbai",
-    // defaultNetwork: "hyperspace",
+    defaultNetwork: "Calibration",
+    // defaultNetwork: "mumbai",
 
     networks: {
-        localnet: {
-            chainId: 31415926,
-            url: "http://127.0.0.1:1234/rpc/v1",
+        Calibration: {
+            chainId: 314159,
+            url: "https://api.calibration.node.glif.io/rpc/v1",
             accounts: [PRIVATE_KEY],
         },
-        hyperspace: {
-            chainId: 3141,
-            url: "https://api.hyperspace.node.glif.io/rpc/v1",
-            accounts: [PRIVATE_KEY],
-        },
-        sepolia: {
-            chainId: 11155111,
-            url: "https://rpc.sepolia.org",
+        FilecoinMainnet: {
+            chainId: 314,
+            url: "https://api.node.glif.io",
             accounts: [PRIVATE_KEY],
         },
         mumbai: {
             chainId: 80001,
-            url: `https://polygon-mumbai.g.alchemy.com/v2/ZiPX0JtXnVqQ56RGdvdy8mvCOs4ZDchO`,
+            url: `
+            https: //polygon-mumbai.g.alchemy.com/v2/ZiPX0JtXnVqQ56RGdvdy8mvCOs4ZDchO`,
             accounts: [PRIVATE_KEY],
         },
     },
