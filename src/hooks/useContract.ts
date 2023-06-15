@@ -1261,6 +1261,30 @@ const removeMemberFromPrivateFolder = async (
     }
   }
 
+  const getCurrentRequestStatus = async (
+    piece_cid: string,
+    dataDAOAddress :string
+  ): Promise<any> => {
+    
+    const tablelandDealClient = new ethers.Contract(
+      dataDAOAddress,
+      crossChainTablelandDealClientAbi,
+      CalibrationProvider
+    )
+    try {
+      const tx = await tablelandDealClient.currentPieceRequestInfo(piece_cid)
+      console.log(tx)
+      toast.update('Promise is pending', {
+        render: 'Transaction sent, waiting for confirmation.',
+      })
+
+      return tx
+    } catch (error) {
+      toast.error('Promise rejected 🤯')
+      throw error
+    }
+  }
+
   const getDataCap = async (
     dataDAOAddress :string
   ): Promise<any> => {
@@ -1493,6 +1517,7 @@ const removeMemberFromPrivateFolder = async (
     getDataCap,
     getDealRequest,
     createDealRequest,
-    createDataDAO
+    createDataDAO,
+    getCurrentRequestStatus
   }
 }
