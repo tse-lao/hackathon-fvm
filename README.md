@@ -31,6 +31,8 @@ The Bacalhau server has been enhanced to handle any operation within the network
 #### Enhanced dealClient Contract
 The dealClient contract now functions as a dataDAO, allowing members to request storage on the Filecoin network and replicate important files. It can handle multiple replication requests for a single file, ensuring redundancy and data availability. The contract has been integrated with a table in Tableland, simplifying access to deals published by storage providers. Additionally, it utilizes the Filecoin dataCap API to query the network and make verified deals, further enhancing data management capabilities.
 
+- [dataDAO-dealClient-Verified](https://fvm.starboard.ventures/calibration/explorer/address/0x204ce0695260c5d3ace6626af63936beea63f17d)
+
 #### New Multisig Features
 DataBridge introduces a fully functional multi-sig wallet contract that integrates seamlessly with Tableland. This contract enables decentralized and efficient tracking of proposals and metadata. Members of the contract can manage files, create proposals, and merge database entries into a single CID at the end of each day. JSON merging is supported, facilitating collaboration and data consolidation. Companies or multisigs can convert merged DBs into NFTs, providing exclusive access to encrypted files, folders, and DBs for NFT holders. This approach allows companies to generate revenue by offering their data and provides a streamlined process for managing files, granting dataCap, and making verified deals on the Filecoin network.
 
