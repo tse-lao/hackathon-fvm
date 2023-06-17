@@ -23,7 +23,9 @@ export async function signAuthMessage() {
   });
 }
 
-export async function shareFile(cid, creator, address) {
+export async function shareFile(cid, creator, address, tokenID) {
+  
+  //we pass in 0
 
   let jwt = await readJWT(address);
   const publicVerifier = "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"
@@ -35,8 +37,41 @@ export async function shareFile(cid, creator, address) {
     cid,
     jwt
   );
+  
+  const conditions = [
+    {
+      id: 1,
+      chain: "Mumbai",
+      method: "hasAccess",
+      standardContractType: "Custom",
+      contractAddress: DB_NFT_address,
+      returnValueTest: {
+        comparator: "==",
+        value: "true",
+      },
+      parameters: [":address", creator, tokenID], 
+      inputArrayType: ['address', 'address', 'uint256'],
+      outputType: "bool"
+
+    }
+
+  ]
+
+  const aggregator = "([1])";
+  
+  
+  const accessControl = await lighthouse.applyAccessCondition(
+    address,
+    cid,
+    jwt,
+    conditions, 
+    aggregator
+  )
+  console.log(accessControl);
   return res;
 }
+
+
 
 export async function grantSmartAccess(cid, tokenID, minRows) {
 
@@ -177,7 +212,7 @@ async function downloadBlob(blob, fileName, mimeType) {
 
   const link = document.createElement('a');
   link.href = url;
-  link.download = fileName + '.' + fileType;
+  link.download = fileName;
 
   // Make the link invisible, but append it to the document
   link.style.display = 'none';
@@ -238,6 +273,7 @@ function getMimeType(blob) {
   });
 }
 
+
 export async function countRows(cid, address){
   let jwt = await readJWT(address);
   const keyObject = await lighthouse.fetchEncryptionKey(
@@ -246,7 +282,10 @@ export async function countRows(cid, address){
       jwt
     );
 
+    console.log(keyObject)
+    
   const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
+
   console.log(decrypted)
   
   const jsonData = await readBlobAsJson(decrypted);

@@ -20,7 +20,7 @@ export default async (req, res) => {
                   )
               )
             FROM  ${openMain} JOIN ${openAttribute}
-            ON ${openAttribute}.tokenID = ${openAttribute}.tokenID  
+            ON ${openMain}.tokenID = ${openAttribute}.tokenID  
                 
             WHERE ${openMain}.tokenID = ${req.query.tokenID}`,
         extract: true, format: "objects", unwrap: false

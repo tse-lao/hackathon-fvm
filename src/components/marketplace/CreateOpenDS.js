@@ -17,7 +17,7 @@ import InputField from "../application/elements/input/InputField";
 import TextArea from '../application/elements/input/TextArea';
 
 
-export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
+export default function CreateOpenDS({ tokenId, openModal, onClose }) {
     const { address } = useAccount();
     const { createOpenDataSet } = useContract();
     const [formData, setFormData] = useState({
@@ -45,25 +45,28 @@ export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
         const apiKey = await getLighthouse(address);
         const authToken = await getDataDepoAuth(address);
         const uploadFile = e.target.files[0];
-        const mockEvent = { target: { files: [uploadFile] }, persist: () => {} };
-    
+        const mockEvent = { target: { files: [uploadFile] }, persist: () => { } };
+
         try {
             const dummyFile = await uploadAndSetFile(mockEvent, apiKey, progressCallback);
             console.log("DUMMY FILE")
             console.log(dummyFile);
-            
+
             //get metadata
-        
+
             setFile(dummyFile);
             await uploadFileWithProgress(uploadFile, progressCallback, authToken.data.access_token);
             await sleep(3000);
             await matchAndSetCarFile(dummyFile, authToken.data.access_token, setLoadingFile, setFile, setCarError);
-            
+
+            console.log(mockEvent.target.files[0].type)
             if (mockEvent.target.files[0].type === "application/json") {
                 let tempMeta = await getMetadataFromFile(mockEvent.target);
-                
+
+                console.log(tempMeta);
+
                 setFormData({ ...formData, metadata: tempMeta });
-            
+
             }
         } catch (error) {
             console.log(error);
@@ -79,7 +82,7 @@ export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
         try {
             const result = await MatchRecord([dummy], authToken.data.access_token, true)
             console.log(result);
-            
+
 
             setFile(
                 {
@@ -93,7 +96,7 @@ export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
             setLoadingFile(false)
         }
     }
-    
+
 
 
     function sleep(ms) {
@@ -116,8 +119,10 @@ export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
     };
 
     const submitOpen = async () => {
-        
-        if(formData.description.length < 10 || formData.description.length > 1000){ 
+
+        //apply control for every address with blance 
+
+        if (formData.description.length < 10 || formData.description.length > 1000) {
             toast.error("Your description needs to be between 10 and 1000 characters")
         }
         setLoading(true)
@@ -125,7 +130,7 @@ export default function CreateOpenDS({ tokenId, openModal,  onClose }) {
         const contract = await createOpenDataSet(
             file.cid,
             file.carRecord.pieceCid,
-            file.metadata,
+            formData.metadata,
             formData.name,
             formData.description,
             formData.categories,

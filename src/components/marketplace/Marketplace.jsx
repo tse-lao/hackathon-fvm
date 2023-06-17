@@ -1,6 +1,6 @@
 // components/Marketplace.js
 
-import { DB_attribute, DB_main } from '@/constants';
+import { DB_main } from '@/constants';
 import { useEffect, useState } from 'react';
 import LoadingEmpty from '../application/elements/loading/LoadingEmpty';
 import Filters from '../application/overlay/Filters';
@@ -30,8 +30,10 @@ const Marketplace = () => {
         const data = await marketplace.json();
         setDatasets(data.result);
       }else {
-        let query = `WHERE ${DB_main}.label!='label' AND ${DB_main}.label!='repo'`;
-
+        
+        
+        let query = `WHERE ${DB_main}.piece_cid!='piece_cid'`;
+        
         if (filters.categories.length > 0) {
           filters.categories.forEach((category, index) => {
             if(index == 0){

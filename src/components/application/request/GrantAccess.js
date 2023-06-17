@@ -12,7 +12,7 @@ const VALIDATE_VALUE = "We are confirming if the provided data is corresponding 
 const RECORD_CONTRIBUTION = "Confirm your contribution to the contract, the owner is only able to see decrypt you data if a certain amount of contributions are made";
 const COUNTING_ROWS = "We are counting the rows of the dataset, this might take a while depending on the size of the dataset";
 
-export default function GrantAccess({ tokenID, metadataCID, address, creator, minRows }) {
+export default function GrantAccess({ tokenID, metadataCID, address, creator, minRows, multiSig }) {
   const polybase = usePolybase();
   const { data, error, loading } = useDocument(polybase.collection("File").where("metadata", "==", metadataCID).where("owner", "==", address.toLowerCase()));
   const [options, setOptions] = useState([]);
@@ -37,6 +37,10 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
         }
        // setSelectedOptions(status.result)
       }
+      
+      //check whether the account is in the multisig table 
+      
+      
       
       fetchData();
     }
@@ -65,7 +69,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       setCoutner(i+1)
       setStatus(PROVIDE_ACCESS)
       const cid = selectedOptions[i];
-      const response = await shareFile(cid, creator, address);
+      const response = await shareFile(cid, creator, address, tokenID);
       
 
       if (tokenID < 1 && selectedOptions.length == 1) {

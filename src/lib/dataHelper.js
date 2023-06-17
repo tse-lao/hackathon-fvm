@@ -8,14 +8,14 @@ export async function readBlobAsJson(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-
     reader.addEventListener('error', () => {
       reject(new Error('Error reading file'));
     });
+
     // Define the onload event handler
     reader.addEventListener('load', async () => {
       try {
-        json = JSON.parse(event.target.result);
+        const json = JSON.parse(reader.result);
         resolve(json);
       } catch (error) {
         reject(error);
@@ -31,8 +31,9 @@ export async function readBlobAsJson(blob) {
     reader.readAsText(blob);
 
     return reader;
-  })
+  });
 }
+
 
 export function readTextAsJson(blob, callback) {
   let reader = new FileReader();

@@ -20,7 +20,7 @@ export default async (req, res) => {
                   )
               )
             FROM  ${openMain} JOIN ${openAttribute}
-                ON ${openAttribute}.tokenID = ${openAttribute}.tokenID  
+                ON ${openMain}.tokenID = ${openAttribute}.tokenID  
             GROUP BY ${openMain}.blockTimeStamp`,
         extract: true, format: "objects", unwrap: false
         });

@@ -11,7 +11,8 @@ export const uploadAndSetFile = async (file, apiKey, progressCallback) => {
             output = await lighthouse.upload(file, apiKey, progressCallback);
             const cid = output.data.Hash;
             let metadata = "no_metadata";
-        if (file.type === "application/json") {
+            
+        if (file.target.files[0].type === "application/json") {
                 metadata = await getMetadataFromFile(file.target);
         }
         console.log(metadata, output)
