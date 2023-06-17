@@ -15,6 +15,8 @@ export default function AttributeTable({ data }) {
     useEffect(() => {
         setCategories([])
         
+        console.log(data)
+        
         var temp = []
         for (var item in data) {
             if (data[item].trait_type == "creator") {

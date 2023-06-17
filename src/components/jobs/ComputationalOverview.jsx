@@ -1,6 +1,6 @@
 import { useState } from "react";
-import AllJobs from "./AllJobs";
 import CreateJob from "./CreateJob";
+import AllJobs from "./JobList";
 
 export default function ComputationalOverview({ tokenID, dataFormat }) {
     const [openModal, setOpenModal] = useState(false)

@@ -1,0 +1,21 @@
+[{
+    "inputs": [{
+            "internalType": "address[]",
+            "name": "owners",
+            "type": "address[]"
+        },
+        {
+            "internalType": "uint256",
+            "name": "number",
+            "type": "uint256"
+        }
+    ],
+    "name": "getBytecodeTokenInfoPasser",
+    "outputs": [{
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+    }],
+    "stateMutability": "pure",
+    "type": "function"
+}]

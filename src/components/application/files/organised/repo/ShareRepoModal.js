@@ -14,7 +14,7 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
     
     useEffect(() => {
         const fetchData = async (id) => {
-            const result = await fetch(`/api/tableland/merkle/all?where= WHERE ${MerkleHelper}.address='${address }'`);
+            const result = await fetch(`/api/tableland/merkle/all?where= WHERE ${MerkleHelper}.address='${address.toLowerCase()}'`);
             const data = await result.json();
           console.log(data);
           setRepos(data.result);
@@ -41,7 +41,7 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
 
 
 
-    const shareToRepo = async (e) => {
+    const shareToGroup = async (e) => {
         e.preventDefault();
 
         console.log(selectedOptions)
@@ -92,7 +92,7 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
     };
 
     return (
-        <ModalLayout title="Share to Repo" onClose={changeOpenModal}>
+        <ModalLayout title="Share to group" onClose={changeOpenModal}>
             <div className="flex flex-col gap-4 mt-8">
                 <div className="divide-y divide-gray-200 max-h-[400px] overflow-auto outline outline-cf-300 rounded-md ring-cf-200 mb-8">
                     {repos.length > 0 ? repos.map((item, index) => (
@@ -116,7 +116,7 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
 
                 </div>
                 <ActionButton text
-                    ="Share Repo Repository" onClick={shareToRepo} />
+                    ="Share to group" onClick={shareToGroup} />
             </div>
         </ModalLayout>
     )

@@ -147,6 +147,97 @@
     },
     {
         "inputs": [{
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "dataCID",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "rows",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "multisig",
+                "type": "address"
+            }
+        ],
+        "name": "MultisigContribute",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "dbCID",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "mintPrice",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "piece_cid",
+                "type": "string"
+            }
+        ],
+        "name": "MultisigCreateDBNFT",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "string",
+                "name": "dataFormatCID",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "dbName",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "internalType": "string[]",
+                "name": "categories",
+                "type": "string[]"
+            },
+            {
+                "internalType": "int256",
+                "name": "requiredRows",
+                "type": "int256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "minSubRows",
+                "type": "uint256"
+            }
+        ],
+        "name": "MultisigRequestDB",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{
                 "internalType": "string",
                 "name": "dataFormatCID",
                 "type": "string"
@@ -252,11 +343,6 @@
                 "type": "uint256"
             },
             {
-                "internalType": "bytes32[]",
-                "name": "SubmitProof",
-                "type": "bytes32[]"
-            },
-            {
                 "internalType": "uint8",
                 "name": "v",
                 "type": "uint8"
@@ -300,7 +386,7 @@
             },
             {
                 "internalType": "string",
-                "name": "label",
+                "name": "piece_cid",
                 "type": "string"
             },
             {
@@ -325,70 +411,6 @@
         "type": "function"
     },
     {
-        "inputs": [{
-                "internalType": "string",
-                "name": "dbCID",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "label",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "dataFormatCID",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "dbName",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "description",
-                "type": "string"
-            },
-            {
-                "internalType": "string[]",
-                "name": "categories",
-                "type": "string[]"
-            }
-        ],
-        "name": "createOpenDataSet",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "string",
-                "name": "repoName",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "description",
-                "type": "string"
-            },
-            {
-                "internalType": "string[]",
-                "name": "SubmitProof",
-                "type": "string[]"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "SubmitRoot",
-                "type": "bytes32"
-            }
-        ],
-        "name": "createPrivateRepo",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "getTablelandStorage",
         "outputs": [{
@@ -406,24 +428,8 @@
                 "type": "address"
             },
             {
-                "internalType": "uint256",
-                "name": "tokenid",
-                "type": "uint256"
-            }
-        ],
-        "name": "hasAccess",
-        "outputs": [{
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-        }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{
                 "internalType": "address",
-                "name": "sender",
+                "name": "multisig",
                 "type": "address"
             },
             {
@@ -432,7 +438,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "hasRepoAccess",
+        "name": "hasAccess",
         "outputs": [{
             "internalType": "bool",
             "name": "",
@@ -465,7 +471,7 @@
     {
         "inputs": [{
             "internalType": "uint256",
-            "name": "tokenid",
+            "name": "tokenId",
             "type": "uint256"
         }],
         "name": "mintDB",
@@ -584,28 +590,6 @@
         "type": "function"
     },
     {
-        "inputs": [{
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "string[]",
-                "name": "SubmitProof",
-                "type": "string[]"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "SubmitRoot",
-                "type": "bytes32"
-            }
-        ],
-        "name": "setRepoSubmitAccessMerkleRoot",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "signerAddress",
         "outputs": [{
@@ -649,43 +633,6 @@
             "type": "address"
         }],
         "name": "transferOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "string",
-                "name": "dbCID",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "label",
-                "type": "string"
-            },
-            {
-                "internalType": "uint8",
-                "name": "v",
-                "type": "uint8"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "r",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "s",
-                "type": "bytes32"
-            }
-        ],
-        "name": "updateDB",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

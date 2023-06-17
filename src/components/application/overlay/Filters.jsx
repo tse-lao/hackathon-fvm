@@ -50,16 +50,13 @@ export default function Filters({name, selectChange, currentFilters}) {
     
     
   return (
-    <div className="-mt">
-      <div className="px-4 py-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900">{name}</h1>
-      </div>
+    <div className="">
 
       {/* Filters */}
       <Disclosure
         as="section"
         aria-labelledby="filter-heading"
-        className="grid items-center border-b border-t border-gray-200 my-8 bg-white"
+        className="grid items-center border border-gray-200 my-8 bg-white rounded-md"
       >
         <h2 id="filter-heading" className="sr-only">
           Filters
@@ -85,13 +82,13 @@ export default function Filters({name, selectChange, currentFilters}) {
               
             </div>
             <div className='pl-6'>
-            <Toggle text="Open Datasets" changeStatus={handleOpenChange}  />
+            <Toggle text="Open Datasets" status={filters.open} changeStatus={handleOpenChange}  />
             </div>
           </div>
         </div>
-        <Disclosure.Panel className="border-t border-gray-200 py-10">
-        <legend className="block font-medium m-6">Category</legend> 
-            <div className="grid  grid-cols-4 gap-y-10 md:grid-cols-4 md:gap-x-6 px-6 py-6">
+        <Disclosure.Panel className="border-t border-gray-200 py-6">
+        <legend className="block font-medium ml-6">Category</legend> 
+            <div className="grid  grid-cols-4  md:grid-cols-4 md:gap-x-6 px-6 ">
                   {categories.map((option, optionIdx) => (
                     <div key={option.value} className="col-span-1 flex items-center text-base sm:text-sm">
                       <input

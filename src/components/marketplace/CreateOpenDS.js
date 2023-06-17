@@ -3,6 +3,7 @@ import MatchRecord from '@/hooks/useBlockchain';
 import { useContract } from '@/hooks/useContract';
 import { getDataDepoAuth } from '@/hooks/useLighthouse';
 import { getLighthouse } from '@/lib/createLighthouseApi';
+import { getMetadataFromFile } from '@/lib/dataHelper';
 import { matchAndSetCarFile, uploadAndSetFile, uploadFileWithProgress } from '@/lib/uploadHelpers';
 import lighthouse from '@lighthouse-web3/sdk';
 import { useState } from 'react';
@@ -16,7 +17,7 @@ import InputField from "../application/elements/input/InputField";
 import TextArea from '../application/elements/input/TextArea';
 
 
-export default function CreateOpenDS({ tokenId, onClose }) {
+export default function CreateOpenDS({ tokenId, openModal, onClose }) {
     const { address } = useAccount();
     const { createOpenDataSet } = useContract();
     const [formData, setFormData] = useState({
@@ -44,16 +45,29 @@ export default function CreateOpenDS({ tokenId, onClose }) {
         const apiKey = await getLighthouse(address);
         const authToken = await getDataDepoAuth(address);
         const uploadFile = e.target.files[0];
-        const mockEvent = { target: { files: [uploadFile] }, persist: () => {} };
-    
+        const mockEvent = { target: { files: [uploadFile] }, persist: () => { } };
+
         try {
             const dummyFile = await uploadAndSetFile(mockEvent, apiKey, progressCallback);
             console.log("DUMMY FILE")
             console.log(dummyFile);
+
+            //get metadata
+
             setFile(dummyFile);
             await uploadFileWithProgress(uploadFile, progressCallback, authToken.data.access_token);
             await sleep(3000);
             await matchAndSetCarFile(dummyFile, authToken.data.access_token, setLoadingFile, setFile, setCarError);
+
+            console.log(mockEvent.target.files[0].type)
+            if (mockEvent.target.files[0].type === "application/json") {
+                let tempMeta = await getMetadataFromFile(mockEvent.target);
+
+                console.log(tempMeta);
+
+                setFormData({ ...formData, metadata: tempMeta });
+
+            }
         } catch (error) {
             console.log(error);
             toast.error(error.message);
@@ -68,7 +82,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
         try {
             const result = await MatchRecord([dummy], authToken.data.access_token, true)
             console.log(result);
-            
+
 
             setFile(
                 {
@@ -82,7 +96,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
             setLoadingFile(false)
         }
     }
-    
+
 
 
     function sleep(ms) {
@@ -105,8 +119,10 @@ export default function CreateOpenDS({ tokenId, onClose }) {
     };
 
     const submitOpen = async () => {
-        
-        if(formData.description.length < 10 || formData.description.length > 1000){ 
+
+        //apply control for every address with blance 
+
+        if (formData.description.length < 10 || formData.description.length > 1000) {
             toast.error("Your description needs to be between 10 and 1000 characters")
         }
         setLoading(true)
@@ -114,10 +130,11 @@ export default function CreateOpenDS({ tokenId, onClose }) {
         const contract = await createOpenDataSet(
             file.cid,
             file.carRecord.pieceCid,
-            file.metadata,
+            formData.metadata,
             formData.name,
             formData.description,
             formData.categories,
+            file.type,
         )
 
         console.log(contract);
@@ -128,7 +145,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
         return <LoadingSpinner />
     }
     return (
-        <ModalLayout title="Create Open Dataset" onClose={onClose}>
+        <ModalLayout title="Create Open Dataset" open={openModal} onClose={onClose}>
             <div className="space-y-4 w-full">
                 <InputField
                     label="Name"
@@ -174,7 +191,7 @@ export default function CreateOpenDS({ tokenId, onClose }) {
                         </div>
                     )}
 
-                {carError ? <ActionButton text="Find Car" onClick={() => matchCarFile(file)} /> : <ActionButton text="Create Open Dataset" onClick={submitOpen} />}
+                {carError ? <ActionButton loading={loading} text="Find Car" onClick={() => matchCarFile(file)} /> : <ActionButton text="Create Open Dataset" onClick={submitOpen} />}
 
 
 

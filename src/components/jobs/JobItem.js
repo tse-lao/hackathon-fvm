@@ -1,24 +1,23 @@
+import { CheckIcon, UsersIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import Category from '../application/elements/Category'
 
 export default function JobItem({ details }) {
     return (
-
-        <div className='px-2 py-6 outline-top hover:bg-gray-100 bg-white'>
-            <Link href={`/jobs/${details.id}`}>
-                <h1
-                    className='text-lg font-bold leading-7 text-gray-700'
-                >{details.name}</h1>
-                <p className='text-sm text-gray-700 overflow-auto'>
-                    {details.description}
-                </p>
-                <div className='flex flex-row flex-wrap gap-2 mt-4'>
-                    {details.categories && details.categories.map((category, index) => (
-                        <Category key={index} category={category} />
-                    ))}
+        <Link href={`/jobs/${details.jobID}`} className="col-span-1 grid grid-cols-6 justify-between bg-white px-6 border py-2 rounded-md m-4 hover:shadow-md max-w-[600px] self-center">
+            <div className="col-span-1 flex flex-col justify-center ">
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <UsersIcon height={16} />
+                    <span> {details.jobID}</span>
                 </div>
+                <div className="flex items-center gap-4 text-sm text-cf-500">
+                    <CheckIcon height={16} />
+                    <span>  {details.jobID}</span>
+                </div>
+            </div>
+            <div className="col-span-5 flex flex-col">
+                <span className="text-gray-700">{details.name}</span>
+                <span className="text-sm text-gray-400">{details.description}</span>
+            </div>
             </Link>
-        </div>
-
     )
 }

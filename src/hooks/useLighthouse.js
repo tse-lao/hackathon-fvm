@@ -3,13 +3,15 @@ import { readBlobAsJson } from '@/lib/dataHelper';
 import { getCurrentDateAsString } from '@/lib/helpers';
 import { getJWT } from '@lighthouse-web3/kavach';
 import lighthouse from '@lighthouse-web3/sdk';
-import { ethers } from 'ethers';
+import { fetchSigner } from '@wagmi/core';
 import MatchRecord from './useBlockchain';
 
-export async function signAuthMessage() {
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
+
+export async function signAuthMessage() {
+  const signer = await fetchSigner();
+  
+  console.log(signer);
   const address = await signer.getAddress();
   const messageRequested = (await lighthouse.getAuthMessage(address)).data.message;
   const signedMessage = await signer.signMessage(messageRequested);
@@ -21,7 +23,9 @@ export async function signAuthMessage() {
   });
 }
 
-export async function shareFile(cid, creator, address) {
+export async function shareFile(cid, creator, address, tokenID) {
+  
+  //we pass in 0
 
   let jwt = await readJWT(address);
   const publicVerifier = "0xf129b0D559CFFc195a3C225cdBaDB44c26660B60"
@@ -33,8 +37,41 @@ export async function shareFile(cid, creator, address) {
     cid,
     jwt
   );
+  
+  const conditions = [
+    {
+      id: 1,
+      chain: "Mumbai",
+      method: "hasAccess",
+      standardContractType: "Custom",
+      contractAddress: DB_NFT_address,
+      returnValueTest: {
+        comparator: "==",
+        value: "true",
+      },
+      parameters: [":address", creator, tokenID], 
+      inputArrayType: ['address', 'address', 'uint256'],
+      outputType: "bool"
+
+    }
+
+  ]
+
+  const aggregator = "([1])";
+  
+  
+  const accessControl = await lighthouse.applyAccessCondition(
+    address,
+    cid,
+    jwt,
+    conditions, 
+    aggregator
+  )
+  console.log(accessControl);
   return res;
 }
+
+
 
 export async function grantSmartAccess(cid, tokenID, minRows) {
 
@@ -72,9 +109,14 @@ export async function grantSmartAccess(cid, tokenID, minRows) {
 
 export async function readJWT(address) {
   
+  
   const jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
   
-  if(jwt) { return jwt }
+  
+if(jwt && jwt !== null) { 
+  console.log(jwt);
+  return jwt 
+  }
   
   const { signedMessage, publicKey } = await signAuthMessage();
   const response = await getJWT(publicKey, signedMessage);
@@ -94,17 +136,8 @@ export async function uploadCarFile(
       form.append("file", item);
     });
 
-    const config = {
-      onUploadProgress: (progressEvent) => {
-        let percentageUploaded =
-          (progressEvent?.loaded / progressEvent?.total) * 100;
-
-        setUploadedProgress(percentageUploaded.toFixed(2));
-      },
-    };
-
-    const sec = "https://data-depot.lighthouse.storage/api"
-    const endpoint = `${sec}/upload/upload_files`
+    const url = "https://data-depot.lighthouse.storage/api"
+    const endpoint = `${url}/upload/upload_files`
 
     console.log(endpoint)
     let check = await fetch(endpoint, {
@@ -115,14 +148,12 @@ export async function uploadCarFile(
       body: form
     })
 
-    console.log(check)
-
     const result = await check.json()
-    console.log(result)
-
+    
+    resolve(result)
 
   } catch (error) {
-    console.log(`Something Went Wrong : ${error}`, "error");
+    console.log(error)
   }
 };
 
@@ -174,7 +205,9 @@ export async function downloadCid(cid, address, tokenId) {
   downloadBlob(decrypted, fileName);
 }
 
-function downloadBlob(blob, fileName) {
+async function downloadBlob(blob, fileName, mimeType) {
+  const fileType = await getMimeType(blob);
+
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement('a');
@@ -207,6 +240,39 @@ function getFirstArray(obj) {
   }
   return null;
 }
+function getMimeType(blob) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      var arr = (new Uint8Array(reader.result)).subarray(0, 4);
+      var header = '';
+      for (var i = 0; i < arr.length; i++) {
+        header += arr[i].toString(16);
+      }
+      var mimeType = '';
+      switch (header) {
+        case '89504e47':
+          mimeType = 'image/png';
+          break;
+        case '47494638':
+          mimeType = 'image/gif';
+          break;
+        case 'ffd8ffe0':
+        case 'ffd8ffe1':
+        case 'ffd8ffe2':
+          mimeType = 'image/jpeg';
+          break;
+        default:
+          mimeType = 'unknown';
+          break;
+      }
+      resolve(mimeType);
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(blob);
+  });
+}
+
 
 export async function countRows(cid, address){
   let jwt = await readJWT(address);
@@ -216,8 +282,12 @@ export async function countRows(cid, address){
       jwt
     );
 
+    console.log(keyObject)
+    
   const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
+
   console.log(decrypted)
+  
   const jsonData = await readBlobAsJson(decrypted);
   
   //check if hte jsonData is an array 

@@ -1,10 +1,11 @@
-import Avatar from '@/components/application/elements/Avatar'
-import Tabs from '@/components/application/elements/Tabs'
-import ProfileStats from '@/components/application/profile/ProfileStats'
-import Layout from '@/pages/Layout'
+
+import Avatar from "@/components/application/elements/Avatar"
+
+import Tabs from "@/components/application/elements/Tabs"
+import ProfileStats from "@/components/application/profile/ProfileStats"
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
-
+import Layout from "../Layout"
 
 const stats = [
   { id: 1, name: 'Total Contributions', stat: '71,897', change: '122', changeType: 'increase' },

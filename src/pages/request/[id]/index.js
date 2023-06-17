@@ -212,7 +212,7 @@ export default function GetRequestDetails() {
           <section aria-labelledby="timeline-title" className="lg:col-span-1 lg:col-start-3">
             <div className="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
               {showGrant ? (
-                <GrantAccess tokenID={data.result.tokenID} setShowGrant={setShowGrant} address={address} creator={data.creator} minRows={data.result.minimumRowsOnSubmission} metadataCID={data.result.dataFormatCID} />
+                <GrantAccess tokenID={data.result.tokenID} setShowGrant={setShowGrant} address={address} creator={data.creator} minRows={data.result.minimumRowsOnSubmission} metadataCID={data.result.dataFormatCID} multiSig="0"/>
               ) : (
                 <div>
                   <h2 id="timeline-title" className="text-lg font-medium text-gray-900">

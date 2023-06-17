@@ -14,7 +14,7 @@ import { ActionButton } from './application/elements/buttons/ActionButton';
 import LoadingIcon from './application/elements/loading/LoadingIcon';
 uploadMetaData
 
-export default function UploadModal({ onClose }) {
+export default function UploadModal({ onClose, open }) {
     const [files, setFiles] = useState([])
     const [encryption, setEncryption] = useState(true)
     const { address } = useAccount();
@@ -115,9 +115,9 @@ export default function UploadModal({ onClose }) {
 
         setUploadStatus("Gathering Authentication");
 
+        console.log(address);
         let api = await getLighthouse(address);
         const jwt = await readJWT(address);
-
         setUploadStatus("Uploading files to lighthouse drive.");
 
         let list = [];

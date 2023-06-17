@@ -1,13 +1,27 @@
-import PerformJob from '@/components/jobs/PerformJob'
-import { DB_main } from '@/constants'
+import Tabs from '@/components/application/elements/Tabs'
+import JobDetails from '@/components/jobs/JobDetails'
+import JobComputations from '@/components/jobs/details/JobComputations'
+import JobDatasets from '@/components/jobs/details/JobDatasets'
 import Layout from '@/pages/Layout'
+import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { usePolybase } from '@polybase/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-export default function Jobs({ }) {
+
+
+const tabs = [
+    { name: 'Details', href: '#', current: true },
+    { name: 'Datasets', href: '#', current: false },
+    { name: 'Computations', href: '#', current: false },
+
+  ]
+  
+
+export default function Jobs() {
     const [openModal, setOpenModal] = useState(false)
     const [datasets, setDatasets] = useState([])
-    const [selected, setSelected] = useState([])
+    const [details, setDetails] = useState(null)
+    const [select, setSelect] = useState("Details")
     const [selectedOption, setSelectedOption] = useState("datasets")
     const router = useRouter()
     const { jobid } = router.query
@@ -16,16 +30,13 @@ export default function Jobs({ }) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const { data } = await polybase.collection('Jobs').where('id', '==', jobid).get()
-            console.log(data)
-            const where = `WHERE ${DB_main}.dataFormatCID = '${data[0].data.dataFormat}'`
-            const result = await fetch(`/api/tableland/token/all?where=${where}`)
+            const result = await fetch(`/api/tableland/jobs/single?jobID=${jobid}`)
             const datasets = await result.json()
-            console.log(datasets)
-            setDatasets(datasets.result)
+            console.log(datasets.result[0])
+            setDetails(datasets.result[0])
+            
 
 
-            const computations = await fetch(`/api/tableland/computations?`)
         }
 
         if (jobid) {
@@ -33,65 +44,26 @@ export default function Jobs({ }) {
         }
     }, [jobid])
 
-    const addSelected = async (dbCID) => {
-        if (selected.includes(dbCID)) {
-            setSelected(selected.filter((item) => item !== dbCID))
-        } else {
-            setSelected([...selected, dbCID])
-        }
-    }
-
-    const renderContent = () => {
-        if (selectedOption === 'datasets') {
-            // return <DatasetsView />; Uncomment this line and define DatasetsView component accordingly
-            return <div className='grid sm:grid-cols-1 md: grid-cols-1 lg:grid-cols-1 gap-4'>
-                {datasets.length > 0 && datasets.map((dataset, index) => (
-                    <div key={index} className={`grid sm:grid-cols-1 md:grid-cols-1 bg-white items-center px-4 py-4 ${selected.includes(dataset.dbCID) && 'outline'}`} onClick={() => addSelected(dataset.dbCID)} >
-                        <span className='text-sm text-gray-600'>{dataset.tokenID} </span>
-                        <span>  {dataset.dbCID}</span>
-                    </div>
-                ))}
-            </div> // Replace this placeholder with your actual Datasets View component
-        } else if (selectedOption === 'jobs') {
-            // return <JobsView />; Uncomment this line and define JobsView component accordingly
-            return <div>Jobs View</div>  // Replace this placeholder with your actual Jobs View component
-        }
-    }
-
+    const setSelected = (tab) => {
+        setSelect(tab)
+      }
 
     return (
         <Layout title="Jobs" active="Jobs">
-
-            <div className="flex justify-between mb-12">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+            <div className='mx-32'>
+            <div className="flex m-8 gap-8">
+                <ArrowLeftIcon height={32 } onClick={() => router.back()}/>
+                <h1 className="text-2xl font-bold tracking-tight text-gray-800">
                     Jobs
                 </h1>
             </div>
-
-
-            <div className='grid md:grid-cols-4  '>
-                <PerformJob className="col-span-1" key="1" jobID={jobid} input={selected} />
-
-                <div className='col-span-3 ml-24 flex flex-col'>
-                    <div className="flex gap-2">
-                        <button
-                            className={`py-2 px-4 text-left ${selectedOption === 'datasets' ? 'bg-gray-200' : ''}`}
-                            onClick={() => setSelectedOption('datasets')}
-                        >
-                            Datasets
-                        </button>
-                        <button
-                            className={`py-2 px-4 text-left ${selectedOption === 'jobs' ? 'bg-gray-200' : ''}`}
-                            onClick={() => setSelectedOption('jobs')}
-                        >
-                            Performed Jobs
-                        </button>
-                    </div>
-                    <div className="flex-grow p-4">
-                    {renderContent()}
-                </div>
-                </div>
-               
+        
+            <Tabs tabs={tabs} selected={setSelected} active={select} />
+            <div className='mt-12'>
+              {select === "Details" && <JobDetails details={details} key="1" jobID={jobid}  />}
+              {select === "Datasets" && <JobDatasets jobID={jobid} />}
+              {select === "Computations" && <JobComputations jobID={jobid} />}
+            </div>
             </div>
         </Layout>
     )

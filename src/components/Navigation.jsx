@@ -1,12 +1,9 @@
-/* 交流QQ群:七5457三七7八 */
-import { useIsMounted } from '@/hooks/useIsMounted'
+"use client"
 import { Disclosure, Menu } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { watchAccount } from '@wagmi/core'
 import Link from 'next/link'
-import { useAccount } from 'wagmi'
-import { Logo } from './Logo'
+import { Suspense } from 'react'
+import LoginButton from './application/elements/buttons/LoginButton'
  
 
 
@@ -15,19 +12,8 @@ function classNames(...classes) {
 }
 
 export default function Navigation({ active }) {
-  const { address } = useAccount();
-  const mounted = useIsMounted();
-  
-  const unwatch = watchAccount((account) => {
-    if(account.address != address){
-      window.location.reload();
-    }
-  })
-
-  
-
   return (
-    <Disclosure as="nav" className="bg-white shadow">
+    <Disclosure as="nav" className="">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -43,17 +29,15 @@ export default function Navigation({ active }) {
                   )}
                 </Disclosure.Button>
               </div>
-              <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div className="flex flex-shrink-0 items-center">
-                  <Logo height={42} />
-                </div>
+              <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-center">
+
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   {/* Current: "border-cf-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                   <Link
                     href="/"
                     className={classNames(
                       "Dashboard" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900  text-cf-500'
                         : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
                     )}
                   >
@@ -63,47 +47,34 @@ export default function Navigation({ active }) {
                     href="/market"
                     className={classNames(
                       "Market" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-cf-500'
                         : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
                     )}
                   >
                     Marketplace
                   </Link>
-                  <Link
-                    href="/request"
-                    className={classNames(
-                      "Request" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
-                        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                    )}
-                  >
-                    Requests
-                  </Link>
+                 
                   <Link
                     href="/jobs"
                     className={classNames(
                       "Jobs" == active
-                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-gray-900'
+                        ? 'inline-flex items-center border-b-2 border-cf-500 px-1 pt-1 text-sm font-medium text-cf-500'
                         : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700',
                     )}
                   >
                     Jobs
                   </Link>
+
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-4 flex-shrink-0 flex gap-6">
-                <div>
-                    <ConnectButton
-                      accountStatus="address"
-                      showBalance={false}
-                      border="none"
-                      
-                    />
+                <Suspense fallback={<span>Loading..</span>}>
+                    <LoginButton />
 
-                  </div>
+                  </Suspense>
                 </Menu>
 
 

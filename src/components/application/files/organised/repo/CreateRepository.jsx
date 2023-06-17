@@ -1,10 +1,11 @@
+
 import { TextField } from '@/components/Fields';
 import ModalLayout from '@/components/ModalLayout';
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
 import TextArea from '@/components/application/elements/input/TextArea';
+import GroupView from '@/components/groups/details/GroupView';
 import { useContract } from '@/hooks/useContract';
 import { useState } from "react";
-import TagsInput from 'react-tagsinput';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
@@ -14,7 +15,10 @@ const {address} = useAccount();
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        owners: [],
+        owners: [{
+             name: "something",
+             name: "another one",
+        }],
     });
 
 
@@ -80,11 +84,7 @@ const {address} = useAccount();
                     onChange={handleChange}
                 />
                 <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-gray-700">Owners</label>
-                    <TagsInput
-                        value={formData.owners}
-                        onChange={handleViewers}
-                    />
+                    <GroupView members={formData.owners} />
                 </div>
                 <ActionButton text
                 ="Create Repository" onClick={createRepository} />

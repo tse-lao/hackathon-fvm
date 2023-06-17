@@ -1,10 +1,9 @@
 "use client"
 import { formatBytes } from '@/lib/helpers';
 import lighthouse from '@lighthouse-web3/sdk';
-import { ethers } from 'ethers';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
+import ProfileElement from './stats/Element';
 
 export default function ProfileStats({ address }) {
   const {address: ownAddress} = useAccount()
@@ -13,10 +12,12 @@ export default function ProfileStats({ address }) {
     { name: 'Contributions', current: 'loading...' },
     { name: 'Balance', current: 'loading...', total: 'loading...' },
   ])
-
+  const {data: userBalance} = useBalance({address})
+  
   useEffect(() => {
     const newStats = []
     const getBalance = async () => {
+
       const balance = await lighthouse.getBalance(address);
       newStats.push(
         {
@@ -27,7 +28,7 @@ export default function ProfileStats({ address }) {
 
       const res = await fetch(`/api/tableland/contributions/count?creator=${address.toLowerCase()}`);
       const data = await res.json();
-      console.log(data.result)
+
 
       newStats.push(
         {
@@ -36,20 +37,22 @@ export default function ProfileStats({ address }) {
 
         });
 
-
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const userBalance = await provider.getBalance(address)
-      newStats.push(
+        if(userBalance){
+          newStats.push(
         {
           name: 'Balance',
-          current: parseFloat(ethers.utils.formatEther(userBalance, 'ether')).toFixed(6),
+          current: Math.round(userBalance.formatted * 10000) / 10000,
+        })
         }
-      )
+      
       //get current ETH balance
       setStats(newStats)
     }
     
+    if(address){
       getBalance()
+      
+    }
     
   }, [address])
 
@@ -57,14 +60,9 @@ export default function ProfileStats({ address }) {
 
   return (
     <div>
-      <h3 className="text-base font-semibold leading-6 text-gray-900">User Profile Statistics</h3>
       <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
         {stats.map((item, index) => (
-          <div key={index} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-            <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
-            <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.current}  {item.total && <span className="text-sm font-md text-gray-500">/ {item.total}</span>}</dd>
-            {index == 0 && address == ownAddress && <Link href="/files"><dd className="mt-1  font-semibold tracking-tight text-cf-600">Show Files</dd></Link>}
-          </div>
+          <ProfileElement key={index} item={item} index={index}/>
         ))}
       </dl>
     </div>

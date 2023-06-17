@@ -1,65 +1,97 @@
-import { useState } from 'react'
-import { useAccount, useBalance, useConnect, useSwitchNetwork } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
+"use client"
+import { useEffect, useState } from 'react';
+import { useAccount, useBalance, useConnect, useNetwork } from 'wagmi';
+import ProfileDetails from '../../profile/ProfileDetails';
 
 export default function LoginButton() {
-  const { address, isConnected } = useAccount()
-  const { connect } = useConnect({
-    connector: new InjectedConnector(),
-  })
-  const { switchNetwork } = useSwitchNetwork() 
-  const {getBalance} = useBalance()
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const chainLogoUrl = 'URL_TO_LOGO' // Replace with the actual URL to the logo obtained from wagmi
+  const { connect, connectors } = useConnect();
+  const { address, status, isConnected, isConnecting, isReconnecting, isDisconnected } = useAccount();
+  const { chain } = useNetwork()
+  const [showModal, setShowModal] = useState(false);
+  const {data:balance} = useBalance({address:address})
+
+  // Eager connection
+  useEffect(() => {
+    if (!isDisconnected) return;
+    const wagmiConnected = localStorage.getItem('wagmi.connected');
+    const isWagmiConnected = wagmiConnected ? JSON.parse(wagmiConnected) : false;
+
+    if (!isWagmiConnected) return;
+
+    connect({ connector: connectors });
+  }, []);
+  
+  function truncateTextMiddle(text, maxLength) {
+    if (text.length <= maxLength) {
+      return text;
+    }
+  
+    const halfLength = Math.floor((maxLength - 3) / 2); // Subtracting 3 to accommodate for the ellipsis
+  
+    const start = text.slice(0, halfLength);
+    const end = text.slice(-halfLength);
+  
+    const truncatedText = start + '...' + end;
+    return truncatedText;
+  }
+  
 
 
-  return (
-    <div className="flex items-center justify-end">
-      <div className="flex items-center">
-        {isConnected ? (
-            <div className="text-sm text-gray-500 mr-2">
-              {address}
-            </div>
-           
-        ) : (
-          <button
-            className="px-2 py-1 text-sm text-white bg-blue-500 rounded hover:bg-blue-600"
-            onClick={() => connect()}
-          >
-            Connect Wallet
-          </button>
-        )}
-        <div className="relative ml-4 inline-block">
-          <button 
-              className="p-1 rounded-full bg-gray-300 inline-flex items-center"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-          >
-            <img
-              src={chainLogoUrl}
-              alt="Chain Logo"
-              className="w-4 h-4 object-cover rounded-full"
-            />
-          </button>
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg p-2 w-64">
-              {/* Dropdown menu content */}
-              <button
-                className="block w-full text-left px-2 py-1 text-sm text-gray-800 hover:bg-gray-100"
-                onClick={() => {switchNetwork(80001); setDropdownOpen(false);}}
-              >
-                Change Chain
+
+  if (isConnecting) {
+    return (
+      <div className="text-md text-white bg-cf-500 rounded-full py-1 px-8" >
+        Loading
+      </div>
+    )
+  }
+
+  if (!isConnecting && address) {
+    return (
+      <div className="flex rounded-md  items-center gap-2">
+        <div className='p-2 flex gap-2'>
+          {status === 'connected' &&
+            (chain.id == 80001 ? <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Polygon_Blockchain_Matic_Logo.svg" alt={`${chain.id}`} className="w-6 h-6" /> :
+              <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Filecoin.svg" alt={`${chain.id}`} className="w-6 h-6" />
+            )}
+            {balance && Math.round(balance.formatted * 100000)/100000}
+        </div>
+        <button className='w-[150px] bg-white p-1 px-1 outline rounded-full outline-gray-200 text-sm overflow truncate' onClick={() => setShowModal(!showModal)}>
+          {truncateTextMiddle(address, 11)}
+          
+          {showModal && <ProfileDetails address={address} showModal={showModal} setShowModal={setShowModal} />}
+
+        </button>
+      </div>
+
+    )
+  }
+
+  if (!isReconnecting && !isConnected && !isConnecting && !address) {
+
+    return (
+      <div className="flex gap-4 items-center">
+        <div className='flex gap-4'>
+          {!isReconnecting && !isConnected && (
+
+            connectors.map((connector) =>
+            (
+              <button className="text-md text-white bg-cf-500 rounded-full py-1 px-8" key={connector.id} onClick={() => connect({ connector })}>
+                {connector.name}
               </button>
-              <div className="text-sm text-gray-500 mr-2">
-              Balance: {getBalance(address)}
-            </div>
-            </div>
-          )}
+            )
+            ))}
         </div>
       </div>
+
+    );
+  }
+
+  return (
+    <div className="text-md text-white bg-cf-500 rounded-full py-1 px-8" >
+      Loading
     </div>
   )
 
-
-
-
 }
+

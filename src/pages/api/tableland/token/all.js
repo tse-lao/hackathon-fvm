@@ -13,7 +13,7 @@ export default async (req, res) => {
                 'description', description,
                 'dbCID', dbCID,
                 'minRows', minRows,
-                'label', label,
+                'piece_cid', piece_cid,
                 'attributes', json_group_array(
                   json_object(
                     'trait_type',trait_type,
@@ -21,7 +21,7 @@ export default async (req, res) => {
                   )
                 )
               )
-            FROM ${DB_main} JOIN ${DB_attribute}
+            FROM  ${DB_main} JOIN ${DB_attribute}
                 ON ${DB_main}.tokenID = ${DB_attribute}.tokenID  
                 ${req.query.where}
             GROUP BY ${DB_main}.tokenID`,

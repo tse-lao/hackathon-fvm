@@ -1,16 +1,11 @@
 
 import { Switch } from '@headlessui/react'
-import { ethers } from 'ethers'
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 import SettingsLayout from './SettingsLayout'
 
-const user = {
-  name: 'Debbie Lewis',
-  handle: 'deblewis',
-  email: 'debbielewis@example.com',
-  imageUrl:
-    'https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=320&h=320&q=80',
-}
+import { createProfile } from '@/hooks/usePolybase'
+import { useAccount } from 'wagmi'
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -20,13 +15,15 @@ export default function Example() {
   const [privateAccount, setPrivateAccount] = useState(false)
   const [allowCommenting, setAllowCommenting] = useState(true)
   const [allowMentions, setAllowMentions] = useState(true)
-  const[publicKey, SetPublicKey] = useState("")
-  const getPublicKey =  async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const publicKeyShow = (await signer.getAddress()).toLowerCase(); 
-    
-    SetPublicKey(publicKeyShow)
+  const[username, setUsername] = useState("")
+  const {address} = useAccount();
+  
+  const submitProfile = async () => {
+      toast.promise(createProfile(username, address), {
+        pending: 'Creating profile...',
+        success: 'Profile created!',
+        error: 'Error creating profile',
+      });
   }
 
   return (
@@ -49,9 +46,9 @@ export default function Example() {
                         type="text"
                         name="first-name"
                         id="first-name"
-                        value={publicKey}
-                        disabled
-                        placeholder='Generate public KEy'
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder='Create a username'
                         autoComplete="given-name"
                         className="mt-2 block w-full rounded-md border-0 px-3 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-0 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
                       />
@@ -59,7 +56,7 @@ export default function Example() {
 
                     <div className="col-span-12 sm:col-span-6">
                     <button
-                    onClick={e => {getPublicKey()}}
+                    onClick={submitProfile}
                     type="submit"
                     className="inline-flex justify-center rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
                   >
@@ -77,7 +74,7 @@ export default function Example() {
                     <div>
                       <h2 className="text-lg font-medium leading-6 text-gray-900">Privacy</h2>
                       <p className="mt-1 text-sm text-gray-500">
-                        Ornare eu a volutpat eget vulputate. Fringilla commodo amet.
+                        Here you can set some privacy related settings. Including the option to create your own profile name, and select the settings on how you want to be found. 
                       </p>
                     </div>
                     <ul role="list" className="mt-2 divide-y divide-gray-200">

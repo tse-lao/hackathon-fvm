@@ -1,14 +1,18 @@
-import { readJWT } from '@/hooks/useLighthouse'
-import lighthouse from '@lighthouse-web3/sdk'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { ethers } from 'ethers'
-import { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi'
+import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
+import LoginButton from '@/components/application/elements/buttons/LoginButton';
+import { OpenButton } from '@/components/application/elements/buttons/OpenButton';
+import { useIsMounted } from '@/hooks/useIsMounted';
+import { readJWT } from '@/hooks/useLighthouse';
+import lighthouse from "@lighthouse-web3/sdk";
+import { useEffect, useState } from 'react';
+import { useAccount, useSignMessage } from 'wagmi';
 export default function Index() {
-  const { address } = useAccount()
+
   const [api, setApi] = useState(null)
   const [jwt, setJwt] = useState(null)
-  const [reload, setReload] = useState(false)
+  const { address } = useAccount()
+  const { data, signMessage, onSuccess } = useSignMessage();
+  const mounted = useIsMounted()
 
   useEffect(() => {
     const apiKey = localStorage.getItem(`lighthouse-${address}`)
@@ -26,17 +30,26 @@ export default function Index() {
     }
   }, [api, jwt, address])
 
+  useEffect(() => {
+    const apiKey = localStorage.getItem(`lighthouse-${address}`)
+
+    if (data && apiKey) {
+      storeAPI()
+    }
+  }, [data])
+
   const setupLighthouse = async () => {
     // 1. Trigger createLighthouse function with user's address.
     const result = await getApiKey(address)
 
-    
+
     // 2. Create JWT Token with user's address.
     const jwt = await readJWT(address)
     console.log(jwt)
     localStorage.setItem(`lighthouse-jwt-${address}`, jwt)
     
-    window.location.reload()
+    setJwt(jwt)
+
   }
 
   const getApiKey = async () => {
@@ -47,24 +60,17 @@ export default function Index() {
       .then((response) => response.json())
       .then((data) => data);
 
-    const auth = await signAuthMessage(verificationMessage)
-    const response = await lighthouse.getApiKey(address, auth)
 
 
+    signMessage({ message: verificationMessage })
 
+  }
+
+  async function storeAPI() {
+    const response = await lighthouse.getApiKey(address, data)
     localStorage.setItem(`lighthouse-${address}`, response.data.apiKey)
-
     setApi(response.data.apiKey)
-    /* { data: { apiKey: '7d8f3d18.eda91521aa294773a8201d2a7d241a2c' } } */
   }
-
-  const signAuthMessage = async (messageRequested) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const signedMessage = await signer.signMessage(messageRequested);
-    return (signedMessage)
-  }
-
 
   // The component return a styled layout for the onboarding process.
   return (
@@ -78,29 +84,38 @@ export default function Index() {
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-700">Connect Your Web3 Account</h2>
           <p className="mt-2 text-gray-500 mb-4">Click the button below to link your Web3 account.</p>
-          <ConnectButton />
+          <LoginButton />
         </div>
 
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-700">Lighthouse Credentials</h2>
           <p className="mt-2 text-gray-500">Next, set up your Lighthouse API Key and JWT.</p>
-          <div className="space-y-8 mt-4">
+        
+          
+          {data ? (
+            <div className="space-y-8 mt-4">
             <div>
               <span className="text-gray-700 font-bold mt-4">API Key </span>
-              <span className="text-gray-700">{api}</span>
+              <span className="text-gray-700 m-4">{api}</span>
+              <ActionButton onClick={storeAPI} disabled={address ? false : true} text="Get API " />
             </div>
             <div>
               <span className="text-gray-700 font-bold mt-4">JWT </span>
-              <span className="text-gray-700 overflow-scroll truncate">{jwt}</span>
+              <span className="text-gray-700 truncate overflow-auto w-full">{jwt}</span>
             </div>
             <button
               onClick={setupLighthouse}
               className="w-full bg-cf-500 hover:bg-cf-700 text-white font-bold py-2 px-4 rounded"
               disabled={address ? false : true}
             >
-            Connect to lighthouse
+              Connect to lighthouse
             </button>
           </div>
+          ) : (
+            <div className="space-y-8 mt-4">
+              <OpenButton onClick={getApiKey} text="Create verified message." />
+            </div>
+          )}
         </div>
       </div>
     </div>

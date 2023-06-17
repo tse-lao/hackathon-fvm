@@ -11,7 +11,7 @@ const DatasetItem = ({ dataset }) => {
       <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
         <div className="flex flex-row justify-between mt-2 items-center">
           <div className="px-6 pt-4 pb-2 items-start	">
-            <h3 className="text-xl font-semibold mb-2 group-hover:text-indigo-500">{dataset.dbName}</h3>
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-indigo-500">{dataset.name}</h3>
 
           </div>
           <div className="px-6 pt-4 pb-2">

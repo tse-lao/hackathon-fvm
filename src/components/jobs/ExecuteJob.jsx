@@ -4,10 +4,9 @@ import { toast } from "react-toastify";
 import { useNetwork, useSwitchNetwork } from "wagmi";
 import ModalLayout from "../ModalLayout";
 import { ActionButton } from "../application/elements/buttons/ActionButton";
-import { OpenButton } from "../application/elements/buttons/OpenButton";
 
-export default function ExecuteJob({ data, input, jobID,  onClose, openModal, changeOpen }) {
-    const { callLillypadJob } = useContract();
+export default function ExecuteJob({ data, input,  onClose, openModal, changeOpen }) {
+    const { ExecuteJob } = useContract();
     const { chain } = useNetwork();
     const [loading,setLoading] = useState(false)
     const { switchNetwork } = useSwitchNetwork()
@@ -20,19 +19,16 @@ export default function ExecuteJob({ data, input, jobID,  onClose, openModal, ch
 
     const startComputing = async () => {
         setLoading(true)
-        console.log(data.spec_start, data.spec_end, data.id)
-        console.log(input[0])
         
-        toast.promise(callLillypadJob(input[0], data.spec_start, data.spec_end, data.id), {
-            pending: `Pending transaction for execution for job ${data.id}...`,
+        fetch(`${process.env.NEXT_PUBLIC_BACALHAU_SERVER}/startJob`)
+        console.log(data.jobID, [], 0)
+        toast.promise(ExecuteJob(data.jobID, [], 0.001), {
+            pending: `Pending transaction for execution for job ${data.jobID}...`,
             success: 'Job started!',
             error: 'Error starting job',
         }).then(() => {
             setLoading(false)
-            if(chain.id != HYPERSPACE_ID){
-                switchNetwork?.(POLYGON)
-            }
-            onClose()
+            onClose;
         })
     }
     
@@ -43,7 +39,8 @@ export default function ExecuteJob({ data, input, jobID,  onClose, openModal, ch
                 {errorMessage && <div className="text-red-500">{errorMessage}</div>}
 
                 <div className='flex flex-col'>
-                    <label className="font-bold">Job {data.id}</label>
+                    <label className="font-bold">Jobid: {data.jobID}</label>
+                    <span>Testing</span>
                     <span>{data.name}</span>
                 </div>
                 <div className='flex flex-col'>
@@ -52,14 +49,10 @@ export default function ExecuteJob({ data, input, jobID,  onClose, openModal, ch
                 </div>
                 <div className='flex flex-col'>
                     <label className="font-bold">Job Input</label>
-                    <span>{input[0]}</span>
+                    <span>{input}</span>
                 </div>
 
-                {chain.id == HYPERSPACE_ID ? <ActionButton loading={loading} onClick={startComputing} text="Make Deal" /> :
-                    <OpenButton text="Change to HyperSpace"
-                        onClick={() => switchNetwork?.(HYPERSPACE_ID)}
-                    />
-                }
+               <ActionButton loading={loading} onClick={startComputing} text="Start Computation" /> 
 
             </div>
         </ModalLayout>
