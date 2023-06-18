@@ -6,7 +6,7 @@
 <img src="public/Screenshot-2023-06-18-151429.webp" alt="alt text" width="40%"/>
 </p>
 
-- [Youtube Demo video](https://www.youtube.com/watch?v=1scDw7K2KPU)
+- [Vimeo Demo video](https://player.vimeo.com/video/831227384?h=c54456f508)
 
 **Authors**
  * [nijoe1](https://github.com/nijoe1)
