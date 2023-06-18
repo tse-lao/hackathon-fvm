@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../elements/LoadingSpinner";
 import LoadingIcon from "../elements/loading/LoadingIcon";
+import DataNotFound from "../elements/message/DataNotFound";
 const PROVIDE_ACCESS = "Please confirm and sign your data to provide access to the contract";
 const VALIDATE_VALUE = "We are confirming if the provided data is corresponding the dataformat of the dataset. ";
 const RECORD_CONTRIBUTION = "Confirm your contribution to the contract, the owner is only able to see decrypt you data if a certain amount of contributions are made";
@@ -69,7 +70,9 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
       setCoutner(i+1)
       setStatus(PROVIDE_ACCESS)
       const cid = selectedOptions[i];
-      const response = await shareFile(cid, creator, address, tokenID);
+       
+      await shareFile(cid, creator, address, tokenID);
+
       
 
       if (tokenID < 1 && selectedOptions.length == 1) {
@@ -134,10 +137,7 @@ export default function GrantAccess({ tokenID, metadataCID, address, creator, mi
                 <span className="ml-4 text-gray-600 text-md overflow-hidden overflow-ellipsis whitespace-nowrap max-w-full">{item.data.name}  </span>
               </label>
             )) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500 text-xl font-medium">No data available</p>
-                <p className="text-gray-400 text-md">Please find in descripotion how t.</p>
-              </div>
+              <DataNotFound message="No files with this metadata" />
             )}
 
           </div>

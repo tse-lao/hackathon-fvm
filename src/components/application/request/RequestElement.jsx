@@ -1,3 +1,4 @@
+import { ListBulletIcon, UserIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import Category from "../elements/Category";
 export default function RequestElement({ index, request }) {
@@ -12,10 +13,11 @@ export default function RequestElement({ index, request }) {
       <div className="flex flex-col justify-between ">
 
           <span className="text-sm text-gray-700">
-            Creator {request.creator}
+             <UserIcon height={16} />{request.creator}
           </span>
           <span className="text-sm text-gray-700">
-            Totals Rows: {request.minimumRowsOnSubmission}
+            <ListBulletIcon height={16}/>
+               {request.minimumRowsOnSubmission}
           </span>
       </div>
     </div>

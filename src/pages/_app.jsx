@@ -5,7 +5,7 @@ import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { WagmiConfig, configureChains, createClient } from 'wagmi';
-import { arbitrum, filecoinHyperspace, polygon, polygonMumbai } from "wagmi/chains";
+import { arbitrum, filecoinCalibration, filecoinHyperspace, polygon, polygonMumbai } from "wagmi/chains";
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { publicProvider } from 'wagmi/providers/public';
 import '../styles/tailwind.css';
@@ -20,7 +20,7 @@ const db = new Polybase({
 
 // Configure chains & providers with the Public provider.
 const { chains, provider, webSocketProvider } = configureChains(
-  [polygonMumbai, arbitrum, polygon, filecoinHyperspace],
+  [polygonMumbai, arbitrum, polygon, filecoinHyperspace, filecoinCalibration],
   [publicProvider()],
 )
 

@@ -1,7 +1,7 @@
 import { useContract } from "@/hooks/useContract";
 import useNftStorage from "@/hooks/useNftStorage";
 import { analyzeJSONStructure, readJSONFromFileInput } from "@/lib/dataHelper";
-import { usePolybase } from "@polybase/react";
+import lighthouse from "@lighthouse-web3/sdk";
 import { useState } from "react";
 import 'react-tagsinput/react-tagsinput.css';
 import { toast } from "react-toastify";
@@ -11,10 +11,9 @@ import LoadingSpinner from "../application/elements/LoadingSpinner";
 import InputField from "../application/elements/input/InputField";
 import TextArea from "../application/elements/input/TextArea";
 
-
 export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) {
     const { address } = useAccount();
-    const {createJob} = useContract();
+    const { createJob } = useContract();
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -22,20 +21,14 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
         spec_end: "",
         numOfInputs: 0,
         categories: [],
-        metadata: "no_metadatA",
+        metadata: "no_metadata",
     });
     const [loadingFile, setLoadingFile] = useState(false);
     const [loadingMeta, setLoadingMeta] = useState(false);
-    const [jobCid, SetJobCid] = useState(null);
+    const [file, setFile] = useState(null);
     const [metadata, setMetadata] = useState(dataFormat);
 
-    const polybase = usePolybase();
     const { uploadMetadata } = useNftStorage();
-
-
-    const handleTagChange = (tags) => {
-        setFormData({ ...formData, categories: tags });
-    };
 
 
 
@@ -57,6 +50,18 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                 setLoadingMeta(false);
             }
         });
+    }
+    
+    const uploadFile = async (e) => {
+        const apiKey = getLighthouse(address);
+        setLoadingFile(true)
+        const file = e.target.files[0];
+        let upload = await lighthouse.upload(file, apiKey);
+        if(upload.data.Hash){
+            setFile(upload.data.Hash)
+        }
+        
+        setLoadingFile(false)
     }
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -88,45 +93,11 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
         }).then((result) => {
             console.log(result)
             if(result.status === "success"){
-                //call the backend to look for the job id 
                 onClose();
             }
         })
-
-
-        //const result = await createJob(formData.name, formData.description, formData.spec_start, formData.spec_end, metadata, formData.categories, address);
     };
 
-    async function createNewJob(name, description, spec_start, spec_end, dataformat, categories, owner) {
-
-        //TODO: change this to only select one job title and add just the spec_start and spec_end
-        const updatedAt = new Date().toISOString();
-        const newId = uuidv4();
-        
-       
-        return new Promise(async (resolve, reject) => {
-            try {
-                const collection = await polybase.collection("Jobs").create([
-                    newId,
-                    name,
-                    description,
-                    spec_start,
-                    spec_end,
-                    dataformat,
-                    categories,
-                    updatedAt,
-                    owner
-                ])
-
-                resolve(collection)
-            } catch (error) {
-                reject(error)
-            }
-
-        }); 
-
-        //id, name, description, jobCid, datafromat, categories, createdAt, owner
-    }
 
 
     return (
@@ -148,20 +119,39 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                     onChange={handleChange}
                     required
                 />
+                {file ? (
+                    <div className="items-center">
+                    cid: 
+                        <a href={`https://gateway.lighthouse.storage/ipfs/${metadata}`}
+                            className="text-cf-600 hover:text-cf-500"
+                        >{file}</a>
+                    </div>
+
+                ) : (
+                    loadingFile ? <LoadingSpinner loadingText='uploading file' /> :
+                        <div>
+                            <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">
+                                Upload Program
+                            </label>
+                            <input
+                                type="file"
+                                name="metadata" id="metadata" onChange={uploadFile} required
+                                accept="*"
+                            />
+                        </div>
+                )}
                 <TextArea
                     label="Spec Start"
                     name="spec_start"
                     rows={2}
                     value={formData.spec_start}
                     onChange={handleChange}
-                    code={true}
                     required
                 />
                 <TextArea
                     label="Spec End"
                     name="spec_end"
                     rows={2}
-                    code={true}
                     value={formData.spec_end}
                     onChange={handleChange}
                     required
@@ -175,21 +165,19 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                     onChange={handleChange}
                     required
                 />
-
-
+                
                 {metadata ? (
                     <div className="items-center">
                         <a href={`https://gateway.ipfs.io/ipfs/${metadata}`}
                             className="text-cf-600 hover:text-cf-500"
                         >Preview metadata</a>
-
                     </div>
 
                 ) : (
                     loadingMeta ? <LoadingSpinner loadingText='uploading metadata' /> :
                         <div>
                             <label htmlFor="requestData" className="block text-md mb-2 font-medium text-gray-700">
-                                Upload to analyze metadata
+                                Upload metadat
                             </label>
                             <input
                                 type="file"
@@ -198,6 +186,8 @@ export default function CreateJob({ onClose, changeOpen, getOpen, dataFormat }) 
                             />
                         </div>
                 )}
+                
+              
                 <button
                     type="submit"
                     onClick={handleSubmit}

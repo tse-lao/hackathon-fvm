@@ -1,5 +1,6 @@
 import Contributions from "@/components/application/data/Contributions";
 import LoadingFull from "@/components/application/elements/loading/LoadingFull";
+import CreateDataSetProposal from "@/components/application/request/CreateDataSetProposal";
 import GrantAccess from "@/components/application/request/GrantAccess";
 import GenerateDataset from "@/components/marketplace/GenerateDataset";
 import { DB_main } from '@/constants';
@@ -22,6 +23,7 @@ export default function GetRequestDetails() {
   const { address } = useAccount();
   const [data, setData] = useState(null);
   const [showGrant, setShowGrant] = useState(true);
+  const [isDao, setIsDao] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalContributions, setTotalContributions] = useState(0);
 
@@ -40,6 +42,11 @@ export default function GetRequestDetails() {
       const data2 = await result2.json();
       setTotalContributions(data2)
       setLoading(false)
+      
+      //TODO: check if the address is a eo or a contract
+      let isContract = ethers.utils.isAddress(data.creator); 
+      
+      setIsDao(isContract);
       
 
     }
@@ -118,7 +125,7 @@ export default function GetRequestDetails() {
     {data && (
       <main className="py-10">
         {/* Page header */}
-        {isModalOpen && <GenerateDataset tokenId={id} onClose={() => setIsModalOpen(false)}/>}
+        {isModalOpen && isDao ? <CreateDataSetProposal creator={data.creator} tokenId={id} onClose={() => setIsModalOpen(false)}/>:  <GenerateDataset dao={isDao} tokenId={id} onClose={() => setIsModalOpen(false)}/>}
         
       
         <div className="mx-auto max-w-3xl px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">

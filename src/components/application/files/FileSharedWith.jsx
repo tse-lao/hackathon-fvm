@@ -1,7 +1,6 @@
 import { readJWT } from "@/hooks/useLighthouse";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import lighthouse from "@lighthouse-web3/sdk";
-import { useDocument } from "@polybase/react";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -21,7 +20,6 @@ export default function FileSharedWith({ cid }) {
         cid: 'QmQ4RtiVh43E1QUKq2aNcSAzLv5WELxwdnncj3Mjp4PCUk'
     })
 
-    const { data, loading, error } = useDocument()
 
     useEffect(() => {
 

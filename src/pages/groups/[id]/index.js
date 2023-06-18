@@ -1,14 +1,18 @@
 "use client"
 
+import { ActionButton } from "@/components/application/elements/buttons/ActionButton";
 import ProfileBalance from "@/components/application/profile/stats/ProfileBalance";
 import GroupBountyProposal from "@/components/groups/details/GroupBountyProposal";
+import GroupDeals from "@/components/groups/details/GroupDeals";
 import GroupDetail from "@/components/groups/details/GroupDetail";
 import GroupProposals from "@/components/groups/details/GroupProposals";
 import GroupTransactions from "@/components/groups/details/GroupTransactions";
 import GroupDataRequest from "@/components/groups/details/data/GroupDataRequest";
+import { useContract } from "@/hooks/useContract";
 import Layout from "@/pages/Layout";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useBalance } from "wagmi";
 
 
@@ -17,13 +21,19 @@ import { useBalance } from "wagmi";
 export default function GroupDetailPage() {
     const router = useRouter()
     const [active, setActive] = useState('details')
+    const { createDataDAO, getMarketBalance } = useContract();
     const { id } = router.query
     const { data: balance } = useBalance({ address: id })
-
+    const [loading, setLoading] = useState(true);
     const [details, setDetails] = useState(
         {
             name: "something",
-            description: "something ellse"
+            description: "something ellse",
+            dataDao: {
+                address: null,
+                dataCap: 0,
+                marketBalance: 0
+            }
         }
     );
     const [members, setMembers] = useState([]);
@@ -31,10 +41,27 @@ export default function GroupDetailPage() {
     useEffect(() => {
         const getData = async () => {
             const details = await fetch(`/api/tableland/multisig/details?multiSig='${id}'`)
+            const getDAO = await fetch(`/api/tableland/multisig/dao?multiSig=${id}`)
+            const dao = await getDAO.json();
+            console.log(dao.result[0]);
 
             const resultDetails = await details.json();
             console.log(resultDetails);
+
+
             setDetails(resultDetails.result[0])
+
+            if (resultDetails.length > 0) {
+
+                const marketBalance = await getMarketBalance(resultDetails.result[0]);
+                const dataCap = await getDataCap(resultDetails.result[0]);
+                let daoDetails = {
+                    address: resultDetails.result[0],
+                    dataCap: dataCap,
+                    marketBalance: marketBalance
+
+                }
+            }
 
             let mem = []
             for (let i = 0; i < resultDetails.result[0].members.length; i++) {
@@ -42,12 +69,26 @@ export default function GroupDetailPage() {
             }
 
 
+
             setMembers(mem)
+            setLoading(false)
         }
         if (id == undefined) return;
 
         getData()
-    }, [id])
+    }, [id]);
+
+    const createStorage = async () => {
+
+        console.log(members);
+        console.log(id);
+        toast.promise(createDataDAO(members, id), {
+            pending: 'Creating Data DAO',
+            success: 'Data DAO Created',
+            error: 'Error Creating Data DAO',
+
+        })
+    }
 
 
     return (
@@ -64,16 +105,32 @@ export default function GroupDetailPage() {
                     </div>
                     <div className="col-span-1">
                         {balance && <ProfileBalance token="matic" balance={balance.formatted} />}
+
+                        {details.dataDao.address ? (
+                            <div>
+                                <span> {details.dataDao.address}</span>
+                                <span> {details.dataDao.marketBalance}</span>
+                                <span> {details.dataDao.dataCap}</span>
+                            </div>
+                        ) : (
+                            <div>
+                                <ActionButton onClick={createStorage} text="Create Storage" />
+                            </div>
+                        )}
+
                     </div>
+
+
 
                 </div>
                 <div className='flex gap-6 flex-wrap'>
                     <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer  ${active === 'details' && 'text-cf-500'}`} onClick={() => setActive('details')}>Details</span>
-                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'proposals' && 'text-cf-500'}`} onClick={() => setActive('proposals')}>Proposals</span>
-                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'transactions' && ' text-cf-500'}`} onClick={() => setActive('transactions')}>Transations</span>
-                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'data-request' && 'text-cf-500'}`} onClick={() => setActive('data-request')}>Data Request</span>
-                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'job-request' && 'text-cf-500'}`} onClick={() => setActive('job-request')}>Job Request</span>
-                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer   ${active == 'group-files' && 'text-cf-500'}`} onClick={() => setActive('group-files')}>Files</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer  ${active == 'proposals' && 'text-cf-500'}`} onClick={() => setActive('proposals')}>Proposals</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer  ${active == 'transactions' && ' text-cf-500'}`} onClick={() => setActive('transactions')}>Transations</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer  ${active == 'data-request' && 'text-cf-500'}`} onClick={() => setActive('data-request')}>Data Request</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer  ${active == 'job-request' && 'text-cf-500'}`} onClick={() => setActive('job-request')}>Job Request</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer  ${active == 'group-files' && 'text-cf-500'}`} onClick={() => setActive('group-files')}>Files</span>
+                    <span className={`hover:text-cf-500 px-4 py-2 cursor-pointer  ${active == 'group-deals' && 'text-cf-500'}`} onClick={() => setActive('group-deals')}>Deals</span>
                 </div>
 
                 <div className=' w-[800px] p-8 rounded-md '>
@@ -82,10 +139,8 @@ export default function GroupDetailPage() {
                     {active == 'transactions' && <GroupTransactions address={id} confirmationTable={details.confirmationTable} proposalTable={details.proposalTable} numberOfConfirmations={details.numberOfConfirmations} />}
                     {active == 'job-request' && <GroupBountyProposal address={id} />}
                     {active == 'data-request' && <GroupDataRequest address={id} />}
-                    {active == 'group-files' && <GroupDataRequest address={id} />}
-
-
-
+                    {active == 'group-files' && <GroupFiles address={id} />}
+                    {active == 'group-deals' && <GroupDeals address={id} />}
                 </div>
             </div>
 

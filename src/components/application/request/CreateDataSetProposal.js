@@ -1,46 +1,35 @@
 import { useContract } from '@/hooks/useContract';
 import { uploadCarFileFromCid } from '@/hooks/useLighthouse';
 import { getSignature, retrieveMergeCID } from '@/hooks/useLitProtocol';
-import { getContributionSplit } from '@/hooks/useTableland';
 import { ethers } from 'ethers';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
-import ModalLayout from '../ModalLayout';
-import LoadingIcon from '../application/elements/loading/LoadingIcon';
 
-export default function GenerateDataset({ tokenId, onClose, dao }) {
+import { TextField } from '@/components/Fields';
+import ModalLayout from '@/components/ModalLayout';
+import LoadingIcon from '../elements/loading/LoadingIcon';
+
+export default function CreateDataSetProposal({ tokenId, creator, onClose }) {
     const { address } = useAccount();
     const [splitterContract, setSplitterContract] = useState(null);
     const [mergedCID, setMergedCID] = useState(null);
     const [mintPrice, setMintPrice] = useState(0.001);
     const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "", 
+        description: ""
+    })
 
     const router = useRouter();
-    const { CreateSpitter, createDB_NFT } = useContract();
+    const { multisigCreateDatabaseProposal } = useContract();
     const [payload, setPayload] = useState(null);
-    async function createSplitterContract() {
-        setLoading(true);
-        const contributors = await getContributionSplit(tokenId);
-        console.log(contributors);
-        try {
-            const hash = await CreateSpitter(address, contributors.contributors, contributors.percentage);
-            console.log(hash);
 
-            let contract = hash.events[0].data.replace("0x000000000000000000000000", "0x");
-            console.log(contract);
-            
-            setSplitterContract(contract);
-
-        } catch (e) {
-            console.log(e);
-        }
-        
-        setLoading(false);
-
-    }
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
 
     const mergeCID = async () => {
         setLoading(true);
@@ -69,7 +58,19 @@ export default function GenerateDataset({ tokenId, onClose, dao }) {
         const sign = await getSignature(toSign);
 
         
-        toast.promise(createDB_NFT(tokenId, mergedCID, mintPrice, splitterContract, payload, sign.v, sign.r, sign.s),{
+        if(formData.name.length < 3 || formData.description.length < 5){
+            toast.error("make sure you have a proposal name and description")
+        }
+        
+        toast.promise(multisigCreateDatabaseProposal(
+            creator, 
+            formData.name, 
+            formData.description, 
+            tokenID, 
+            mergedCID, 
+            mintPrice, 
+            payload, 
+            ),{
             pending: 'Preparing Database into NFT',
             success: 'Database ready for minting, enjoy the rewards!',
             error: 'Oops, something went wrong.'
@@ -93,27 +94,36 @@ export default function GenerateDataset({ tokenId, onClose, dao }) {
 
                 <div className='flex flex-col mt-4 gap-4'>
                     <h2 className='text-xl font-bold text-gray-800 '>
-                        Splitter Contract
+                        Proposal
                     </h2>
                     {splitterContract ? (
-                        <Link href={`/splitter/address/${splitterContract}`} className='text-cf-600 hover: text-cf-800' blank>
-                            {splitterContract}
-                        </Link>
+                        <div>
+                            <h2>{formData.name}</h2>
+                            <span>{formData.description}</span>
+                        </div>
                     ) : 
                         loading ? (
                             <LoadingIcon height={64}/>
                         ):(
                         <div className='flex flex-col gap-2'>
-                            <span className='text-gray-600'>
-                                First we need to create a splitter contract, where all the contributors will be able to collect rewards upon minting the NFT.
-                                If people are minting the NFT they will be rewarded with a fair percentage over the total contribution.
-
-
-                            </span>
+                        <TextField
+                        label="Repository Name"
+                        name="name"
+                        id="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                    />
+                    <TextArea
+                        label="Description"
+                        name="description"
+                        id="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                    />
                             <button
                                 className='bg-cf-500 hover:bg-cf-700 text-white font-bold py-2 px-4 rounded'
-                                onClick={createSplitterContract}
-                            >Create Splitter</button>
+                                onClick={setSplitterContract(true)}
+                            >Contine</button>
 
                         </div>
 

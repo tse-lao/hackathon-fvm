@@ -6,8 +6,7 @@ console.log(req.query.piece_cid)
         const params = new URLSearchParams({
           //statement: `SELECT ${DealRequests}.dealID FROM ${DealRequests} JOIN ${DealClientDeals} where ${DealRequests}.piece_cid = ${DealClientDeals}.piece_cid and ${DealRequests}.piece_cid = '${req.query.cid}'`,
             statement: `SELECT * FROM ${DealRequests} WHERE piece_cid = '${req.query.piece_cid}'`,
-        });
-    
+        });    
         try {
           const response = await fetch(`${url}?${params.toString()}`, {
             headers: {

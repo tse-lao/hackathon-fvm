@@ -80,24 +80,23 @@ export default function AssignBountyWinner({ onClose, multiSig, selected, bounty
   return (
 
       <div className="flex flex-col gap-6">
-        <span>Bounty ID: {bountyID}</span>
-        <span>Selected: {selected.name}</span>
-        <InputField
-          label="Name"
-          name="name"
-          type="text"
-          value={formData.name}
+        <span className='text text-gray-700'><strong>Proposal:</strong> {selected.name}</span>
+          <InputField
+            label="Name"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={handleChange}
+            required={true}
+          />
+          <TextArea
+          label="Description"
+          name="description"
+          rows="3"
+          value={formData.description}
           onChange={handleChange}
           required={true}
         />
-        <TextArea
-        label="Description"
-        name="description"
-        rows="3"
-        value={formData.description}
-        onChange={handleChange}
-        required={true}
-      />
         
 
         <ActionButton loading={loading} onClick={assignWinner} text="Assign Winner" />

@@ -197,8 +197,11 @@ export async function downloadCid(cid, address, tokenId) {
   const decrypted = await lighthouse.decryptFile(cid, keyObject.data.key);
 
   const date = getCurrentDateAsString();
+  
+  let name = tokenId.split(0); 
+  
 
-  const fileName = `token-${tokenId}-${date}.json`;
+  const fileName = `${name}-${date}.json`;
   
   console.log(fileName)
 

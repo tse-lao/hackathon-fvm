@@ -1,21 +1,30 @@
 import ModalLayout from '@/components/ModalLayout';
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
-import { MerkleHelper } from '@/constants/tableland';
+import DataNotFound from '@/components/application/elements/message/DataNotFound';
 import { useContract } from '@/hooks/useContract';
-import { shareAccessToRepo } from '@/lib/shareAccessToRepo';
+import { shareFile } from '@/hooks/useLighthouse';
 import { useEffect, useState } from "react";
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
+
 export default function ShareRepoModal({ cid, changeOpenModal }) {
-    const { submitData } = useContract();
+    const { submitData, addFileonMultisigFolder } = useContract();
     const { address } = useAccount();
     const [repos, setRepos] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
     
     useEffect(() => {
-        const fetchData = async (id) => {
-            const result = await fetch(`/api/tableland/merkle/all?where= WHERE ${MerkleHelper}.address='${address.toLowerCase()}'`);
-            const data = await result.json();
+        const fetchData = async () => {
+            
+            //get all the multisigs
+            let query = `WHERE ${MultisigOwnersTable}.ownerAddress='${address.toLowerCase()}'`
+            const res = await fetch(`/api/tableland/multisig/all?where=${query}`)
+      
+            const result = await res.json();
+            
+            console.log(result);
+            setData(result.result);
+            setLoading(false)
           console.log(data);
           setRepos(data.result);
       
@@ -52,27 +61,20 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
         
         for(let option in selectedOptions){
             console.log(selectedOptions[option])
-            const result = await shareAccessToRepo(selectedOptions[option], cid, address);
-
-            console.log(result);
-            toast.promise(submitData(
-                result.token,
-                result.cid,
-                result.count,
-                result.array,
-                result.index,
-                result.v,
-                result.r,
-                result.s
-            ), {
-                pending: "Submitting Data...",
-                success: "Data Submitted.",
-                error: "Error submitting data."
-    
-            })
             
+            //TODO: why do we need a tokenID here?
+            toast.promise(addFileonMultisigFolder(
+                item.tokenID, 
+                item.multisigAddress, 
+                cid
+            ))
+
+            //TODO: check if the access control works.... 
+            shareFile(cid, item.multisigAddress, address, item.tokenID)
+            
+   
         }
-        //const applyAccess = await applyAccessConditions(madrid);
+        
 
         // console.log(applyAccess)
 
@@ -86,10 +88,13 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
 
         //const arrayAddress = access.map((item) => item.address);
         //console.log(arrayAddress)
-     
-
+    
 
     };
+    
+    const applyAccessConditions = async() => {
+        
+    }
 
     return (
         <ModalLayout title="Share to group" onClose={changeOpenModal}>
@@ -100,18 +105,15 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
                         <label key={index} className={`flex items-center py-4 px-4 hover:bg-gray-100 transition-colors duration-150 cursor-pointer `}>
                             <input
                                 type="checkbox"
-                                value={item.tokenID}
-                                checked={selectedOptions.includes(item.tokenID)}
+                                value={item}
+                                checked={selectedOptions.includes(item)}
                                 onChange={handleCheckboxChange}
                                 className="form-checkbox text-cf-500 rounded-sm"
                             />
-                            <span className="ml-4 text-gray-600 text-md overflow-hidden overflow-ellipsis whitespace-nowrap max-w-full">{item.dbName}  </span>
+                            <span className="ml-4 text-gray-600 text-md overflow-hidden overflow-ellipsis whitespace-nowrap max-w-full">{item.name}  </span>
                         </label>
                     )) : (
-                        <div className="text-center py-8">
-                            <p className="text-gray-500 text-xl font-medium">No data available</p>
-                            <p className="text-gray-400 text-md">Please find in descripotion how t.</p>
-                        </div>
+                       <DataNotFound message="No groups available" />
                     )}
 
                 </div>

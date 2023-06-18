@@ -19,18 +19,18 @@ import {
   crossChainTablelandDealClientAddress,
   crossChainTablelandDealRewarderAbi,
   crossChainTablelandDealRewarderAddress,
+  dataDAOFactory,
+  dataDAOFactoryAbi,
   escrowAbi,
   helper,
   helperAbi,
+  openDBandFolderAbi,
+  openDBandFolderAddress,
   splitImplementation,
   splitterAbi,
-  openDBandFolderAddress,
-  openDBandFolderAbi,
-  dataDAOFactory,
-  dataDAOFactoryAbi,
 } from '../constants'
 
-export const useContract = () => {
+export const ≠useContract = () => {
   const { data: signer } = useSigner()
   const CalibrationProvider = new ethers.providers.JsonRpcProvider(
     "https://api.calibration.node.glif.io/rpc/v1"
@@ -1177,7 +1177,8 @@ const removeMemberFromPrivateFolder = async (
   ): Promise<any> => {
     
     try {
-      const tx = await TablelandDealClientFactory.createDataDAO(owners,multisigAddress,await ethers.utils.randomBytes(32),{gasLimit: 10000000000 })
+      const random = await ethers.utils.randomBytes(32) 
+      const tx = await TablelandDealClientFactory.createDataDAO(owners,multisigAddress,random, { gasLimit: 100000000 })
       console.log(tx)
       toast.update('Promise is pending', {
         render: 'Transaction sent, waiting for confirmation.',
@@ -1186,6 +1187,7 @@ const removeMemberFromPrivateFolder = async (
       const receipt = await tx.wait()
       return receipt
     } catch (error) {
+      console.log(error)
       toast.error('Promise rejected 🤯')
       throw error
     }

@@ -32,7 +32,7 @@ export default function JobBountyProposals({ bountyID, details }) {
       <ModalButton onClick={() => setOpenModal(!openModal)} text="Create" />
       {openModal && (
         (address.toLowerCase() == details.creator || details.members.includes(address.toLowerCase())) ? 
-        <AssignBountyWinner selected={selected} bountyID={bountyID} multiSig={multiSig} address={details.creator}/> 
+          <AssignBountyWinner selected={selected} bountyID={bountyID} multiSig={multiSig} address={details.creator}/> 
           :
          <CreateBountyProposal bountyID={bountyID} />
         )

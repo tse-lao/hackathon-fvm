@@ -80,8 +80,6 @@ export default function ViewFile() {
     /* Decrypt file */
     const decrypt = async (mimeType) => {
         const jwt = await readJWT(address);
-
-
         try {
             const keyObject = await lighthouse.fetchEncryptionKey(
                 cid,
@@ -96,15 +94,7 @@ export default function ViewFile() {
             console.log(e);
             setAccessDenied(true);
         }
-
-
-
-
-
-
         //setFileData(decrypted);
-
-
     }
 
 
