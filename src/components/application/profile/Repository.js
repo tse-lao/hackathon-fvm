@@ -45,7 +45,7 @@ export default function Groups() {
         className="fixed bottom-12 right-12 bg-cf-500 text-white px-4 py-2 rounded"
         href="/groups/add"
       >
-        Create Multisig
+        Create Group
       </Link>
     </div>
 
