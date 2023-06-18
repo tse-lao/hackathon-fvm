@@ -1,6 +1,8 @@
+
 import ModalLayout from '@/components/ModalLayout';
 import { ActionButton } from '@/components/application/elements/buttons/ActionButton';
 import DataNotFound from '@/components/application/elements/message/DataNotFound';
+import { MultisigOwnersTable } from '@/constants/tableland';
 import { useContract } from '@/hooks/useContract';
 import { shareFile } from '@/hooks/useLighthouse';
 import { useEffect, useState } from "react";
@@ -23,7 +25,7 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
             const result = await res.json();
             
             console.log(result);
-            setData(result.result);
+            setRepos(result.result);
             setLoading(false)
           console.log(data);
           setRepos(data.result);
@@ -35,6 +37,7 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
 
     const handleCheckboxChange = (e) => {
         const checkedValue = e.target.value;
+        console.log(e);
         const isChecked = e.target.checked;
     
         if (isChecked) {
@@ -64,13 +67,13 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
             
             //TODO: why do we need a tokenID here?
             toast.promise(addFileonMultisigFolder(
-                item.tokenID, 
-                item.multisigAddress, 
+                option.tokenID, 
+                option.multisigAddress, 
                 cid
             ))
 
             //TODO: check if the access control works.... 
-            shareFile(cid, item.multisigAddress, address, item.tokenID)
+            shareFile(cid, option.multisigAddress, address, option.tokenID)
             
    
         }
@@ -92,9 +95,6 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
 
     };
     
-    const applyAccessConditions = async() => {
-        
-    }
 
     return (
         <ModalLayout title="Share to group" onClose={changeOpenModal}>
@@ -105,7 +105,7 @@ export default function ShareRepoModal({ cid, changeOpenModal }) {
                         <label key={index} className={`flex items-center py-4 px-4 hover:bg-gray-100 transition-colors duration-150 cursor-pointer `}>
                             <input
                                 type="checkbox"
-                                value={item}
+                                value={{item}}
                                 checked={selectedOptions.includes(item)}
                                 onChange={handleCheckboxChange}
                                 className="form-checkbox text-cf-500 rounded-sm"

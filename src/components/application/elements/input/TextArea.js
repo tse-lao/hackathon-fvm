@@ -1,7 +1,7 @@
 export default function TextArea({ label, name, rows, value, onChange, required, code }) {
     return (
       <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={name} className="block text-sm font-bold text-gray-700">
           {label}
         </label>
         <textarea

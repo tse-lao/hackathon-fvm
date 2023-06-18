@@ -30,7 +30,7 @@ import {
   splitterAbi,
 } from '../constants'
 
-export const ≠useContract = () => {
+export const useContract = () => {
   const { data: signer } = useSigner()
   const CalibrationProvider = new ethers.providers.JsonRpcProvider(
     "https://api.calibration.node.glif.io/rpc/v1"

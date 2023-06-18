@@ -25,15 +25,15 @@ export default function GroupDetailPage() {
     const { id } = router.query
     const { data: balance } = useBalance({ address: id })
     const [loading, setLoading] = useState(true);
+    const [dataDao, setDataDao] = useState({
+        address: "0x00",
+        dataCap: 0,
+        marketBalance: 0
+    });
     const [details, setDetails] = useState(
         {
             name: "something",
             description: "something ellse",
-            dataDao: {
-                address: null,
-                dataCap: 0,
-                marketBalance: 0
-            }
         }
     );
     const [members, setMembers] = useState([]);
@@ -61,12 +61,16 @@ export default function GroupDetailPage() {
                     marketBalance: marketBalance
 
                 }
+                
+                setDataDao(daoDetails)
             }
 
             let mem = []
             for (let i = 0; i < resultDetails.result[0].members.length; i++) {
                 mem.push(resultDetails.result[0].members[i].ownerAddress)
             }
+            
+            
 
 
 
@@ -106,7 +110,7 @@ export default function GroupDetailPage() {
                     <div className="col-span-1">
                         {balance && <ProfileBalance token="matic" balance={balance.formatted} />}
 
-                        {details.dataDao.address ? (
+                        {dataDao.address != "0x00" ? (
                             <div>
                                 <span> {details.dataDao.address}</span>
                                 <span> {details.dataDao.marketBalance}</span>
