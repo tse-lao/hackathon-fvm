@@ -25,7 +25,7 @@ Our inspiration for the DataBridge platform came from the need to revolutionize 
 
  DataBridge is a decentralized application (DApp) designed to fulfill these needs it functions as a database aggregator. DataBridge empowers users to create decentralized databases (DBs) and request contributions from others. Once a DB reaches a predetermined threshold, the requestor can create a DB NFT. To ensure fair distribution of token minting revenues to DB contributors, our platform utilizes a splitter contract created using the thirdWeb splitter contract factory. 
  
- With DataBridge, users can leverage verifiable computations over data through the Lillypad oracle and facilitate deal-making using Filecoin proposed contracts. Onboard open datasets into IPFS and Filecoin through the DataBridge platform while maintaining your own private repository of encrypted files. Additionally, create sharable private repositories with secure access control, where only whitelisted addresses have the privilege to add files and access encrypted contents. To enhance security and efficiency, DataBridge incorporates Merkle trees for access control.
+ With DataBridge, users can leverage verifiable computations using the bacalhau network and facilitate deal-making using Filecoin proposed contracts. Onboard open datasets into IPFS and Filecoin through the DataBridge platform while maintaining your own private repository of encrypted files. Additionally, create sharable private repositories with secure access control, where only whitelisted addresses have the privilege to add files and access encrypted contents. To enhance security and efficiency, DataBridge incorporates Merkle trees for access control.
 
 ### DataBridge offers the following key improvements on HackFS:
 
