@@ -1178,7 +1178,7 @@ const removeMemberFromPrivateFolder = async (
     
     try {
       const random = await ethers.utils.randomBytes(32) 
-      const tx = await TablelandDealClientFactory.createDataDAO(owners,multisigAddress,random, { gasLimit: 100000000 })
+      const tx = await TablelandDealClientFactory.createDataDAO(owners,multisigAddress,random, { gasLimit: 10000000000 })
       console.log(tx)
       toast.update('Promise is pending', {
         render: 'Transaction sent, waiting for confirmation.',
