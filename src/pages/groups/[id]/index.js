@@ -1,6 +1,5 @@
 "use client"
 
-import { ActionButton } from "@/components/application/elements/buttons/ActionButton";
 import ProfileBalance from "@/components/application/profile/stats/ProfileBalance";
 import GroupBountyProposal from "@/components/groups/details/GroupBountyProposal";
 import GroupDeals from "@/components/groups/details/GroupDeals";
@@ -13,7 +12,7 @@ import Layout from "@/pages/Layout";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useBalance } from "wagmi";
+import { useBalance, useSwitchNetwork } from "wagmi";
 
 
 
@@ -25,6 +24,7 @@ export default function GroupDetailPage() {
     const { id } = router.query
     const { data: balance } = useBalance({ address: id })
     const [loading, setLoading] = useState(true);
+    const { switchNetwork } = useSwitchNetwork();
     const [dataDao, setDataDao] = useState({
         address: "0x00",
         dataCap: 0,
@@ -86,12 +86,21 @@ export default function GroupDetailPage() {
 
         console.log(members);
         console.log(id);
+        
+        await switchNetwork({
+            chainId: '314159',
+        })
+
         toast.promise(createDataDAO(members, id), {
             pending: 'Creating Data DAO',
             success: 'Data DAO Created',
             error: 'Error Creating Data DAO',
 
         })
+        
+        await switchNetwork({
+            chainId: 80001, 
+            })
     }
 
 
@@ -118,7 +127,6 @@ export default function GroupDetailPage() {
                             </div>
                         ) : (
                             <div>
-                                <ActionButton onClick={createStorage} text="Create Storage" />
                             </div>
                         )}
 

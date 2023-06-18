@@ -192,8 +192,7 @@ export const useContract = () => {
         description,
         categories,
         requiredRows,
-        minimumRowsOnSubmission,
-        { gasLimit: 1000000 }
+        minimumRowsOnSubmission
       )
 
       console.log(tx)
@@ -230,8 +229,7 @@ export const useContract = () => {
       dbCID,
       dataFormatCID,
       mimeType,
-      label,
-      { gasLimit: 1000000 }
+      label
     )
     return await tx.wait()
   }
@@ -246,8 +244,7 @@ export const useContract = () => {
       const tx = await folderAndOpenDB.createMultisigFolder(
         folderName,
         description,
-        multisigAddress,
-        { gasLimit: 1000000 }
+        multisigAddress
       )
 
       console.log(tx)
@@ -276,8 +273,7 @@ const addFileonMultisigFolder = async (
     const tx = await folderAndOpenDB.addFileOnMultisigGroup(
       tokenId,
       multisigAddress,
-      dataCID,
-      { gasLimit: 1000000 }
+      dataCID
     )
 
     console.log(tx)
@@ -309,8 +305,7 @@ const addFileonMultisigFolder = async (
         repoName,
         description,
         adminAddress,
-        membersAddresses,
-        { gasLimit: 1000000 }
+        membersAddresses
       )
 
       console.log(tx)
@@ -337,8 +332,7 @@ const addFileonPrivateFolder = async (
   try {
     const tx = await folderAndOpenDB.addFileOnPrivateGroup(
       tokenId,
-      dataCID,
-      { gasLimit: 1000000 }
+      dataCID
     )
 
     console.log(tx)
@@ -366,8 +360,7 @@ const hasFolderAccess = async (
     const hasAccess = await folderAndOpenDB.hasFolderAccess(
       sender,
       multisig,
-      folderID,
-      { gasLimit: 1000000 }
+      folderID
     )
 
     console.log(hasAccess)
@@ -397,8 +390,7 @@ const addMemberToPrivateFolder = async (
   try {
     const tx = await folderAndOpenDB.addMemberToPrivateFolder(
       folderID,
-      newMember,
-      { gasLimit: 1000000 }
+      newMember
     )
 
     console.log(tx)
@@ -424,8 +416,7 @@ const removeMemberFromPrivateFolder = async (
   try {
     const tx = await folderAndOpenDB.removeMemberFromPrivateFolder(
       folderID,
-      newMember,
-      { gasLimit: 1000000 }
+      newMember
     )
 
     console.log(tx)
@@ -459,8 +450,7 @@ const removeMemberFromPrivateFolder = async (
       const tx = await DB_NFT.setRepoSubmitAccessMerkleRoot(
         tokenId,
         SubmitProof,
-        SubmitRoot,
-        { gasLimit: 1000000 }
+        SubmitRoot
       )
 
       console.log(tx)
@@ -496,9 +486,6 @@ const removeMemberFromPrivateFolder = async (
         v,
         r,
         s,
-        {
-          gasLimit: 1000000,
-        }
       )
 
       console.log(tx)
@@ -540,7 +527,6 @@ const removeMemberFromPrivateFolder = async (
         v,
         r,
         s,
-        { gasLimit: 1000000 }
       )
       console.log(tx)
       toast.update('Promise is pending', {
@@ -566,9 +552,7 @@ const removeMemberFromPrivateFolder = async (
     r: string,
     s: string
   ) => {
-    const tx = await DB_NFT.updateDB(tokenId, dbCID, piece_cid, v, r, s, {
-      gasLimit: 1000000,
-    })
+    const tx = await DB_NFT.updateDB(tokenId, dbCID, piece_cid, v, r, s)
     return await tx.wait()
   }
 
@@ -578,8 +562,7 @@ const removeMemberFromPrivateFolder = async (
 
   const mint = async (tokenid: number, mintPrice: string) => {
     const tx = await DB_NFT.mintDB(tokenid, {
-      value: mintPrice,
-      gasLimit: 1000000,
+      value: mintPrice
     })
     return await tx.wait()
   }
@@ -633,9 +616,7 @@ const removeMemberFromPrivateFolder = async (
         MultisigAbi,
         signer!
       )
-      const tx = await multisig.submitTransaction(Multisigaddress,0,data, name,description,  {
-        gasLimit: 1000000,
-      })
+      const tx = await multisig.submitTransaction(Multisigaddress,0,data, name,description)
       
       console.log(tx)
       toast.update('Promise is pending', {
@@ -817,9 +798,6 @@ const removeMemberFromPrivateFolder = async (
         dataCID,
         rows,
         multisigAddress,
-        {
-          gasLimit: 1000000,
-        }
       )
 
       console.log(tx)
@@ -886,7 +864,7 @@ const removeMemberFromPrivateFolder = async (
         MultisigAbi,
         signer!
       )
-      const tx = await multisig.confirmTransaction(transactionIndex)
+      const tx = await multisig.confirmTransaction(transactionIndex, {gasLimit: 10000000})
       
       console.log(tx)
       toast.update('Promise is pending', {
@@ -1023,7 +1001,9 @@ const removeMemberFromPrivateFolder = async (
         endCommand,
         numberOfInputs,
         winner,
-
+        {
+          gasLimit: 10000000
+        }
       )
       console.log(tx)
       toast.update('Promise is pending', {
@@ -1049,10 +1029,7 @@ const removeMemberFromPrivateFolder = async (
       try {
         const tx = await tablelandBacalhau.ExecutionFulfilled(
           requestID,
-          result,
-          {
-            gasLimit: 100000000,
-          }
+          result
         )
         console.log(tx)
         toast.update('Promise is pending', {
@@ -1178,7 +1155,11 @@ const removeMemberFromPrivateFolder = async (
     
     try {
       const random = await ethers.utils.randomBytes(32) 
+<<<<<<< HEAD
+      const tx = await TablelandDealClientFactory.createDataDAO(owners,multisigAddress,random)
+=======
       const tx = await TablelandDealClientFactory.createDataDAO(owners,multisigAddress,random, { gasLimit: 200000000 })
+>>>>>>> f79ffeb88615506f75bf3b77c5e01b5b46763356
       console.log(tx)
       toast.update('Promise is pending', {
         render: 'Transaction sent, waiting for confirmation.',
@@ -1223,7 +1204,11 @@ const removeMemberFromPrivateFolder = async (
       signer!
     )
     try {
+<<<<<<< HEAD
+      const tx = await tablelandDealClient.makeDealProposal(DealRequestStruct)
+=======
       const tx = await tablelandDealClient.makeDealProposal(DealRequestStruct,{gasLimit: 7920027 })
+>>>>>>> f79ffeb88615506f75bf3b77c5e01b5b46763356
       console.log(tx)
       toast.update('Promise is pending', {
         render: 'Transaction sent, waiting for confirmation.',

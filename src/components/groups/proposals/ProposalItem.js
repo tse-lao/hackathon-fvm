@@ -25,14 +25,7 @@ export default function ProposalItem({ proposal, numberOfConfirmations, multiSig
     }, [proposal.confirmations.length])
     
     const confirmProposal = async () => {
-        if(status === 1){
-            toast.promise(multisigExecuteTransaction(multiSigAddress, proposal.proposalID), {
-                pending: 'Confirming execution of the proposal',
-                success: 'Confirmed executed the transaction',
-                error: 'Error execution proposal'
-            })
-            return;
-        }
+
 
         toast.promise(multisigConfirmTransaction(multiSigAddress, proposal.proposalID), {
             pending: 'Confirming proposal',

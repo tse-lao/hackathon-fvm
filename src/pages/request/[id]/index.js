@@ -44,7 +44,9 @@ export default function GetRequestDetails() {
       setLoading(false)
       
       //TODO: check if the address is a eo or a contract
-      let isContract = ethers.utils.isAddress(data.creator); 
+      let isContract = checkDao(data.creator); 
+    
+    // if it comes here, then it's not a contract.
       
       setIsDao(isContract);
       
@@ -54,6 +56,15 @@ export default function GetRequestDetails() {
   }, [id])
 
 
+  const checkDao = async () => {
+    try {
+      const code = await provider.getCode(data.creator);
+      if (code !== '0x') return true;
+    } catch (error) {}
+    
+    return false;
+  }
+    
   const mintNFT = async () => {
     
     //Getting splitter and create the spliitter contract.

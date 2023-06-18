@@ -1,4 +1,3 @@
-import UploadModal from '@/components/UploadModal';
 import LoadingFull from '@/components/application/elements/loading/LoadingFull';
 import Drive from '@/components/application/files/organised/Drive';
 import { useIsMounted } from '@/hooks/useIsMounted';
@@ -28,20 +27,9 @@ export default function Files() {
                                 Below find all the files uploaded by you.
                             </p>
                         </div>
-                        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex gap-2">
-
-                            <button
-                                type="button"
-                                onClick={openModal}
-                                className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >
-                                Add file
-                            </button>
-                        </div>
                     </div>
                     <Drive address={address} />
                 </div>
-                {isModalOpen && <UploadModal onClose={() => setIsModalOpen(false)} />}
             </Layout>
         )
     }

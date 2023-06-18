@@ -1,7 +1,8 @@
  
 export const calibration = {
   id: 314159,
-  name: 'Filecoin Calibration Network',
+  name: 'Calibration',
+  chainId: '0x4cb2f', 
   network: 'calibration',
   nativeCurrency: {
     decimals: 18,
