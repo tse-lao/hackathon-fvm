@@ -1200,7 +1200,6 @@ const removeMemberFromPrivateFolder = async (
     cidHex: string,
     pieceSize: number,
     label: string,
-    dataDAOAddress :string
   ): Promise<any> => {
     let latestBlock = await provider.getBlock("latest")
     let startEpoch = latestBlock.number + 27670
@@ -1219,7 +1218,7 @@ const removeMemberFromPrivateFolder = async (
       [locationRef, carSize, false, false],
     ]
     const tablelandDealClient = new ethers.Contract(
-      dataDAOAddress,
+      "0xC5944E04EE98ac6248Cdf8CB85a51447Bf35D39e",
       crossChainTablelandDealClientAbi,
       signer!
     )
