@@ -32,6 +32,8 @@ Our inspiration for the DataBridge platform came from the need to revolutionize 
 #### Improved Bacalhau Server
 The Bacalhau server has been enhanced to handle any operation within the network. It now utilizes a Lilypad-inspired architecture and integrates a contract with Tableland for decentralized SQL-based contract indexing. This integration enables users to create Job bounty requests using the newly established Oracle contract. The workflow involves describing the desired job, creating a bounty request, and receiving proposals from data scientists. The bounty creator selects the most suitable proposal, assigns it to the winner, and rewards them with the bounty. This incentivizes job creators and benefits the Bacalhau executor server, similar to Lilypad's approach.
 
+- [Bacalhau-Server Repo](https://github.com/tse-lao/bacalhau-server)
+
 #### Enhanced dealClient Contract
 The dealClient contract now functions as a dataDAO, allowing members to request storage on the Filecoin network and replicate important files. It can handle multiple replication requests for a single file, ensuring redundancy and data availability. The contract has been integrated with a table in Tableland, simplifying access to deals published by storage providers. Additionally, it utilizes the Filecoin dataCap API to query the network and make verified deals, further enhancing data management capabilities.
 
